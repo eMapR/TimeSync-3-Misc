@@ -11,36 +11,34 @@
 		<style>
 			.axis path, 
 			.axis line {
-				fill: none;
-				stroke: black;
-				shape-rendering: crispEdges;
+			fill: none;
+			stroke: black;
+			shape-rendering: crispEdges;
 			}
 			.axis text {
-				/*isplay:none;*/
-				font-family: sans-serif;
-				font-size: 11px;
+			/*isplay:none;*/
+			font-family: sans-serif;
+			font-size: 11px;
 			}
 			.dropdown:hover .dropdown-menu {
-				display: block;
+			display: block;
 			}
 			.dropdown-menu {
-				margin-top: 0;
+			margin-top: 0;
 			}
 			.container{margin-top:60px;}
-						li:hover{background-color:#f1f1f1;}
+			li:hover{background-color:#f1f1f1;}
 			.dropdown-menu .active{background-color:#dbdbdb;}
 			li{
-				padding-left:10px;
-				cursor:pointer;
+			padding-left:10px;
+			cursor:pointer;
 			}
 			.btn-default:focus{background-color:white;}
-
 		</style>
-	
 	</head>
 	<body>
-		<div class="container">			
-			<div class="col-md-8">                     
+		<div class="container">
+			<div class="col-md-8">
 				<div id="plot"></div>
 			</div>
 			<div class="col-md-4">
@@ -48,7 +46,7 @@
 					<button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Indices
 					<span class="caret"></span></button>
 					<ul class="dropdown-menu" id="index-list">
-						<li class="active" id="B1">Band 1</li>
+						<li class="" id="B1">Band 1</li>
 						<li class="" id="B2">Band 2</li>
 						<li class="" href="#" id="B3">Band 3</li>
 						<li class="" href="#" id="B4">Band 4</li>
@@ -56,7 +54,7 @@
 						<li class="" href="#" id="B7">Band 7</li>
 						<li class="" href="#" id="TCB">TC Brightness</li>
 						<li class="" href="#" id="TCG">TC Greenness</li>
-						<li class="" href="#" id="TCW">TC Wetness</li>
+						<li class="active" href="#" id="TCW">TC Wetness</li>
 						<li class="" href="#" id="TCA">TC Angle</li>
 						<li class="" href="#" id="NDVI">NDVI</li>
 						<li class="" href="#" id="NBR">NBR</li>
@@ -118,326 +116,320 @@
 				</div>
 			</div>
 		</div>
-
 		<script>
-
-		//function to retrieve json data - this is synchronous right now $getJSON is asynchronous and doesn't allow access to the json data outside the function. 
-		//Could possibly put all calculations in the function and use asynchronously
-		function getJson(url) {
-            return JSON.parse($.ajax({
-                type: 'GET',
-                url: url,
-                dataType: 'json',
-                global: false,
-                async: false,
-                success: function (data) {
-                    return data;
-                }
-            }).responseText);
-        }
-		
-		//function to return stretch color array by index
-		function setcolor(data, index, stretch, n_stdev, len) {
-			minv = stretch[index].mean - (stretch[index].stdev * n_stdev);
-			maxv = stretch[index].mean + (stretch[index].stdev * n_stdev);
-			var color = [];
-			for (i = 0; i < len; i++) {
-				if (data.Values[i][index] < minv) data.Values[i][index] = minv;
-				if (data.Values[i][index] > maxv) data.Values[i][index] = maxv;
-				color[i] = ((data.Values[i][index] - minv) / (maxv - minv)) * 255;
-			}
-			return color;
-		}
-		
-		//function to return stretch color array for RGB display
-		function scaledRGB(data, Rindex, Gindex, Bindex, stretch, n_stdev, len){
-			var colorR = setcolor(data, Rindex, stretch, n_stdev, len);
-			var colorG = setcolor(data, Gindex, stretch, n_stdev, len);
-			var colorB = setcolor(data, Bindex, stretch, n_stdev, len);
-			var color = [];
-			for(var i=0;i<len;i++) {color[i] = d3.rgb(colorR[i],colorG[i],colorB[i]);}
-			return color;
-		}
-		
-		//define the D3 scatterplot updating function
-		function update(data, index, rgbcolor, domain){
-			//ymin = d3.min(data.Values, function(d) {return d[index];});
-			//ymax = d3.max(data.Values, function(d) {return d[index];});
-							
-			//Update scale domains
-			yscale.domain([domain[index].min, domain[index].max]);
-
+			//function to retrieve json data - this is synchronous right now.  The easy $getJSON function is asynchronous 
+			//and doesn't allow access to the json data outside the function. 
+			//Could possibly put everything inside the $getJSON function and use asynchronously
+			function getJson(url) {
+			          return JSON.parse($.ajax({
+			              type: 'GET',
+			              url: url,
+			              dataType: 'json',
+			              global: false,
+			              async: false,
+			              success: function (data) {
+			                  return data;
+			              }
+			          }).responseText);
+			      }
 			
-			//Update the circles with new data
-			svg.selectAll("circle")
-				.data(data.Values)					   
-				.transition()
-				.duration(500)
-				.attr("cx", function(d){return xscale(d.ImageDate);})
-				.attr("cy", function(d){return yscale(d[index]);})
-				.style("fill",function(d,i){return rgbcolor[i]})
-			
-			//Update y axis
-			svg.select(".y.axis")
-				.transition()
-				.duration(500)
-				.call(yaxis);
-		}
-		
-
-		//////////////////////////////////////////////////////////////////////////////////////////////////////////
-		//////////DEFINE STATIS VARIABLES/////////
-		
-		//define the mean and stdev of indices for stretching
-		var stretch={
-				"TCB":{
-				  "mean":3098,
-				  "stdev":1247
-				},
-				"TCG":{
-				  "mean":1549,
-				  "stdev":799
-				},
-				"TCW":{
-				  "mean":-701,
-				  "stdev":772
+			//function to return stretch color array by index
+			function setcolor(data, index, stretch, n_stdev, len) {
+				minv = stretch[index].mean - (stretch[index].stdev * n_stdev);
+				maxv = stretch[index].mean + (stretch[index].stdev * n_stdev);
+				var color = [];
+				for (i = 0; i < len; i++) {
+					if (data.Values[i][index] < minv) data.Values[i][index] = minv;
+					if (data.Values[i][index] > maxv) data.Values[i][index] = maxv;
+					color[i] = ((data.Values[i][index] - minv) / (maxv - minv)) * 255;
 				}
-		}
-		
-		var domain={
-				"B1":{
-					"min":-50,
-					"max":2000
-				},
-				"B2":{
-					"min":-50,
-					"max":2000
-				},
-				"B3":{
-					"min":-50,
-					"max":2500
-				},
-				"B4":{
-					"min":-50,
-					"max":4500
-				},
-				"B5":{
-					"min":-50,
-					"max":4500
-				},
-				"B7":{
-					"min":-50,
-					"max":4000
-				},
-				"TCB":{
-					"min":0,
-					"max":7000
-				},
-				"TCG":{
-					"min":-500,
-					"max":2500
-				},
-				"TCW":{
-					"min":-3500,
-					"max":500
-				},
-				"TCA":{
-					"min":-500,
-					"max":4000
-				},
-				"NDVI":{
-					"min":-1,
-					"max":1
-				},
-				"NBR":{
-					"min":-1,
-					"max":1
-				}			
-		}
-		
-   	
-        var data = getJson("./test3.json"); //get the data
-		var len = Object.keys(data.Values).length; //get the number of years
-		
-		var b1; //set some variables that will be reused
-		var b2; //set some variables that will be reused
-		var b3; //set some variables that will be reused
-		var b4; //set some variables that will be reused
-		var b5; //set some variables that will be reused
-		var b7; //set some variables that will be reused
-		var bcoef = [0.2043, 0.4158, 0.5524, 0.5741, 0.3124, 0.2303]; 
-		var gcoef = [-0.1603, -0.2819, -0.4934, 0.7940, -0.0002, -0.1446];
-		var wcoef = [0.0315, 0.2021, 0.3102, 0.1594,-0.6806, -0.6109];
-		
-		//calculate indices and include them in the json file
-		for(i=0; i<len; i++){
-			//pull out the values by band from json so we don't have to deal with the long json text to call a value when calculating indices 
-			b1 = data.Values[i].B1;
-			b2 = data.Values[i].B2;
-			b3 = data.Values[i].B3;
-			b4 = data.Values[i].B4;
-			b5 = data.Values[i].B5;
-			b7 = data.Values[i].B7;
-		
-			//calculate indices
-			data.Values[i]["TCB"]=(b1*bcoef[0])+(b2*bcoef[1])+(b3*bcoef[2])+(b4*bcoef[3])+(b5*bcoef[4])+(b7*bcoef[5]);		
-			data.Values[i]["TCG"]=(b1*gcoef[0])+(b2*gcoef[1])+(b3*gcoef[2])+(b4*gcoef[3])+(b5*gcoef[4])+(b7*gcoef[5]);
-			data.Values[i]["TCW"]=(b1*wcoef[0])+(b2*wcoef[1])+(b3*wcoef[2])+(b4*wcoef[3])+(b5*wcoef[4])+(b7*wcoef[5]);
-			data.Values[i]["TCA"]=Math.atan(data.Values[i].TCG/data.Values[i].TCB) * (180/Math.PI) * 100;
-			data.Values[i]["NBR"]=(b1-b7)/(b4+b7);
-			data.Values[i]["NDVI"]=(b4-b3)/(b4+b3);
-		}
-		
-		//get the scaled rgb color
-		var rgbcolor = scaledRGB(data, "TCB", "TCG", "TCW", stretch, 2, len);
-		
-		//////////////////////////////////////////////////////////////////////////////////////////////////////////
-		////////////start plotting/////////////
-		
-		var index = "B1"
-
-		//get the range of the x values
-		//var ymin = d3.min(data.Values, function(d) {return d[index];});
-		//var ymax = d3.max(data.Values, function(d) {return d[index];});
-		var xmin = d3.min(data.Values, function(d) {return d.ImageDate;});
-		var xmax = d3.max(data.Values, function(d) {return d.ImageDate;});
-		
-		//adjust the ranges so there is some buffer
-		xmin = xmin-1;
-		xmax = xmax+1;
-		//ymin = ymin-100;
-		//ymax = ymax+100;
-
-		
-		
-		//define the width of the svg plot area
-		var w = 700; 
-		var h = 300; 
-		
-		//define the plot margins
-		var pt = 10; //plot top
-		var pr = 20; //plot right
-		var pl = 50; //plot left
-		var pb = 37; //plot bottom
-		
-		///////////////////////////////////////////////////////	
-		//define the scales
-		var xscale = d3.scale.linear()
-			.domain([xmin, xmax])
-			.range([pl, w - pr]);
-		
-		var yscale = d3.scale.linear()
-			.domain([domain[index].min, domain[index].max])
-			.range([h - pb, pt]);
+				return color;
+			}
 			
-		///////////////////////////////////////////////////////		
-		//define the axis
-		var xaxis = d3.svg.axis()
-			.scale(xscale)
-			.orient("bottom")
-			.tickFormat(d3.format("d"));
-		
-		var yaxis = d3.svg.axis()
-			.scale(yscale)
-			.orient("left");
-		
-		///////////////////////////////////////////////////////		
-		//append the svg element to the html body - set the svg width and height
-		var svg = d3.select(plot)
-			.append("svg")
-			.attr("width", w)
-			.attr("height", h);
-		
-		///////////////////////////////////////////////////////
-		//create the circles that will go into the svg
-		var circles = svg.selectAll("circle")
-			.data(data.Values)
-			.enter()
-			.append("circle")
-			.style("fill",function(d,i){return rgbcolor[i]})
-			//.style("fill","black")
-
-	
-		//define the circle attributes		
-		circles.attr("cx", function(d){return xscale(d.ImageDate);})
-			.attr("cy", function(d){return yscale(d[index]);})
-			.attr("r", 8);
-		
-		
-		////////////////////////////////////////		
-		//create the x axis
-		svg.append("g")
-			.attr("class", "x axis")
-			.attr("transform", "translate(0," + (h - pb) + ")")
-			.call(xaxis);
+			//function to return scaled color arrays as RGB color
+			function scaledRGB(data, Rindex, Gindex, Bindex, stretch, n_stdev, len){
+				var colorR = setcolor(data, Rindex, stretch, n_stdev, len);
+				var colorG = setcolor(data, Gindex, stretch, n_stdev, len);
+				var colorB = setcolor(data, Bindex, stretch, n_stdev, len);
+				var color = [];
+				for(var i=0;i<len;i++) {color[i] = d3.rgb(colorR[i],colorG[i],colorB[i]);}
+				return color;
+			}
 			
-		//Create the y axis
-		svg.append("g")
-			.attr("class", "y axis")
-			.attr("transform", "translate(" + pl + ",0)")
-			.call(yaxis);
-		
-		////////////////////////////////////////		
-		//text label for the x axis
-		svg.append("text")      
-			.attr("x", w-pr)
-			.attr("y", h-8)
-			.style("text-anchor", "end")
-		
-		//text label for the y axis			
-		svg.append("text")
-			.attr("transform", "rotate(-90)")
-			.attr("y", 10)
-			.attr("x", pt*-1)
-			.style("text-anchor", "end")
-		
-		//update the plot when buttons are clicked
-		//d3.select("#B1").on("click", function(){update(data,"B1");});
-		//d3.select("#B2").on("click", function(){update(data,"B2");});
-		//d3.select("#B3").on("click", function(){update(data,"B3");});
-		//d3.select("#B4").on("click", function(){update(data,"B4");});
-		//d3.select("#B5").on("click", function(){update(data,"B5");});
-		//d3.select("#B7").on("click", function(){update(data,"B7");});
-		//d3.select("#TCB").on("click", function(){update(data,"TCB");});
-		//d3.select("#TCG").on("click", function(){update(data,"TCG");});
-		//d3.select("#TCW").on("click", function(){update(data,"TCW");});
-		//d3.select("#TCA").on("click", function(){update(data,"TCA");});
-		//d3.select("#NDVI").on("click", function(){update(data,"NDVI");});
-		//d3.select("#NBR").on("click", function(){update(data,"NBR");});
-									
-		
-		
-		//right now the points and colors are redrawn each time, in the future could break this down
-		//by which button type is pressed, either index of color and only update each the point locations
-		//or the colors
-		$(".dropdown-menu li").click(function() { //This will attach the function to all the input elements
-			var listid = $(this).closest("ul").attr('id');
-			var indexid = $(this).attr('id');
-			var newactive = "#"+listid+" #"+indexid;
-			var activesearch = "#"+listid+" .active";
-			var activeid = $(activesearch).attr('id');
-			var oldactive = "#"+listid+" #"+activeid;
-			$(oldactive).removeClass('active');
-			$(newactive).addClass('active');
-			var indexid = $("#index-list li.active").attr('id');		
-			var redid = $("#red-list li.active").attr('id');
-			var greenid = $("#green-list li.active").attr('id');
-			var blueid = $("#blue-list li.active").attr('id');
-			rgbcolor1 = scaledRGB(data, redid, greenid, blueid, stretch, 2, len);
-			update(data, indexid, rgbcolor1, domain);
+			//function to update the D3 scatterplot when new selection are made
+			function update(data, index, rgbcolor, domain){
+								
+				//update scale domains
+				yscale.domain([domain[index].min, domain[index].max]);
+				
+				//update the circles with new data
+				svg.selectAll("circle")
+					.data(data.Values)					   
+					.transition()
+					.duration(500)
+					.attr("cx", function(d){return xscale(d.ImageDate);})
+					.attr("cy", function(d){return yscale(d[index]);})
+					.style("fill",function(d,i){return rgbcolor[i]})
+				
+				//update y axis
+				svg.select(".y.axis")
+					.transition()
+					.duration(500)
+					.call(yaxis);
+			}
 			
-		});
-		
-		
-
-
-
-		
-		
-		
+			
+			//////////////////////////////////////////////////////////////////////////////////////////////////////////
+			//////////DEFINE STATIC VARIABLES/////////
+			
+			//define the mean and stdev of indices for stretching
+			var stretch={
+					"B1":{
+					  "mean":604,
+					  "stdev":670
+					},
+					"B2":{
+					  "mean":827,
+					  "stdev":410
+					},
+					"B3":{
+					  "mean":903,
+					  "stdev":555
+					},
+					"B4":{
+					  "mean":2317,
+					  "stdev":659
+					},
+					"B5":{
+					  "mean":2287,
+					  "stdev":900
+					},
+					"B7":{
+					  "mean":1611,
+					  "stdev":829
+					},
+					"TCB":{
+					  "mean":3098,
+					  "stdev":1247
+					},
+					"TCG":{
+					  "mean":1549,
+					  "stdev":799
+					},
+					"TCW":{
+					  "mean":-701,
+					  "stdev":772
+					},
+					"TCG":{
+					  "mean":1549,
+					  "stdev":799
+					}
+					
+			}
+			
+			//define the domain of the indices for scaling to the range of the plot
+			var domain={
+					"B1":{
+						"min":-50,
+						"max":2000
+					},
+					"B2":{
+						"min":-50,
+						"max":2000
+					},
+					"B3":{
+						"min":-50,
+						"max":2500
+					},
+					"B4":{
+						"min":-50,
+						"max":4500
+					},
+					"B5":{
+						"min":-50,
+						"max":4500
+					},
+					"B7":{
+						"min":-50,
+						"max":4000
+					},
+					"TCB":{
+						"min":0,
+						"max":7000
+					},
+					"TCG":{
+						"min":-500,
+						"max":2500
+					},
+					"TCW":{
+						"min":-3500,
+						"max":500
+					},
+					"TCA":{
+						"min":-500,
+						"max":4000
+					},
+					"NDVI":{
+						"min":-1,
+						"max":1
+					},
+					"NBR":{
+						"min":-1,
+						"max":1
+					}			
+			}
+			
+			var data = getJson("./test3.json"); //get the data
+			var len = Object.keys(data.Values).length; //get the number of years
+			
+			var b1; //set some variables that will be reused
+			var b2; //set some variables that will be reused
+			var b3; //set some variables that will be reused
+			var b4; //set some variables that will be reused
+			var b5; //set some variables that will be reused
+			var b7; //set some variables that will be reused
+			var bcoef = [0.2043, 0.4158, 0.5524, 0.5741, 0.3124, 0.2303]; 
+			var gcoef = [-0.1603, -0.2819, -0.4934, 0.7940, -0.0002, -0.1446];
+			var wcoef = [0.0315, 0.2021, 0.3102, 0.1594,-0.6806, -0.6109];
+			
+			//calculate indices and include them in the json object
+			for(i=0; i<len; i++){
+				//pull out the values by band from json object so we don't have to deal with the long json text to 
+				//call a value when calculating indices 
+				b1 = data.Values[i].B1;
+				b2 = data.Values[i].B2;
+				b3 = data.Values[i].B3;
+				b4 = data.Values[i].B4;
+				b5 = data.Values[i].B5;
+				b7 = data.Values[i].B7;
+			
+				//calculate indices
+				data.Values[i]["TCB"]=(b1*bcoef[0])+(b2*bcoef[1])+(b3*bcoef[2])+(b4*bcoef[3])+(b5*bcoef[4])+(b7*bcoef[5]);		
+				data.Values[i]["TCG"]=(b1*gcoef[0])+(b2*gcoef[1])+(b3*gcoef[2])+(b4*gcoef[3])+(b5*gcoef[4])+(b7*gcoef[5]);
+				data.Values[i]["TCW"]=(b1*wcoef[0])+(b2*wcoef[1])+(b3*wcoef[2])+(b4*wcoef[3])+(b5*wcoef[4])+(b7*wcoef[5]);
+				data.Values[i]["TCA"]=Math.atan(data.Values[i].TCG/data.Values[i].TCB) * (180/Math.PI) * 100;
+				data.Values[i]["NBR"]=(b1-b7)/(b4+b7);
+				data.Values[i]["NDVI"]=(b4-b3)/(b4+b3);
+			}
+			
+			//get the scaled rgb color
+			var rgbcolor = scaledRGB(data, "TCB", "TCG", "TCW", stretch, 2, len);
+			
+			//////////////////////////////////////////////////////////////////////////////////////////////////////////
+			////////////START PLOTTING/////////////
+			
+			var index = "TCW" //default index to display
+			
+			//get the range of the x values
+			var xmin = d3.min(data.Values, function(d) {return d.ImageDate;});
+			var xmax = d3.max(data.Values, function(d) {return d.ImageDate;});
+			
+			//adjust the ranges so there is some buffer
+			xmin = xmin-1;
+			xmax = xmax+1;
+			
+			//define the width of the svg plot area
+			var w = 700; 
+			var h = 300; 
+			
+			//define the plot margins
+			var pt = 10; //plot top
+			var pr = 20; //plot right
+			var pl = 50; //plot left
+			var pb = 37; //plot bottom
+			
+			///////////////////////////////////////////////////////	
+			//define the scales
+			var xscale = d3.scale.linear()
+				.domain([xmin, xmax])
+				.range([pl, w - pr]);
+			
+			var yscale = d3.scale.linear()
+				.domain([domain[index].min, domain[index].max])
+				.range([h - pb, pt]);
+				
+			///////////////////////////////////////////////////////		
+			//define the axis
+			var xaxis = d3.svg.axis()
+				.scale(xscale)
+				.orient("bottom")
+				.tickFormat(d3.format("d"));
+			
+			var yaxis = d3.svg.axis()
+				.scale(yscale)
+				.orient("left");
+			
+			///////////////////////////////////////////////////////		
+			//append the svg element to the html body - set the svg width and height
+			var svg = d3.select(plot)
+				.append("svg")
+				.attr("width", w)
+				.attr("height", h);
+			
+			///////////////////////////////////////////////////////
+			//create the circles that will go into the svg
+			var circles = svg.selectAll("circle")
+				.data(data.Values)
+				.enter()
+				.append("circle")
+				.style("fill",function(d,i){return rgbcolor[i]})
+				//.style("fill","black")
+			
+			
+			//define the circle attributes		
+			circles.attr("cx", function(d){return xscale(d.ImageDate);})
+				.attr("cy", function(d){return yscale(d[index]);})
+				.attr("r", 10);
+			
+			
+			////////////////////////////////////////		
+			//create the x axis
+			svg.append("g")
+				.attr("class", "x axis")
+				.attr("transform", "translate(0," + (h - pb) + ")")
+				.call(xaxis);
+				
+			//create the y axis
+			svg.append("g")
+				.attr("class", "y axis")
+				.attr("transform", "translate(" + pl + ",0)")
+				.call(yaxis);
+			
+			////////////////////////////////////////		
+			//text label for the x axis
+			svg.append("text")      
+				.attr("x", w-pr)
+				.attr("y", h-8)
+				.style("text-anchor", "end")
+			
+			//text label for the y axis			
+			svg.append("text")
+				.attr("transform", "rotate(-90)")
+				.attr("y", 10)
+				.attr("x", pt*-1)
+				.style("text-anchor", "end")
+			
+			//update the plot when buttons are clicked		
+			//right now the points and colors are redrawn each time, in the future could break this down
+			//by which button type is pressed, either index or color and only update either the point locations
+			//or the colors
+			$(".dropdown-menu li").click(function() { //This will attach the function to all the input elements
+				var listid = $(this).closest("ul").attr('id');
+				var indexid = $(this).attr('id');
+				var newactive = "#"+listid+" #"+indexid;
+				var activesearch = "#"+listid+" .active";
+				var activeid = $(activesearch).attr('id');
+				var oldactive = "#"+listid+" #"+activeid;
+				$(oldactive).removeClass('active');
+				$(newactive).addClass('active');
+				var indexid = $("#index-list li.active").attr('id');		
+				var redid = $("#red-list li.active").attr('id');
+				var greenid = $("#green-list li.active").attr('id');
+				var blueid = $("#blue-list li.active").attr('id');
+				rgbcolor1 = scaledRGB(data, redid, greenid, blueid, stretch, 2, len);
+				update(data, indexid, rgbcolor1, domain);	
+			});
+			
 		</script>
-		
-		
-
 	</body>
-</html> 
+</html>
