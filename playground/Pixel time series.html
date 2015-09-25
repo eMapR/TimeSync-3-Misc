@@ -223,8 +223,19 @@
 					"TCG":{
 					  "mean":1549,
 					  "stdev":799
-					}
-					
+					},
+					"TCA":{
+					  "mean":1532,
+					  "stdev":1002
+					},
+					"NDVI":{
+					  "mean":0.4600587,
+					  "stdev":0.1833235
+					},
+					"NBR":{
+					  "mean":0.2174783,
+					  "stdev":0.2293639
+					}		
 			}
 			
 			//define the domain of the indices for scaling to the range of the plot
@@ -308,7 +319,7 @@
 				data.Values[i]["TCG"]=(b1*gcoef[0])+(b2*gcoef[1])+(b3*gcoef[2])+(b4*gcoef[3])+(b5*gcoef[4])+(b7*gcoef[5]);
 				data.Values[i]["TCW"]=(b1*wcoef[0])+(b2*wcoef[1])+(b3*wcoef[2])+(b4*wcoef[3])+(b5*wcoef[4])+(b7*wcoef[5]);
 				data.Values[i]["TCA"]=Math.atan(data.Values[i].TCG/data.Values[i].TCB) * (180/Math.PI) * 100;
-				data.Values[i]["NBR"]=(b1-b7)/(b4+b7);
+				data.Values[i]["NBR"]=(b4-b7)/(b4+b7);
 				data.Values[i]["NDVI"]=(b4-b3)/(b4+b3);
 			}
 			
