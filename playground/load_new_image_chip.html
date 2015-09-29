@@ -10,152 +10,241 @@
 		<script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
 		<script type="text/javascript" src="owlcarousel/jquery.mousewheel.min.js"></script>
 		<style>
-			.axis path, 
-			.axis line {
-			fill: none;
-			stroke: black;
-			shape-rendering: crispEdges;
-			}
-			.axis text {
-			/*isplay:none;*/
-			font-family: sans-serif;
-			font-size: 11px;
-			}
-			.dropdown:hover .dropdown-menu {
-			display: block;
-			}
-			.dropdown-menu {
-			margin-top: 0;
-			}
-			.container{margin-top:60px;}
-			li:hover{background-color:#f1f1f1;}
-			.dropdown-menu .active{background-color:#dbdbdb;}
-			li{
-			padding-left:10px;
-			cursor:pointer;
-			}
-			.btn-default:focus{background-color:white;}
 
-			.fixed img{
-				position: absolute;
-				top: 0px;
-				bottom: -999px;
-				left: -9999px;
-				right: -9999px;
-				margin: auto;
-				width:100%;
-				/*height:100%;*/
-				margin: auto;
+			.container{margin-top:60px;}
+			.chipholder img{
+				image-rendering:optimizeSpeed;             /* Legal fallback */
+				image-rendering:-moz-crisp-edges;          /* Firefox        */
+				image-rendering:-o-crisp-edges;            /* Opera          */
+				image-rendering:-webkit-optimize-contrast; /* Safari         */
+				image-rendering:optimize-contrast;         /* CSS3 Proposed  */
+				image-rendering:crisp-edges;               /* CSS4 Proposed  */
+				image-rendering:pixelated;                 /* CSS4 Proposed  */
+				-ms-interpolation-mode:nearest-neighbor;   /* IE8+           */
+			}
+			.chipholder{
+				display:inline-block;
+				position: relative;
+				width: 255px;
+				height: 255px;
+				overflow: hidden;
+				pointer-events: auto;
 			}
 			
-			.chips img{
-				z-index: -1;
+			.chipholder img{
+				
 				position: absolute;
 				top: 0px;
-				/*bottom: -99px;*/
 				left: -99999px;
 				right: -99999px;
 				margin: auto;
-				width:255;
-				/*height:100%;*/
-				margin: auto;
+				width: 255px;
 			}
-			.pixelated{
-			image-rendering:optimizeSpeed;             /* Legal fallback */
-			image-rendering:-moz-crisp-edges;          /* Firefox        */
-			image-rendering:-o-crisp-edges;            /* Opera          */
-			image-rendering:-webkit-optimize-contrast; /* Safari         */
-			image-rendering:optimize-contrast;         /* CSS3 Proposed  */
-			image-rendering:crisp-edges;               /* CSS4 Proposed  */
-			image-rendering:pixelated;                 /* CSS4 Proposed  */
-			-ms-interpolation-mode:nearest-neighbor;   /* IE8+           */
-			}
-			.chipholder{
-			position: relative;
-			width:255px;
-			height:255px;
-			overflow:hidden;
 			
-			}
 			.target{
-				position:absolute;
-				top:127px;
-				left:127px;
-				right:127px;
-				bottom:127px;
+				position: absolute;
+				top: 127px;
+				left: 127px;
+				right: 127px;
+				bottom: 127px;
 				border: 1px solid red;
-			
+			}
+			#chip-modal .modal-dialog {
+				height: 780px;
+				width: 1060px;
+				/*overflow-y: auto;*/
+			}
+			#chip-modal{
+				top:25px;
+				right:5%;
+
+				outline: none;
+			}
+			.chip-gallery{
+				height:780px;
+				overflow-y: auto;
 			}
 		</style>
 	</head>
 	<body>
 
 		<div class="container">
-			<button id="zoomin" class="btn btn-default" type="button" style="display:in-line block;">Zoom in</button>
-			<div class="chipholder pixelated chips">
-				<img src="chips/chips_2012.png">
-				<div class="target"></div>
-				<!-- <svg height="255" width="255"><path d="M127 127 L128 127 L128 128 L127 128 z" stroke="red" stroke-width=".5" fill="none"/></svg> -->
+			<div class="chip-gallery">
+				<div class="chipholder zoom">
+					<img src="chips/chips_2012.png">
+					<div class="target"></div>
+				</div>
+				<div class="chipholder zoom">
+					<img src="chips/chips_2012.png">
+					<div class="target"></div>
+				</div>
+				<div class="chipholder zoom">
+					<img src="chips/chips_2012.png">
+					<div class="target"></div>
+				</div>
+				<div class="chipholder zoom">
+					<img src="chips/chips_2012.png">
+					<div class="target"></div>
+				</div>
+				<div class="chipholder zoom">
+					<img src="chips/chips_2012.png">
+					<div class="target"></div>
+				</div>
+				<div class="chipholder zoom">
+					<img src="chips/chips_2012.png">
+					<div class="target"></div>
+				</div>
+				<div class="chipholder zoom">
+					<img src="chips/chips_2012.png">
+					<div class="target"></div>
+				</div>
+				<div class="chipholder zoom">
+					<img src="chips/chips_2012.png">
+					<div class="target"></div>
+				</div>
+				<div class="chipholder zoom">
+					<img src="chips/chips_2012.png">
+					<div class="target"></div>
+				</div>
+				<div class="chipholder zoom">
+					<img src="chips/chips_2012.png">
+					<div class="target"></div>
+				</div>
+				<div class="chipholder zoom">
+					<img src="chips/chips_2012.png">
+					<div class="target"></div>
+				</div>
+				<div class="chipholder zoom">
+					<img src="chips/chips_2012.png">
+					<div class="target"></div>
+				</div>
+				<div class="chipholder zoom">
+					<img src="chips/chips_2012.png">
+					<div class="target"></div>
+				</div>	
+				<div class="chipholder zoom">
+					<img src="chips/chips_2012.png">
+					<div class="target"></div>
+				</div>
+				<div class="chipholder zoom">
+					<img src="chips/chips_2012.png">
+					<div class="target"></div>
+				</div>
+				<div class="chipholder zoom">
+					<img src="chips/chips_2012.png">
+					<div class="target"></div>
+				</div>	
+				<div class="chipholder zoom">
+					<img src="chips/chips_2012.png">
+					<div class="target"></div>
+				</div>
+				<div class="chipholder zoom">
+					<img src="chips/chips_2012.png">
+					<div class="target"></div>
+				</div>
+				<div class="chipholder zoom">
+					<img src="chips/chips_2012.png">
+					<div class="target"></div>
+				</div>					
 			</div>
-			<div class="chipholder pixelated fixed">
-				<img src="chips/chips_2012.png">
-				<div class="target"></div>
-				<!-- <svg height="255" width="255"><path d="M100 100 L128 127 L200 200 L127 200 z" stroke="red" stroke-width="3" fill="none"/></svg> -->
+			
+ 			<!-- Modal -->
+			<div id="chip-modal" class="modal" role="dialog" > <!-- class:fade  data-backdrop="false" -->
+				<div class="modal-dialog">
+
+					<!-- Modal content -->
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal">&times;</button>
+							<h4 class="modal-title">Year</h4>
+						</div>
+						<div id="modal-chipholder" class="chip-gallery">
+
+						</div>
+					</div>
+				</div>
 			</div>
+			
 		</div>
 		<script>
 			
 			
 
+//$( ".chipholder" ).click(function( event ) {
+  //alert( "clicked: " + $(event.target).attr('class') );
+//});
+
+			
+			$(".chipholder").click(function(){
+                $( "#modal-chipholder" ).empty();
+				for(var i=1;i<20;i++){
+					$("#modal-chipholder").append('<div class="chipholder zoom"><img src="chips/chips_2012.png"><div class="target"></div></div>');
+				}
+				$("#chip-modal").modal("show");
+            });
+
 		    var cts = 1/255; //chip target scalar		
 		     
-			$("#zoomin").click(function(){
+
+			 
+			 
+			$(".targetsize").click(function(){
 				cts = 3/255
 				var reset = "126px"
-				$(".chips img").css("width", "255px");
-				$(".chips img").css("top", "0px");
+				$(".chipholder img").css("width", "255px");
+				$(".chipholder img").css("top", "0px");
 				$(".target").css("top", reset);
 				$(".target").css("left", reset);
 				$(".target").css("right", reset);
 				$(".target").css("bottom", reset);
 			});
 			
-			
-			$(".chips").mousewheel(function(e) {
-				//console.log(e. deltaY);
-				var wcur = parseFloat($(".chips img").css( "width" ));
-				var cto = parseFloat($(".target").css( "top" )); //current ship target offset
-				if(e.deltaY>0){
-					wnew = wcur*(2)+1; //+1
-					if (wnew < 20000){
-						wcss = wnew+"px";
-						console.log(wcss);
-						tcss = (((wnew-255)/2)*-1)+"px";
-						ctsadj = (cto-(wnew*cts)/4)+"px";
-						console.log(ctsadj);
-						$(".chips img").css("width", wcss);
-						$(".chips img").css("top", tcss);
-						$(".target").css("top", ctsadj);
-						$(".target").css("left", ctsadj);
-						$(".target").css("right", ctsadj);
-						$(".target").css("bottom", ctsadj);
-					}
-				} else{
-					wnew = (wcur - ((wcur-1)/2))-1;
-					if (wnew >= 255){
-						wcss = wnew+"px";
-						tcss = (((wnew-255)/2)*-1)+"px";
-						ctsadj = (cto+(wnew*cts)/2)+"px";
-						$(".chips img").css("width", wcss);
-						$(".chips img").css("top", tcss);
-						$(".target").css("top", ctsadj);
-						$(".target").css("left", ctsadj);
-						$(".target").css("right", ctsadj);
-						$(".target").css("bottom", ctsadj);
+			//when implementing this for real, the top of .chipholder id will have to be queried and adjusted individually
+			//since they will each have a different starting top offset
+			//$(".zoom").mousewheel(function(e) {
+			$(document).on("mousewheel",".zoom",function(e){
+				if(e.shiftKey){
+					var wcur = parseFloat($(".chipholder img").css( "width" ));
+					var cto = parseFloat($(".target").css( "top" ));
+					if(e.deltaY>0){
+						wnew = wcur*(2)+1; //+1
+						if (wnew <= 16383){ //doubled in size 6 times from original is max
+							wcss = wnew+"px";
+							tcss = (((wnew-255)/2)*-1)+"px";
+							ctsadj = (cto-(wnew*cts)/4)+"px";
+							$(".chipholder img").css({
+								"width": wcss,
+								"top": tcss
+							});
+							$(".target").css({
+								"top": ctsadj,
+								"left": ctsadj,
+								"right": ctsadj,
+								"bottom": ctsadj
+							});
+						}
+					}else{
+						wnew = (wcur - ((wcur-1)/2))-1;
+						if (wnew >= 255){
+							wcss = wnew+"px";
+							tcss = (((wnew-255)/2)*-1)+"px";
+							ctsadj = (cto+(wnew*cts)/2)+"px";
+							$(".chipholder img").css({
+								"width": wcss,
+								"top": tcss
+							});
+							$(".target").css({
+								"top": ctsadj,
+								"left": ctsadj,
+								"right": ctsadj,
+								"bottom": ctsadj
+							});
+						}
 					}
 				}
 			});
 		
+
 		
 		
 		</script>
