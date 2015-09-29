@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lan="en">
+	<head>
+		<title>Pixel time series</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+		<script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
+		<script type="text/javascript" src="owlcarousel/jquery.mousewheel.min.js"></script>
+		<style>
+			.axis path, 
+			.axis line {
+			fill: none;
+			stroke: black;
+			shape-rendering: crispEdges;
+			}
+			.axis text {
+			/*isplay:none;*/
+			font-family: sans-serif;
+			font-size: 11px;
+			}
+			.dropdown:hover .dropdown-menu {
+			display: block;
+			}
+			.dropdown-menu {
+			margin-top: 0;
+			}
+			.container{margin-top:60px;}
+			li:hover{background-color:#f1f1f1;}
+			.dropdown-menu .active{background-color:#dbdbdb;}
+			li{
+			padding-left:10px;
+			cursor:pointer;
+			}
+			.btn-default:focus{background-color:white;}
+
+			.fixed img{
+				position: absolute;
+				top: 0px;
+				bottom: -999px;
+				left: -9999px;
+				right: -9999px;
+				margin: auto;
+				width:100%;
+				/*height:100%;*/
+				margin: auto;
+			}
+			
+			.chips img{
+				z-index: -1;
+				position: absolute;
+				top: 0px;
+				/*bottom: -99px;*/
+				left: -99999px;
+				right: -99999px;
+				margin: auto;
+				width:255;
+				/*height:100%;*/
+				margin: auto;
+			}
+			.pixelated{
+			image-rendering:optimizeSpeed;             /* Legal fallback */
+			image-rendering:-moz-crisp-edges;          /* Firefox        */
+			image-rendering:-o-crisp-edges;            /* Opera          */
+			image-rendering:-webkit-optimize-contrast; /* Safari         */
+			image-rendering:optimize-contrast;         /* CSS3 Proposed  */
+			image-rendering:crisp-edges;               /* CSS4 Proposed  */
+			image-rendering:pixelated;                 /* CSS4 Proposed  */
+			-ms-interpolation-mode:nearest-neighbor;   /* IE8+           */
+			}
+			.chipholder{
+			position: relative;
+			width:255px;
+			height:255px;
+			overflow:hidden;
+			
+			}
+			.target{
+				position:absolute;
+				top:127px;
+				left:127px;
+				right:127px;
+				bottom:127px;
+				border: 1px solid red;
+			
+			}
+		</style>
+	</head>
+	<body>
+
+		<div class="container">
+			<button id="zoomin" class="btn btn-default" type="button" style="display:in-line block;">Zoom in</button>
+			<div class="chipholder pixelated chips">
+				<img src="chips/chips_2012.png">
+				<div class="target"></div>
+				<!-- <svg height="255" width="255"><path d="M127 127 L128 127 L128 128 L127 128 z" stroke="red" stroke-width=".5" fill="none"/></svg> -->
+			</div>
+			<div class="chipholder pixelated fixed">
+				<img src="chips/chips_2012.png">
+				<div class="target"></div>
+				<!-- <svg height="255" width="255"><path d="M100 100 L128 127 L200 200 L127 200 z" stroke="red" stroke-width="3" fill="none"/></svg> -->
+			</div>
+		</div>
+		<script>
+			
+			
+
+		    var cts = 1/255; //chip target scalar		
+		     
+			$("#zoomin").click(function(){
+				cts = 3/255
+				var reset = "126px"
+				$(".chips img").css("width", "255px");
+				$(".chips img").css("top", "0px");
+				$(".target").css("top", reset);
+				$(".target").css("left", reset);
+				$(".target").css("right", reset);
+				$(".target").css("bottom", reset);
+			});
+			
+			
+			$(".chips").mousewheel(function(e) {
+				//console.log(e. deltaY);
+				var wcur = parseFloat($(".chips img").css( "width" ));
+				var cto = parseFloat($(".target").css( "top" )); //current ship target offset
+				if(e.deltaY>0){
+					wnew = wcur*(2)+1; //+1
+					if (wnew < 20000){
+						wcss = wnew+"px";
+						console.log(wcss);
+						tcss = (((wnew-255)/2)*-1)+"px";
+						ctsadj = (cto-(wnew*cts)/4)+"px";
+						console.log(ctsadj);
+						$(".chips img").css("width", wcss);
+						$(".chips img").css("top", tcss);
+						$(".target").css("top", ctsadj);
+						$(".target").css("left", ctsadj);
+						$(".target").css("right", ctsadj);
+						$(".target").css("bottom", ctsadj);
+					}
+				} else{
+					wnew = (wcur - ((wcur-1)/2))-1;
+					if (wnew >= 255){
+						wcss = wnew+"px";
+						tcss = (((wnew-255)/2)*-1)+"px";
+						ctsadj = (cto+(wnew*cts)/2)+"px";
+						$(".chips img").css("width", wcss);
+						$(".chips img").css("top", tcss);
+						$(".target").css("top", ctsadj);
+						$(".target").css("left", ctsadj);
+						$(".target").css("right", ctsadj);
+						$(".target").css("bottom", ctsadj);
+					}
+				}
+			});
+		
+		
+		
+		</script>
+	</body>
+</html>
