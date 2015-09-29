@@ -175,29 +175,18 @@
 //});
 
 			
-			$(".chipholder").click(function(){
-                $( "#modal-chipholder" ).empty();
-				for(var i=1;i<20;i++){
-					$("#modal-chipholder").append('<div class="chipholder zoom"><img src="chips/chips_2012.png"><div class="target"></div></div>');
+			$(".chipholder").click(function(e){
+				if (e.shiftKey) {
+	                $( "#modal-chipholder" ).empty();
+					for(var i=1;i<20;i++){
+						$("#modal-chipholder").append('<div class="chipholder zoom"><img src="chips/chips_2012.png"><div class="target"></div></div>');
+					}
+					$("#chip-modal").modal("show");
 				}
-				$("#chip-modal").modal("show");
             });
-
-		    var cts = 1/255; //chip target scalar		
-		     
-
-			 
-			 
-			$(".targetsize").click(function(){
-				cts = 3/255
-				var reset = "126px"
-				$(".chipholder img").css("width", "255px");
-				$(".chipholder img").css("top", "0px");
-				$(".target").css("top", reset);
-				$(".target").css("left", reset);
-				$(".target").css("right", reset);
-				$(".target").css("bottom", reset);
-			});
+	
+			//TODO: sync zoomLevel across all chip holders.
+		    var zoomLevel = 1;
 			
 			//when implementing this for real, the top of .chipholder id will have to be queried and adjusted individually
 			//since they will each have a different starting top offset
@@ -207,11 +196,18 @@
 					var wcur = parseFloat($(".chipholder img").css( "width" ));
 					var cto = parseFloat($(".target").css( "top" ));
 					if(e.deltaY>0){
-						wnew = wcur*(2)+1; //+1
+						//TODO: use image dimension directly to simplify the following code.
+						wnew = wcur*(1.1)+1; //+1
+						zoomLevel *= 1.1;
+						if (zoomLevel > 60) {
+							zoomLevel = 60;
+							wnew = 16383;
+						}
 						if (wnew <= 16383){ //doubled in size 6 times from original is max
 							wcss = wnew+"px";
 							tcss = (((wnew-255)/2)*-1)+"px";
-							ctsadj = (cto-(wnew*cts)/4)+"px";
+							ctsadj = (255 - zoomLevel)/2 + 'px';
+
 							$(".chipholder img").css({
 								"width": wcss,
 								"top": tcss
@@ -224,11 +220,17 @@
 							});
 						}
 					}else{
-						wnew = (wcur - ((wcur-1)/2))-1;
+						//wnew = (wcur - ((wcur-1)/2))-1;
+						wnew = (wcur / 1.1)-1;
+						zoomLevel /= 1.1;
+						if (zoomLevel < 1.0) {
+							zoomLevel = 1.0;
+							wnew = 255;
+						}
 						if (wnew >= 255){
 							wcss = wnew+"px";
 							tcss = (((wnew-255)/2)*-1)+"px";
-							ctsadj = (cto+(wnew*cts)/2)+"px";
+							ctsadj = (255 - zoomLevel)/2 + 'px';
 							$(".chipholder img").css({
 								"width": wcss,
 								"top": tcss
@@ -243,9 +245,6 @@
 					}
 				}
 			});
-		
-
-		
 		
 		</script>
 	</body>
