@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lan="en">
+	<head>
+		<title>Chip strip</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+	</head>
+	<body>
+
+
+		<h1>Controller Window</h1>
+		<p>
+		  <button id="send">Send Message</button>
+		</p>
+		<div id="message"></div>
+		<script>
+			var receiver = window.open("./receiver.html","_blank","width=1060, height=700", "toolbar=0","titlebar=0","menubar=0");
+			var controller = window.frames;
+			var message = "this is from the controller"
+			$("#send").click(function(){receiver.postMessage(message, '*')});
+			
+			$(window).on("message onmessage",function(e){$("#message").append(e.originalEvent.data)});
+		</script>
+		
+		
+	</body>
+</html>
