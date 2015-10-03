@@ -15,10 +15,10 @@
 		</p>
 		<div id="message"></div>
 		<script>
-			var receiver = window.open("./receiver.html","_blank","width=500, height=500", "toolbar=0","titlebar=0","menubar=0");
+			var remote = window.open("./remote.html","_blank","width=500, height=500", "toolbar=0","titlebar=0","menubar=0");
 
 			var message = "this is from the origin window "
-			$("#send").click(function(){receiver.postMessage(message, '*')});
+			$("#send").click(function(){remote.postMessage(message, '*')});
 			
 			$(window).on("message onmessage",function(e){
 				$("#message").append(e.originalEvent.data)

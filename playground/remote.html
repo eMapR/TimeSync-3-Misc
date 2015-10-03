@@ -14,18 +14,18 @@
 		</p>
 		<div id="message"></div>
 		<script>
-			var controllerURL; //need to save the url of the controller - will get it once a message has been sent from it
+			var originURL; //need to save the url of the origin window - will get it once a message has been sent from it
 			
-			//receive messages from the controller
+			//receive messages from the origin window
 			$(window).on("message onmessage",function(e){
 				$("#message").append(e.originalEvent.data); //****need to use 'originalEvent' instead of 'event' since im using jquery to bind the event. the jquery event object is different from the javascript event object - originalEvent is a copied version of the original javascript event object
-				controllerURL = e.originalEvent.source; //the 'e.originalEvent.source' is just the url of the controller - save it for use later when we need to send messages to the controller
+				originURL = e.originalEvent.source; //the 'e.originalEvent.source' is just the url of the origin window - save it for use later when we need to send messages to the origin window
 			});
 			
-			//send messages to the controller
+			//send messages to the origin window
 			var message = "this is from the remote window "
 			$(document).on("click","#send",function(e){
-				controllerURL.postMessage(message, '*'); //the 'controllerURL' object is just the url of the controller saved when a messages was received from it	
+				originURL.postMessage(message, '*'); //the 'originURL' object is just the url of the origin window saved when a messages was received from it	
 			});
 		</script>
 		
