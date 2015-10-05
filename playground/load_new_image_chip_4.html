@@ -208,7 +208,8 @@
 						"action":"add_chips", //hard assign
 						"n_chips":"40", //get this from the img metadata
 						"src":"chips/chips_2012.png", //get this from the id of the .chipholder clicked
-						"canvasID":$(this).attr("id")
+						"canvasID":$(this).attr("id"),
+						"zoomLevel":zoomLevel
 					};
 					if ((chipstripwindow == null) || (chipstripwindow.closed)){      //if the window is not loaded then load it and send the message after it is fully loaded
 						chipstripwindow = window.open("./chip_strip_4.html","_blank","width=1080px, height=840px", "toolbar=0","titlebar=0","menubar=0","scrollbars=yes"); //open the remote chip strip window

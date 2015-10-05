@@ -178,8 +178,12 @@
 				if(pass_data.action == "add_chips"){
 					originURL = e.originalEvent.source; //the 'e.originalEvent.source' is just the url of the origin window - save it for use later when we need to send messages to the origin window
 					originChipID = pass_data.canvasID;
+					zoomLevel = pass_data.zoomLevel;
 					loadChipStrips();
-					$(document).ready(function(){drawAllChips()}); //wait until the image has loaded and then draw the chips
+					$(document).ready(function(){
+						updateZoom(); //update the zoom arrays
+						drawAllChips()
+					}); //wait until the image has loaded and then draw the chips
 				} else if (pass_data.action == "zoom"){
 					zoomLevel = pass_data.zoomLevel;
 					updateZoom();
