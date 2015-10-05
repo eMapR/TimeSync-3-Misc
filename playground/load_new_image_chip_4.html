@@ -12,86 +12,26 @@
 		<style>
 
 			.container{margin-top:60px;}
-			canvas{
-				image-rendering:optimizeSpeed;             /* Legal fallback */
-				image-rendering:-moz-crisp-edges;          /* Firefox        */
-				image-rendering:-o-crisp-edges;            /* Opera          */
-				image-rendering:-webkit-optimize-contrast; /* Safari         */
-				image-rendering:optimize-contrast;         /* CSS3 Proposed  */
-				image-rendering:crisp-edges;               /* CSS4 Proposed  */
-				image-rendering:pixelated;                 /* CSS4 Proposed  */
-				-ms-interpolation-mode:nearest-neighbor;   /* IE8+           */
-			}
-			.chipholder{
-				display:inline-block;
-				position: relative;
-				width: 255px;
-				height: 255px;
-				overflow: hidden;
-				pointer-events: auto;
-			}
-			
-			.chipholder img{
-				display: block;
-				position: absolute;
-				/*top: -99999px;*/
-				/*left: -99999px;
-				/*right: -99999px;
-				/*bottom: -99999px;*/
-				/*margin: auto;
-				/*width: 255px;*/
-				/*max-height: none;*/
-				/*max-height: max-content;*/
-				/*max-height: min-content;*/
-				/*max-height: fit-content;*/
-				/*max-height: fill-available;*/
-				
-				
-			}
-			
-			.target{
-				position: absolute;
-				top: 127px;
-				left: 127px;
-				right: 127px;
-				bottom: 127px;
-				border: 1px solid red;
-			}
-			#chip-modal .modal-dialog {
-				height: 780px;
-				width: 1060px;
-				/*overflow-y: auto;*/
-			}
-			#chip-modal{
-				top:25px;
-				right:5%;
 
-				outline: none;
-			}
 			.chip-gallery{
-				display:inline-block;
-				/*height:780px;*/
-				/*overflow-y: auto;*/
+				height:800px;
+				overflow-y: auto;
+			}
+			.chip-gallery canvas{
+				display:inline;
+				margin:3px;
+				vertical-align:top;
 			}
 			.img-gallery{
 				display:none;
 			}
 		</style>
 	</head>
-	<body onload="drawChips();">
+	<body onload="drawAllChips();">
 
 		<div class="container">
-			<div class="chip-gallery">
-
-<!--  				<canvas id="myCanvas1" width="255" height="255" style="border:1px solid #d3d3d3;"></canvas>
-				<canvas id="myCanvas2" width="255" height="255" style="border:1px solid #d3d3d3;"></canvas> -->
-			</div>
-			<div class="img-gallery">
-
-<!--  				<canvas id="myCanvas1" width="255" height="255" style="border:1px solid #d3d3d3;"></canvas>
-				<canvas id="myCanvas2" width="255" height="255" style="border:1px solid #d3d3d3;"></canvas> -->
-			</div>
-			
+			<div class="chip-gallery"></div>
+			<div class="img-gallery"></div>	
 		</div>
 		<script>
 		
@@ -135,9 +75,11 @@
 				}
 			}
 			
+			loadChipStrips(); //run the function
+			
 
 			//draw the image chips to the canvases
-			function drawChips(){
+			function drawAllChips(){
 				var canvasID = {}, //canvas id for a given chip
 					imgID = {}, //img id for a given chip
 					ctx = {}; //img id for a given chip 
@@ -154,10 +96,41 @@
 					ctx.strokeStyle="#FF0000";
 					ctx.lineWidth=1;
 					ctx.lineCap = 'square';
-					//console.log(box);
 					ctx.strokeRect(127.5-(box/2), 127.5-(box/2), box, box);	
 				}
 			}
+			
+			
+						
+			////////////REPLACE A CHIP WITH ONE SELECTED IN THE REMOTE WINDOW////////////////////
+			function replaceChip(replaceThisChip,newSyOffset){
+				
+				//set some variables
+				var canvasID = {}, //canvas id for a given chip
+					imgID = {}, //img id for a given chip
+					ctx = {}; //img id for a given chip 
+				
+				//adjust the chip offset for the orig and zoom arrays
+				syOrig[replaceThisChip] = newSyOffset //set the new original offset
+				syZoom[replaceThisChip] = syOrig[replaceThisChip]+sAdj[zoomLevel]; //set the new zoom offset
+				
+				//do the drawing
+				canvasID = document.getElementById(canvasIDs[replaceThisChip]);
+				imgID = document.getElementById(imgIDs[replaceThisChip]);
+				ctx = canvasID.getContext("2d");
+				ctx.mozImageSmoothingEnabled = false;
+				//ctx.webkitImageSmoothingEnabled = false;
+				ctx.msImageSmoothingEnabled = false;
+				ctx.imageSmoothingEnabled = false;
+				ctx.drawImage(imgID,sxZoom[replaceThisChip],syZoom[replaceThisChip],sWidthZoom[replaceThisChip],sWidthZoom[replaceThisChip],0,0,255,255);
+				ctx.strokeStyle="#FF0000";
+				ctx.lineWidth=1;
+				ctx.lineCap = 'square';
+				ctx.strokeRect(127.5-(box/2), 127.5-(box/2), box, box);		
+			}
+			//////////////////////////////////////////////////////////////////////////////////////
+			
+			
 			
 			//create the zoom adjustment array
             var sAdj = [0],
@@ -177,11 +150,9 @@
 			//$("canvas").on("mousewheel", function(e){
 				if(e.shiftKey){
 					if(e.deltaX == -1 || e.deltaY == 1){zoomIn = 1} else {zoomIn = 0}
-					console.log(zoomIn);
+					//console.log(zoomIn);
 					if(zoomIn > 0){
-						if (zoomLevel < maxZoom){
-						zoomLevel++;
-						}
+						if (zoomLevel < maxZoom){zoomLevel++;}
 					} else {
 						if (zoomLevel > minZoom){zoomLevel--;}
 					}
@@ -194,7 +165,7 @@
 					//console.log(zoomLevel);
 					box = lwAdj[zoomLevel];
 					//console.log(box);
-					drawChips();
+					drawAllChips();
 				}
 			});
 			
@@ -204,13 +175,17 @@
 			$("body").on("click", "canvas", function(e){ //need to use body because the canvases have probably not loaded yet
 				if (e.ctrlKey) { 
 					//setup a json object with info about the image chip strip to display
+					//var thiscanvas = $(this).attr("id")
+					//console.log(thiscanvas);
 					var pass_data = {
 						"action":"add_chips", //hard assign
 						"n_chips":"40", //get this from the img metadata
 						"src":"chips/chips_2012.png", //get this from the id of the .chipholder clicked
+						"canvasID":$(this).attr("id")
 					};
+					//console.log(pass_data.canvasID);
 					if ((chipstripwindow == null) || (chipstripwindow.closed)){      //if the window is not loaded then load it and send the message after it is fully loaded
-						chipstripwindow = window.open("./chip_strip_4.html","_blank","width=1060, height=900", "toolbar=0","titlebar=0","menubar=0"); //open the remote chip strip window
+						chipstripwindow = window.open("./chip_strip_4.html","_blank","width=1080px, height=840px", "toolbar=0","titlebar=0","menubar=0","scrollbars=yes"); //open the remote chip strip window
 						$(chipstripwindow).load(function(){chipstripwindow.postMessage(JSON.stringify(pass_data),"*");}); //wait until the remote window finishes loading before sending the message
 					} else {                                                         //else if the window is already loaded, just send the message - no need to wait
 						chipstripwindow.postMessage(JSON.stringify(pass_data),"*");
@@ -220,8 +195,20 @@
 			///////////////////////////////////////////////////////////////////////////////////////////
 			
 			
+			//////////////////////////GET MESSAGES FROM REMOTE///////////////////////////////// 
+			//receive messages from the origin window
+			$(window).on("message onmessage",function(e){
+				var pass_data = JSON.parse(e.originalEvent.data);
+				if(pass_data.action == "replace_chip"){
+					replaceChip(pass_data.originChipIndex, pass_data.newSyOffset); //replace a chip with one selected in the remote window
+					//$(document).ready(function(){drawAllChips()}); //wait until the image has loaded and then draw the chips
+				}
+				//$("#message").append(e.originalEvent.data); //****need to use 'originalEvent' instead of 'event' since im using jquery to bind the event. the jquery event object is different from the javascript event object - originalEvent is a copied version of the original javascript event object
+				originURL = e.originalEvent.source; //the 'e.originalEvent.source' is just the url of the origin window - save it for use later when we need to send messages to the origin window
+			});	
+			//////////////////////////////////////////////////////////////////////////////////
 			
-			loadChipStrips()
+			
 			
 			
 			

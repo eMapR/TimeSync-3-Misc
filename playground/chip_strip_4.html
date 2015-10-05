@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lan="en">
 	<head>
-		<title>Pixel time series</title>
+		<title>Full chip series</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
@@ -11,80 +11,30 @@
 		<script type="text/javascript" src="jquery.mousewheel.min.js"></script>
 		<style>
 
-			.container{margin-top:60px;}
-			canvas{
-				image-rendering:optimizeSpeed;             /* Legal fallback */
-				image-rendering:-moz-crisp-edges;          /* Firefox        */
-				image-rendering:-o-crisp-edges;            /* Opera          */
-				image-rendering:-webkit-optimize-contrast; /* Safari         */
-				image-rendering:optimize-contrast;         /* CSS3 Proposed  */
-				image-rendering:crisp-edges;               /* CSS4 Proposed  */
-				image-rendering:pixelated;                 /* CSS4 Proposed  */
-				-ms-interpolation-mode:nearest-neighbor;   /* IE8+           */
-			}
-			.chipholder{
-				display:inline-block;
-				position: relative;
-				width: 255px;
-				height: 255px;
-				overflow: hidden;
-				pointer-events: auto;
-			}
-			
-			.chipholder img{
-				display: block;
-				position: absolute;
-				/*top: -99999px;*/
-				/*left: -99999px;
-				/*right: -99999px;
-				/*bottom: -99999px;*/
-				/*margin: auto;
-				/*width: 255px;*/
-				/*max-height: none;*/
-				/*max-height: max-content;*/
-				/*max-height: min-content;*/
-				/*max-height: fit-content;*/
-				/*max-height: fill-available;*/
-				
-				
-			}
-			
-			.target{
-				position: absolute;
-				top: 127px;
-				left: 127px;
-				right: 127px;
-				bottom: 127px;
-				border: 1px solid red;
-			}
-			#chip-modal .modal-dialog {
-				height: 780px;
-				width: 1060px;
-				/*overflow-y: auto;*/
-			}
-			#chip-modal{
-				top:25px;
-				right:5%;
-
-				outline: none;
+			.container{
+				margin-top:60px;
 			}
 			.chip-gallery{
-				display:inline-block;
-				/*height:780px;*/
-				/*overflow-y: auto;*/
+				height:850px;
+				overflow-y: auto;
+			}
+			.chip-gallery canvas{
+				display:inline;
+				margin:3px;
+				vertical-align:top;
 			}
 			.img-gallery{
 				display:none;
 			}
 		</style>
 	</head>
-	<body onload="drawChips();">
+	<body> <!-- onload="drawChips();"--> 
 
-		<div class="container">
+
 			<div class="chip-gallery"></div>
 			<div class="img-gallery"></div>
 			
-		</div>
+
 		<script>
 		
 			var canvasIDs = [], 
@@ -101,7 +51,7 @@
 				minZoom = 0,
 				maxZoom = 40;
 				box = 1;
-				
+			
 			//add the canvas and images for each chip on-the-fly
 			function loadChipStrips(){
 				var canvasID = "", 
@@ -127,6 +77,27 @@
 				}
 			}
 			
+
+			
+			///////////////////SEND MESSAGES TO THE ORIGIN WINDOW///////////////////	
+			$(document).on("click","canvas",function(e){
+				if (e.ctrlKey) {
+					var canvasID = $(this).attr("id"); //get the id of the chip that was clicked on
+					var canvasIDindex = parseInt(canvasID.replace( /^\D+/g, '')); //extract the chip index
+					var newSyOffset = canvasIDindex*255; //calc the source x offset for that chip
+					var originChipIndex = parseInt(originChipID.replace( /^\D+/g, '')); //extract the origin chip index
+					//console.log([canvasID,canvasIDindex,newSyOffset]);
+					var passback = {
+						"action":"replace_chip",
+						"newSyOffset":newSyOffset, //tell the origin where to set the original offset for the chip
+						"originChipID":originChipID, //tell the origin which chip to set the original offset for (ID)
+						"originChipIndex":originChipIndex //tell the origin which chip to set the original offset for (index)
+					}
+					console.log(passback);
+					originURL.postMessage(JSON.stringify(passback), '*'); //the 'originURL' object is just the url of the origin window saved when a messages was received from it	
+				}
+			});
+			/////////////////////////////////////////////////////////////////////////
 
 			//draw the image chips to the canvases
 			function drawChips(){
@@ -184,32 +155,29 @@
 				}
 			});
 			
-					
-			//////////////////////////PORT TO ORIGIN/////////////////////////////////
-			 
+			//////////////////////////GET MESSAGES FROM ORIGIN///////////////////////////////// 
 			var originURL; //need to save the url of the origin window - will get it once a message has been sent from it
-			var offsetall = [];
-			var imgidall = [];
+			//var offsetall = [];
+			//var imgidall = [];
 			var n_chips;
+			var originChipID
 			//receive messages from the origin window
 			$(window).on("message onmessage",function(e){
 				var pass_data = JSON.parse(e.originalEvent.data);
-				console.log(pass_data.action);
-				if(pass_data.action == "add_chips"){loadChipStrips()}
+				//console.log(pass_data.action);
+				if(pass_data.action == "add_chips"){
+					originChipID = pass_data.canvasID;
+					loadChipStrips();
+					$(document).ready(function(){drawChips()}); //wait until the image has loaded and then draw the chips
+				}
 				//$("#message").append(e.originalEvent.data); //****need to use 'originalEvent' instead of 'event' since im using jquery to bind the event. the jquery event object is different from the javascript event object - originalEvent is a copied version of the original javascript event object
 				originURL = e.originalEvent.source; //the 'e.originalEvent.source' is just the url of the origin window - save it for use later when we need to send messages to the origin window
-			});
-			
-			//send messages to the origin window
-			var message = "this is from the remote window "
-			$(document).on("click","#send",function(e){
-				originURL.postMessage(message, '*'); //the 'originURL' object is just the url of the origin window saved when a messages was received from it	
-			});
-			/////////////////////////////////////////////////////////////////////////
+				//console.log(originURL);
+			});	
+			//////////////////////////////////////////////////////////////////////////////////
 			
 			
-			
-			loadChipStrips()
+		
 			
 			
 			
