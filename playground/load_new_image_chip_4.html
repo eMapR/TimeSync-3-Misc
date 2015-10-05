@@ -34,7 +34,8 @@
 			<div class="img-gallery"></div>	
 		</div>
 		<script>
-		
+			
+			///////////////SET GLOBAL VARIABLES//////////////////////////////////////////////////////////
 			var canvasIDs = [], 
 				imgIDs = [], 
 				sxOrig = [], //source x offset
@@ -49,8 +50,11 @@
 				minZoom = 0,
 				maxZoom = 40;
 				box = 1;
-				
-			//add the canvas and images for each chip on-the-fly
+			///////////////////////////////////////////////////////////////////////////////////////////////
+			
+			
+			
+			///////////DEFINE THE FUNCTION TO ADD THE CANVAS AND IMAGE FOR EACH CHIP ON-THE-FLY////////////
 			function loadChipStrips(){
 				var canvasID = "", 
 					imgID = "",
@@ -74,16 +78,17 @@
 					$(".img-gallery").append(appendThisImg);
 				}
 			}
+			/////////////////////////////////////////////////////////////////////////////////////////////////
 			
 			loadChipStrips(); //run the function
 			
 
-			//draw the image chips to the canvases
+			////////////////DEFINE FUNCTION TO DRAW ALL THE IMAGE CHIPS TO THE CANVASES/////////////////////
 			function drawAllChips(){
 				var canvasID = {}, //canvas id for a given chip
 					imgID = {}, //img id for a given chip
 					ctx = {}; //img id for a given chip 
-				//alert("im in!");
+
 				for(i=0; i<n_chips; i++){
 					canvasID = document.getElementById(canvasIDs[i]);
 					imgID = document.getElementById(imgIDs[i]);
@@ -99,10 +104,10 @@
 					ctx.strokeRect(127.5-(box/2), 127.5-(box/2), box, box);	
 				}
 			}
-			
+			///////////////////////////////////////////////////////////////////////////////////////////////
 			
 						
-			////////////REPLACE A CHIP WITH ONE SELECTED IN THE REMOTE WINDOW////////////////////
+			////////////REPLACE A CHIP WITH ONE SELECTED IN THE REMOTE WINDOW//////////////////////////////
 			function replaceChip(replaceThisChip,newSyOffset){
 				
 				//set some variables
@@ -128,7 +133,7 @@
 				ctx.lineCap = 'square';
 				ctx.strokeRect(127.5-(box/2), 127.5-(box/2), box, box);		
 			}
-			//////////////////////////////////////////////////////////////////////////////////////
+			/////////////////////////////////////////////////////////////////////////////////////////////////
 			
 			
 			
@@ -146,44 +151,65 @@
 				lwAdj.push(lwstarter)
 			}
   
-			$("body").on("mousewheel","canvas",function(e){
-			//$("canvas").on("mousewheel", function(e){
+			function updateZoom(){
+				for(i = 0; i < n_chips; i++){
+					sxZoom[i] = sxOrig[i]+sAdj[zoomLevel];
+					syZoom[i] = syOrig[i]+sAdj[zoomLevel];
+					sWidthZoom[i] = sWidthOrig[i]-(sAdj[zoomLevel]*2);
+				}
+				box = lwAdj[zoomLevel];
+			}
+  
+			
+			$(document).on("mousewheel","canvas",function(e){
 				if(e.shiftKey){
 					if(e.deltaX == -1 || e.deltaY == 1){zoomIn = 1} else {zoomIn = 0}
-					//console.log(zoomIn);
 					if(zoomIn > 0){
-						if (zoomLevel < maxZoom){zoomLevel++;}
+						if (zoomLevel < maxZoom){
+						zoomLevel++;
+						}
 					} else {
 						if (zoomLevel > minZoom){zoomLevel--;}
 					}
-					for(i = 0; i < n_chips; i++){
-						//console.log("im in!");
-						sxZoom[i] = sxOrig[i]+sAdj[zoomLevel];
-						syZoom[i] = syOrig[i]+sAdj[zoomLevel];
-						sWidthZoom[i] = sWidthOrig[i]-(sAdj[zoomLevel]*2);
+
+					//redraw the chips
+					updateZoom(); //update the zoom arrays	
+					drawAllChips(); //redraw the chips with the new zoom
+					
+					//prepare zoom message
+					zoomInfo = {
+						"action":"zoom",
+						"zoomLevel":zoomLevel
 					}
-					//console.log(zoomLevel);
-					box = lwAdj[zoomLevel];
-					//console.log(box);
-					drawAllChips();
+
+					//send the zoom array to the external window
+					if ((chipstripwindow != null) && chipstripwindow.closed == false){ 
+						//prepare zoom message
+						zoomInfo = {
+							"action":"zoom",
+							"zoomLevel":zoomLevel
+						}
+						//send the zoom message
+						chipstripwindow.postMessage(JSON.stringify(zoomInfo),"*");
+					}		
 				}
 			});
+			
+			
+			
+			
 			
 			
 			///////////////////OPEN THE REMOTE CHIP STRIP WINDOW AND SEND MESSAGES/////////////////////
 			var chipstripwindow = null ;//keep track of whether the chipstrip window is open or not so it is not opened in multiple new window on each chip click
 			$("body").on("click", "canvas", function(e){ //need to use body because the canvases have probably not loaded yet
 				if (e.ctrlKey) { 
-					//setup a json object with info about the image chip strip to display
-					//var thiscanvas = $(this).attr("id")
-					//console.log(thiscanvas);
 					var pass_data = {
 						"action":"add_chips", //hard assign
 						"n_chips":"40", //get this from the img metadata
 						"src":"chips/chips_2012.png", //get this from the id of the .chipholder clicked
 						"canvasID":$(this).attr("id")
 					};
-					//console.log(pass_data.canvasID);
 					if ((chipstripwindow == null) || (chipstripwindow.closed)){      //if the window is not loaded then load it and send the message after it is fully loaded
 						chipstripwindow = window.open("./chip_strip_4.html","_blank","width=1080px, height=840px", "toolbar=0","titlebar=0","menubar=0","scrollbars=yes"); //open the remote chip strip window
 						$(chipstripwindow).load(function(){chipstripwindow.postMessage(JSON.stringify(pass_data),"*");}); //wait until the remote window finishes loading before sending the message
@@ -202,9 +228,13 @@
 				if(pass_data.action == "replace_chip"){
 					replaceChip(pass_data.originChipIndex, pass_data.newSyOffset); //replace a chip with one selected in the remote window
 					//$(document).ready(function(){drawAllChips()}); //wait until the image has loaded and then draw the chips
+				} else if (pass_data.action == "zoom"){
+					zoomLevel = pass_data.zoomLevel;
+					updateZoom();
+					drawAllChips();
 				}
+				
 				//$("#message").append(e.originalEvent.data); //****need to use 'originalEvent' instead of 'event' since im using jquery to bind the event. the jquery event object is different from the javascript event object - originalEvent is a copied version of the original javascript event object
-				originURL = e.originalEvent.source; //the 'e.originalEvent.source' is just the url of the origin window - save it for use later when we need to send messages to the origin window
 			});	
 			//////////////////////////////////////////////////////////////////////////////////
 			
