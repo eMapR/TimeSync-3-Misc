@@ -232,7 +232,7 @@
 			}
 			
 			//function to update the D3 scatterplot when new selection are made
-			function update(data, index, rgbcolor, domain, chiprange){
+			function update(data, index, rgbcolor, domain){
 		
 				//update scale domains
 				yscale.domain([domain[index].min, domain[index].max]);
@@ -245,7 +245,19 @@
 					.attr("cx", function(d){return xscale(d.ImageDate);})
 					.attr("cy", function(d){return yscale(d[index]);})
 					.style("fill",function(d,i){return rgbcolor[i]})
+
 				
+				//update y axis
+				svg.select(".y.axis")
+					.transition()
+					.duration(500)
+					.call(yaxis);
+			}
+			
+			
+			//function to update the visible chip range in D3 scatterplot when chip carousel is scrolled
+			function updateChipRange(chiprange){
+						
 				svg.select(".line1")
 					.attr("x1", xscale(chiprange[0]-0.5))  //<<== change your code here
 					.attr("y1", 10)
@@ -264,11 +276,6 @@
 					.style("stroke", "grey")
 					.style("fill", "none");
 				
-				//update y axis
-				svg.select(".y.axis")
-					.transition()
-					.duration(500)
-					.call(yaxis);
 			}
 			
 			
@@ -557,10 +564,10 @@
 				var blueid = $("#blue-list li.active").attr('id');
 				rgbcolor1 = scaledRGB(data, redid, greenid, blueid, stretch, 2, len);
 				var owlids = $(".owl-item.active div").map(function(i){return this.id;});
-				var owlmin = Math.min.apply(null, owlids),
-				owlmax = Math.max.apply(null, owlids);
-				var chiprange = [owlmin,owlmax];
-				update(data, indexid, rgbcolor1, domain, chiprange);	
+				//var owlmin = Math.min.apply(null, owlids),
+				//owlmax = Math.max.apply(null, owlids);
+				//var chiprange = [owlmin,owlmax];
+				update(data, indexid, rgbcolor1, domain);	
 			});
 			
 			
@@ -610,7 +617,7 @@ owl.on('translate.owl.carousel translated.owl.carousel', function(event) {
 	var owlmin = Math.min.apply(null, owlids),
     owlmax = Math.max.apply(null, owlids);
     var chiprange = [owlmin,owlmax];
-	update(data, index, rgbcolor, domain, chiprange)
+	updateChipRange(chiprange);
 })
 		
 		
