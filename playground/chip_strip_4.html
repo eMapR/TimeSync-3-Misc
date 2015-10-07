@@ -7,8 +7,7 @@
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-		<script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
-		<script type="text/javascript" src="jquery.mousewheel.min.js"></script>
+		<script src="jquery.mousewheel.min.js"></script>
 		<style>
 
 			.container{
@@ -141,31 +140,34 @@
 				box = lwAdj[zoomLevel];
 			}
   
-  
-			$(document).on("mousewheel","canvas",function(e){
-				if(e.shiftKey){
-					if(e.deltaX == -1 || e.deltaY == 1){zoomIn = 1} else {zoomIn = 0}
-					if(zoomIn > 0){
-						if (zoomLevel < maxZoom){
-						zoomLevel++;
+			$(document).ready(function(){ //not sure if this $(document).ready check is needed, but doesn't hurt
+				$(document).on("mousewheel","canvas",function(e){
+					e.preventDefault(); //make sure that default browser behaviour is prevented
+					if(e.shiftKey){
+						e.preventDefault(); //make sure that default browser behaviour is prevented
+						if(e.deltaX == -1 || e.deltaY == 1){zoomIn = 1} else {zoomIn = 0}
+						if(zoomIn > 0){
+							if (zoomLevel < maxZoom){
+							zoomLevel++;
+							}
+						} else {
+							if (zoomLevel > minZoom){zoomLevel--;}
 						}
-					} else {
-						if (zoomLevel > minZoom){zoomLevel--;}
-					}
 
-					//redraw the chips
-					updateZoom(); //update the zoom arrays	
-					drawAllChips(); //redraw the chips with the new zoom
-					
-					//prepare zoom message
-					zoomInfo = {
-						"action":"zoom",
-						"zoomLevel":zoomLevel
-					}
+						//redraw the chips
+						updateZoom(); //update the zoom arrays	
+						drawAllChips(); //redraw the chips with the new zoom
+						
+						//prepare zoom message
+						zoomInfo = {
+							"action":"zoom",
+							"zoomLevel":zoomLevel
+						}
 
-					//send zoom message
-					originURL.postMessage(JSON.stringify(zoomInfo),"*");		
-				}
+						//send zoom message
+						originURL.postMessage(JSON.stringify(zoomInfo),"*");		
+					}
+				});
 			});
 			
 			//////////////////////////GET MESSAGES FROM ORIGIN///////////////////////////////// 
