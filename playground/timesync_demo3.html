@@ -4,10 +4,12 @@
 		<title>TimeSync</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge"> <!--needed so that D3 will work in IE!-->
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-		<script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
+		<!--<script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>!-->
 		<script type="text/javascript" src="jquery.mousewheel.min.js"></script>
 		<style>
 			html {
@@ -309,7 +311,8 @@
 			//function to retrieve json data
 			$.getJSON(jsonURL).done(function(jsonobject){
 				data = jsonobject
-				len = Object.keys(data.Values).length
+				len = data.Values.length;
+				//len = Object.keys(data.Values).length
 				calcIndices();
 				rgbColor = scaledRGB(data, "TCB", "TCG", "TCW", stretch, 2, len); //get the scaled rgb color
 				plotInt();
@@ -562,17 +565,18 @@
 				});
 			});
 			
-			//make the trajectory svg circles selectable
+			//make the chip gallery expand on click
 			$(document).ready(function(){
-				$(".chip-gallery").click(function(){
-
+				$(".chip-gallery").click(function(e){
+					if(!e.ctrlKey){
 						var status = $(this).css("height");
 						console.log(status);
 						if(status == "524px"){
 							$(this).css("height","auto");
 						} else {
 							$(this).css("height","524px");
-						}	
+						}
+					}
 					
 				});
 			});
@@ -711,40 +715,43 @@
 			}
   
 			
-			$(document).on("mousewheel","canvas",function(e){
-				if(e.shiftKey){
-					if(e.deltaX == -1 || e.deltaY == 1){zoomIn = 1} else {zoomIn = 0}
-					if(zoomIn > 0){
-						if (zoomLevel < maxZoom){
-						zoomLevel++;
+			$(document).ready(function(){ //not sure if this $(document).ready check is needed, but doesn't hurt
+				$(document).on("mousewheel","canvas",function(e){
+					//e.preventDefault(); //make sure that default browser behaviour is prevented
+					if(e.shiftKey){ //
+						e.preventDefault(); //make sure that default browser behaviour is prevented
+						if(e.deltaX == -1 || e.deltaY == 1){zoomIn = 1} else {zoomIn = 0}
+						if(zoomIn > 0){
+							if (zoomLevel < maxZoom){
+							zoomLevel++;
+							}
+						} else {
+							if (zoomLevel > minZoom){zoomLevel--;}
 						}
-					} else {
-						if (zoomLevel > minZoom){zoomLevel--;}
-					}
 
-					//redraw the chips
-					updateZoom(); //update the zoom arrays	
-					drawAllChips(); //redraw the chips with the new zoom
-					
-					//prepare zoom message
-					zoomInfo = {
-						"action":"zoom",
-						"zoomLevel":zoomLevel
-					}
-
-					//send the zoom array to the external window
-					if ((chipstripwindow != null) && chipstripwindow.closed == false){ 
+						//redraw the chips
+						updateZoom(); //update the zoom arrays	
+						drawAllChips(); //redraw the chips with the new zoom
+						
 						//prepare zoom message
 						zoomInfo = {
 							"action":"zoom",
 							"zoomLevel":zoomLevel
 						}
-						//send the zoom message
-						chipstripwindow.postMessage(JSON.stringify(zoomInfo),"*");
-					}		
-				}
+
+						//send the zoom array to the external window
+						if ((chipstripwindow != null) && chipstripwindow.closed == false){ 
+							//prepare zoom message
+							zoomInfo = {
+								"action":"zoom",
+								"zoomLevel":zoomLevel
+							}
+							//send the zoom message
+							chipstripwindow.postMessage(JSON.stringify(zoomInfo),"*");
+						}		
+					}
+				});
 			});
-			
 			
 			
 			
