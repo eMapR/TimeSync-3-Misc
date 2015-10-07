@@ -316,8 +316,38 @@
 				calcIndices();
 				rgbColor = scaledRGB(data, "TCB", "TCG", "TCW", stretch, 2, len); //get the scaled rgb color
 				plotInt();
+				
+				////make the trajectory svg circles selectable
+				//$(document).ready(function(){
+				//	$("circle").click(function(e){
+				//		if(e.ctrlKey){
+				//			e.preventDefault(); //make sure that default browser behaviour is prevented
+				//			var status = $(this).attr("class");
+				//			if(status == "unselected"){
+				//				$(this).attr("class","selected");
+				//			} else {
+				//				$(this).attr("class","unselected");
+				//			}	
+				//		}
+				//	});
+				//});
+				
 			});
-			
+					
+			//make the trajectory svg circles selectable
+			$(document).ready(function(){
+				$(document).on("click", "circle", function(e){ //need to use this style event binding for elements that don't exisit yet - these lines will run before the "circle" elements are created, alternatively could use the commented lines in the above jquery section
+					if(e.ctrlKey){
+						e.preventDefault(); //make sure that default browser behaviour is prevented
+						var status = $(this).attr("class");
+						if(status == "unselected"){
+							$(this).attr("class","selected");
+						} else {
+							$(this).attr("class","unselected");
+						}	
+					}
+				});
+			});
 			
 			//define function to return stretch color array by index
 			function setcolor(data, index, stretch, n_stdev, len) {
@@ -551,26 +581,13 @@
 				});
 			});
 			
-			//make the trajectory svg circles selectable
-			$(document).ready(function(){
-				$("circle").click(function(e){
-					if(e.ctrlKey){
-						var status = $(this).attr("class");
-						if(status == "unselected"){
-							$(this).attr("class","selected");
-						} else {
-							$(this).attr("class","unselected");
-						}	
-					}
-				});
-			});
+
 			
 			//make the chip gallery expand on click
 			$(document).ready(function(){
 				$(".chip-gallery").click(function(e){
 					if(!e.ctrlKey){
 						var status = $(this).css("height");
-						console.log(status);
 						if(status == "524px"){
 							$(this).css("height","auto");
 						} else {
