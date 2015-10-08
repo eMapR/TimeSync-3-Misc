@@ -298,10 +298,11 @@
 					}			
 			};
 			
+						
 			var n_stdev = 2,
-				data, // = getJson("./test3.json"), //get the data
-				len, // = Object.keys(data.Values).length, //get the number of years
-				index = "TCW", //default index to display			
+				data = {}, // = getJson("./test3.json"), //get the data
+				len = 0, // = Object.keys(data.Values).length, //get the number of years
+				specIndex = "TCW", //default index to display	
 				rgbColor,
 				jsonURL = "./test3.json";
 			
@@ -338,6 +339,7 @@
 			$(document).ready(function(){
 				$(document).on("click", "circle", function(e){ //need to use this style event binding for elements that don't exisit yet - these lines will run before the "circle" elements are created, alternatively could use the commented lines in the above jquery section
 					if(e.ctrlKey){
+						
 						e.preventDefault(); //make sure that default browser behaviour is prevented
 						var circleIndex = $("circle").index(this)
 						if(circleIndex != 0 &&  circleIndex != len-1){
@@ -358,49 +360,64 @@
 			
 			//define function to add and remove line segments
 			function changePlotLine(){
-				selectedCircles = $(".selected");
+				var selectedCircles = $(".selected");
 				var lineData = [];
 				var i = 0;
 				for(i; i < selectedCircles.length; i++){
 					var thisone = $("circle").index(selectedCircles[i]);
-					lineData.push({"x":data.Values[thisone].ImageDate, "y":data.Values[thisone][index]});
+					lineData.push({"x":data.Values[thisone].ImageDate, "y":data.Values[thisone][specIndex]});
 				}
 				
 				$(".plotLine").remove();				//add the default line
-				console.log(lineData);
 				//make the line function to convert the xy object to svg path syntax 
 				//var lineFunction = d3.svg.line() //TODO: CHECK IF THIS NEEDS TO BE A GLOBAL VARIABLE OR NOT
 				//	.x(function(d){return xscale(d.x);})
 				//	.y(function(d){return yscale(d.y);})
 				//	.interpolate("linear");
 				
-				var lineGraph = svg.append("path")
+				lineGraph = svg.append("path")
 					.attr("d", lineFunction(lineData))
 					.attr("stroke", "#FF0000")
 					.attr("stroke-width", 2)
 					.attr("fill", "none")
 					.attr("class","plotLine");
+				
+				//define the zooming function - what gets scaled on zoom 
+				function zoomed() {
+					svg.select(".y.axis").call(yaxis);
+					svg.selectAll("circle").attr("cy", function(d){return yscale(d[specIndex]);});
+					svg.selectAll(".plotLine").attr("d", lineFunction(lineData));
+				}
+				
+				//define the zoom behavior
+				var zoom = d3.behavior.zoom()
+					.y(yscale)
+					.scaleExtent([1, 5])
+					.on("zoom", zoomed);
+				
+				//call the function to make the scale change
+				svg.call(zoom).on("dblclick.zoom", null)//svg was defined in the plotInt function
+
 			}
 			
-			
 			//define function to return stretch color array by index
-			function setcolor(data, index, stretch, n_stdev, len) {
-				var minv = stretch[index].mean - (stretch[index].stdev * n_stdev),
-					maxv = stretch[index].mean + (stretch[index].stdev * n_stdev),
+			function setcolor(data, specIndex, stretch, n_stdev, len) {
+				var minv = stretch[specIndex].mean - (stretch[specIndex].stdev * n_stdev),
+					maxv = stretch[specIndex].mean + (stretch[specIndex].stdev * n_stdev),
 					color = [];
 				for (i = 0; i < len; i++) {
-					if (data.Values[i][index] < minv) data.Values[i][index] = minv;
-					if (data.Values[i][index] > maxv) data.Values[i][index] = maxv;
-					color[i] = ((data.Values[i][index] - minv) / (maxv - minv)) * 255;
+					if (data.Values[i][specIndex] < minv) data.Values[i][specIndex] = minv;
+					if (data.Values[i][specIndex] > maxv) data.Values[i][specIndex] = maxv;
+					color[i] = ((data.Values[i][specIndex] - minv) / (maxv - minv)) * 255;
 				}
 				return color;
 			}
 			
 			//define function to return scaled color arrays as RGB color
-			function scaledRGB(data, Rindex, Gindex, Bindex, stretch, n_stdev, len){
-				var colorR = setcolor(data, Rindex, stretch, n_stdev, len),
-					colorG = setcolor(data, Gindex, stretch, n_stdev, len),
-					colorB = setcolor(data, Bindex, stretch, n_stdev, len),
+			function scaledRGB(data, RspecIndex, GspecIndex, BspecIndex, stretch, n_stdev, len){
+				var colorR = setcolor(data, RspecIndex, stretch, n_stdev, len),
+					colorG = setcolor(data, GspecIndex, stretch, n_stdev, len),
+					colorB = setcolor(data, BspecIndex, stretch, n_stdev, len),
 					color = [];
 				for(var i=0;i<len;i++) {color[i] = d3.rgb(colorR[i],colorG[i],colorB[i]);}
 				return color;
@@ -468,7 +485,7 @@
 				
 				//define the y scale
 				yscale = d3.scale.linear() //NEEDS TO BE A GLOBAL VARIABLE - IS USED HERE AND IN THE UPDATE FUNCTION
-					.domain([domain[index].min, domain[index].max])
+					.domain([domain[specIndex].min, domain[specIndex].max])
 					.range([h - pb, pt]);
 						
 				//define the x axis
@@ -485,7 +502,8 @@
 				//define the zooming function - what gets scaled on zoom
 				function zoomed() {
 					svg.select(".y.axis").call(yaxis);
-					svg.selectAll("circle").attr("cy", function(d){return yscale(d[index]);});
+					svg.selectAll("circle").attr("cy", function(d){return yscale(d[specIndex]);});
+					svg.selectAll(".plotLine").attr("d", lineFunction(lineData));
 				}
 				
 				//define the zoom behavior
@@ -506,8 +524,8 @@
 						
 				//make the default line data
 				var lineData = [ //needs to be local variable
-					{"x":yearmin ,"y":data.Values[0][index]},
-					{"x":yearmax ,"y":data.Values[len-1][index]}
+					{"x":yearmin ,"y":data.Values[0][specIndex]},
+					{"x":yearmax ,"y":data.Values[len-1][specIndex]}
 				];
 
 
@@ -524,7 +542,7 @@
 					.append("circle")
 					.style("fill",function(d,i){return rgbColor[i]})
 					.attr("cx", function(d){return xscale(d.ImageDate);})
-					.attr("cy", function(d){return yscale(d[index]);})
+					.attr("cy", function(d){return yscale(d[specIndex]);})
 					.attr("r", 10)
 					.attr("class","unselected");
 				
@@ -576,15 +594,15 @@
 			}
 			
 			//define function to update the D3 scatterplot when new selection are made
-			function update(data, index, rgbColor, domain){
-				
+			function update(data, specIndex, rgbColor, domain){
 				//update the y domain based on the new index
-				yscale.domain([domain[index].min, domain[index].max]); //yscale was defined in the plotInt function
+				yscale.domain([domain[specIndex].min, domain[specIndex].max]); //yscale was defined in the plotInt function
 				
 				//define the zooming function - what gets scaled on zoom 
 				function zoomed() {
 					svg.select(".y.axis").call(yaxis);
-					svg.selectAll("circle").attr("cy", function(d){return yscale(d[index]);});
+					svg.selectAll("circle").attr("cy", function(d){return yscale(d[specIndex]);});
+					svg.selectAll(".plotLine").attr("d", lineFunction(lineData));
 				}
 				
 				//define the zoom behavior
@@ -602,7 +620,7 @@
 					.transition()
 					.duration(500)
 					.attr("cx", function(d){return xscale(d.ImageDate);})
-					.attr("cy", function(d){return yscale(d[index]);})
+					.attr("cy", function(d){return yscale(d[specIndex]);})
 					.style("fill",function(d,i){return rgbColor[i]})
 
 					
@@ -613,7 +631,7 @@
 				var i = 0;
 				for(i; i < selectedCircles.length; i++){
 					var thisone = $("circle").index(selectedCircles[i]);
-					lineData.push({"x":data.Values[thisone].ImageDate, "y":data.Values[thisone][index]});
+					lineData.push({"x":data.Values[thisone].ImageDate, "y":data.Values[thisone][specIndex]});
 				}
 				
 				//update the line
@@ -637,24 +655,33 @@
 			//or the colors
 			$(document).ready(function(){
 				$(".dropdown-menu li").click(function() { //This will attach the function to all the input elements
-					var listid = $(this).closest("ul").attr('id'),
-						indexid = $(this).attr('id'),
-						newactive = "#"+listid+" #"+indexid,
-						activesearch = "#"+listid+" .active",
+					
+					//figure out which dropdown was selected and change its active status 
+					var thisListID = $(this).closest("ul").attr('id'),
+						thisSpecIndexID = $(this).attr('id'),
+						newactive = "#"+thisListID+" #"+thisSpecIndexID,
+						activesearch = "#"+thisListID+" .active",
 						activeid = $(activesearch).attr('id'),
-						oldactive = "#"+listid+" #"+activeid;
+						oldactive = "#"+thisListID+" #"+activeid;
 					
 					$(oldactive).removeClass('active');
 					$(newactive).addClass('active');
 					
-					var indexid = $("#index-list li.active").attr('id'),		
-						redid = $("#red-list li.active").attr('id'),
-						greenid = $("#green-list li.active").attr('id'),
-						blueid = $("#blue-list li.active").attr('id');
+					//get the active classes from the dropdown displays buttons
+					var activeSpecIndex = $("#index-list li.active").attr('id'),		
+						activeRedSpecIndex = $("#red-list li.active").attr('id'),
+						activeGreenSpecIndex = $("#green-list li.active").attr('id'),
+						activeBlueSpecIndex = $("#blue-list li.active").attr('id');
 					
-					rgbColor = scaledRGB(data, redid, greenid, blueid, stretch, 2, len);
-					update(data, indexid, rgbColor, domain);
-					$("#specPlotIndex").text($("#"+indexid).text());
+					//get the RBG color
+					rgbColor = scaledRGB(data, activeRedSpecIndex, activeGreenSpecIndex, activeBlueSpecIndex, stretch, 2, len);
+					
+					//reset the global varible so that other functions know what it is know
+					specIndex=activeSpecIndex 
+					
+					//update the plot
+					update(data, specIndex, rgbColor, domain);
+					$("#specPlotIndex").text($("#"+specIndex).text());
 				});
 			});
 			
