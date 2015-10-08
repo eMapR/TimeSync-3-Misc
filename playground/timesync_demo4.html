@@ -502,8 +502,8 @@
 					.call(zoom);
 				
 				//call the zoom once - needed for the updating to work
-				svg.call(zoom);
-				
+				svg.call(zoom).on("dblclick.zoom", null);
+						
 				//make the default line data
 				var lineData = [ //needs to be local variable
 					{"x":yearmin ,"y":data.Values[0][index]},
@@ -594,7 +594,7 @@
 					.on("zoom", zoomed);
 				
 				//call the function to make the scale change
-				svg.call(zoom); //svg was defined in the plotInt function
+				svg.call(zoom).on("dblclick.zoom", null)//svg was defined in the plotInt function
 				
 				//update the circles with new data
 				svg.selectAll("circle") //svg was defined in the plotInt function
