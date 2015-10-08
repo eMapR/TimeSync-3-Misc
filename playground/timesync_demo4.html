@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lan="en">
+	<head>
+		<title>TimeSync</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge"> <!--needed so that D3 will work in IE!-->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
+		<!--<script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>!-->
+		<script type="text/javascript" src="jquery.mousewheel.min.js"></script>
+		<style>
+			html {
+				overflow-y: scroll;
+			}			
+			body {
+				-webkit-touch-callout: none;
+				-webkit-user-select: none;
+				-khtml-user-select: none;
+				-moz-user-select: none;
+				-ms-user-select: none;
+				user-select: none;
+			}
+			.axis path, 
+			.axis line {
+				fill: none;
+				stroke: black;
+				shape-rendering: crispEdges;
+			}
+			.axis text, #specPlotIndex {
+				font-family: sans-serif;
+				font-size: 11px;
+			}
+			.dropdown:hover .dropdown-menu {
+				display: block;
+			}
+			.dropdown-menu {
+				margin-top: 0;
+			}
+			.container{
+				margin-top:40px;
+			}
+			li:hover{
+				background-color:#f1f1f1;
+			}
+			.dropdown-menu .active{
+				background-color:#dbdbdb;
+			}
+			li{
+				padding-left:10px;
+				cursor:pointer;
+			}
+			.btn-default:focus{
+				background-color:white;
+			}
+			.chip-gallery{
+				height:524px;
+				width:1070px;
+				overflow-y: auto;
+				border:1px solid #dbdbdb;
+				border-radius: 4px;
+				margin-top:10px;
+			}
+			.chip-gallery canvas{
+				display:inline;
+				margin:3px;
+				vertical-align:top;
+				cursor: pointer;
+			}
+			.img-gallery{
+				display:none;
+			}
+			#plot{
+				border:1px solid #dbdbdb;
+				border-radius: 4px;
+				cursor: n-resize;
+				/*cursor: grab;*/
+			}
+			/*#plot:active{
+				cursor:grabbing;
+			}*/
+			circle{
+				cursor: pointer;
+			}
+			circle.selected{				
+				stroke:#FF0000;
+				stroke-width:1;
+			}
+			circle:hover{
+				stroke:#FF0000;
+				stroke-width:1;
+			}
+		</style>
+	</head>
+	<body onload="drawAllChips()">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-8">
+					<div id="plot"></div>
+				</div>
+				<div class="col-md-4">
+					<div class="dropdown" style="display:inline-block">
+						<button class="btn btn-default dropdown-toggle" type="button">Indices
+						<span class="caret"></span></button>
+						<ul class="dropdown-menu" id="index-list">
+							<li class="" id="B1">Band 1</li>
+							<li class="" id="B2">Band 2</li>
+							<li class="" href="#" id="B3">Band 3</li>
+							<li class="" href="#" id="B4">Band 4</li>
+							<li class="" href="#" id="B5">Band 5</li>
+							<li class="" href="#" id="B7">Band 7</li>
+							<li class="" href="#" id="TCB">TC Brightness</li>
+							<li class="" href="#" id="TCG">TC Greenness</li>
+							<li class="active" href="#" id="TCW">TC Wetness</li>
+							<li class="" href="#" id="TCA">TC Angle</li>
+							<li class="" href="#" id="NDVI">NDVI</li>
+							<li class="" href="#" id="NBR">NBR</li>
+						</ul>
+					</div>
+					<div class="dropdown" style="display:inline-block">
+						<button class="btn btn-default dropdown-toggle" type="button">Red
+						<span class="caret"></span></button>
+						<ul class="dropdown-menu" id="red-list">
+							<li class="" href="#" id="B1">Band 1</li>
+							<li class="" href="#" id="B2">Band 2</li>
+							<li class="" href="#" id="B3">Band 3</li>
+							<li class="" href="#" id="B4">Band 4</li>
+							<li class="" href="#" id="B5">Band 5</li>
+							<li class="" href="#" id="B7">Band 7</li>
+							<li class="active" href="#" id="TCB">TC Brightness</li>
+							<li class="" href="#" id="TCG">TC Greenness</li>
+							<li class="" href="#" id="TCW">TC Wetness</li>
+							<li class="" href="#" id="TCA">TC Angle</li>
+							<li class="" href="#" id="NDVI">NDVI</li>
+							<li class="" href="#" id="NBR">NBR</li>
+						</ul>
+					</div>
+					<div class="dropdown" style="display:inline-block">
+						<button class="btn btn-default dropdown-toggle" type="button">Green
+						<span class="caret"></span></button>
+						<ul class="dropdown-menu" id="green-list">
+							<li class="" href="#" id="B1">Band 1</li>
+							<li class="" href="#" id="B2">Band 2</li>
+							<li class="" href="#" id="B3">Band 3</li>
+							<li class="" href="#" id="B4">Band 4</li>
+							<li class="" href="#" id="B5">Band 5</li>
+							<li class="" href="#" id="B7">Band 7</li>
+							<li class="" href="#" id="TCB">TC Brightness</li>
+							<li class="active" href="#" id="TCG">TC Greenness</li>
+							<li class="" href="#" id="TCW">TC Wetness</li>
+							<li class="" href="#" id="TCA">TC Angle</li>
+							<li class="" href="#" id="NDVI">NDVI</li>
+							<li class="" href="#" id="NBR">NBR</li>
+						</ul>
+					</div>
+					<div class="dropdown" style="display:inline-block">
+						<button class="btn btn-default dropdown-toggle" type="button">Blue
+						<span class="caret"></span></button>
+						<ul class="dropdown-menu" id="blue-list">
+							<li class="" href="#" id="B1">Band 1</li>
+							<li class="" href="#" id="B2">Band 2</li>
+							<li class="" href="#" id="B3">Band 3</li>
+							<li class="" href="#" id="B4">Band 4</li>
+							<li class="" href="#" id="B5">Band 5</li>
+							<li class="" href="#" id="B7">Band 7</li>
+							<li class="" href="#" id="TCB">TC Brightness</li>
+							<li class="" href="#" id="TCG">TC Greenness</li>
+							<li class="active" href="#" id="TCW">TC Wetness</li>
+							<li class="" href="#" id="TCA">TC Angle</li>
+							<li class="" href="#" id="NDVI">NDVI</li>
+							<li class="" href="#" id="NBR">NBR</li>
+						</ul>
+					</div>
+
+				</div>
+ 			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<div class="chip-gallery"></div>
+					<div class="img-gallery"></div>	
+				</div>
+			</div>
+		</div>
+		
+		
+		
+		<script>
+		
+		
+			//////////DEFINE GLOBAL VARIABLES/////////////////////////////////////////////////////////
+			//define the mean and stdev of indices for stretching
+			var stretch={
+					"B1":{
+					  "mean":604,
+					  "stdev":670
+					},
+					"B2":{
+					  "mean":827,
+					  "stdev":410
+					},
+					"B3":{
+					  "mean":903,
+					  "stdev":555
+					},
+					"B4":{
+					  "mean":2317,
+					  "stdev":659
+					},
+					"B5":{
+					  "mean":2287,
+					  "stdev":900
+					},
+					"B7":{
+					  "mean":1611,
+					  "stdev":829
+					},
+					"TCB":{
+					  "mean":3098,
+					  "stdev":1247
+					},
+					"TCG":{
+					  "mean":1549,
+					  "stdev":799
+					},
+					"TCW":{
+					  "mean":-701,
+					  "stdev":772
+					},
+					"TCG":{
+					  "mean":1549,
+					  "stdev":799
+					},
+					"TCA":{
+					  "mean":1532,
+					  "stdev":1002
+					},
+					"NDVI":{
+					  "mean":0.4600587,
+					  "stdev":0.1833235
+					},
+					"NBR":{
+					  "mean":0.2174783,
+					  "stdev":0.2293639
+					}		
+			};
+			
+			//define the domain of the indices for scaling to the range of the plot
+			var domain={
+					"B1":{
+						"min":-50,
+						"max":2000
+					},
+					"B2":{
+						"min":-50,
+						"max":2000
+					},
+					"B3":{
+						"min":-50,
+						"max":2500
+					},
+					"B4":{
+						"min":-50,
+						"max":4500
+					},
+					"B5":{
+						"min":-50,
+						"max":4500
+					},
+					"B7":{
+						"min":-50,
+						"max":4000
+					},
+					"TCB":{
+						"min":0,
+						"max":7000
+					},
+					"TCG":{
+						"min":-500,
+						"max":2500
+					},
+					"TCW":{
+						"min":-3500,
+						"max":500
+					},
+					"TCA":{
+						"min":-500,
+						"max":4000
+					},
+					"NDVI":{
+						"min":-1,
+						"max":1
+					},
+					"NBR":{
+						"min":-1,
+						"max":1
+					}			
+			};
+			
+			var n_stdev = 2,
+				data, // = getJson("./test3.json"), //get the data
+				len, // = Object.keys(data.Values).length, //get the number of years
+				index = "TCW", //default index to display			
+				rgbColor,
+				jsonURL = "./test3.json";
+			
+			
+			/////////////DEFINE FUNCTIONS////////////////////////////////////////////////////////////////
+			
+			//function to retrieve json data
+			$.getJSON(jsonURL).done(function(jsonobject){
+				data = jsonobject
+				len = data.Values.length;
+				//len = Object.keys(data.Values).length
+				calcIndices();
+				rgbColor = scaledRGB(data, "TCB", "TCG", "TCW", stretch, 2, len); //get the scaled rgb color
+				plotInt();
+				
+				////make the trajectory svg circles selectable
+				//$(document).ready(function(){
+				//	$("circle").click(function(e){
+				//		if(e.ctrlKey){
+				//			e.preventDefault(); //make sure that default browser behaviour is prevented
+				//			var status = $(this).attr("class");
+				//			if(status == "unselected"){
+				//				$(this).attr("class","selected");
+				//			} else {
+				//				$(this).attr("class","unselected");
+				//			}	
+				//		}
+				//	});
+				//});
+				
+			});
+					
+			//make the trajectory svg circles selectable
+			$(document).ready(function(){
+				$(document).on("click", "circle", function(e){ //need to use this style event binding for elements that don't exisit yet - these lines will run before the "circle" elements are created, alternatively could use the commented lines in the above jquery section
+					if(e.ctrlKey){
+						e.preventDefault(); //make sure that default browser behaviour is prevented
+						var circleIndex = $("circle").index(this)
+						if(circleIndex != 0 &&  circleIndex != len-1){
+							var status = $(this).attr("class");
+							
+							if(status == "unselected"){
+								$(this).attr("class","selected");
+								changePlotLine();	
+							} else {
+								$(this).attr("class","unselected");
+								changePlotLine();
+							}	
+						}					
+					}
+				});
+			});
+			
+			
+			//define function to add and remove line segments
+			function changePlotLine(){
+				selectedCircles = $(".selected");
+				var lineData = [];
+				var i = 0;
+				for(i; i < selectedCircles.length; i++){
+					var thisone = $("circle").index(selectedCircles[i]);
+					lineData.push({"x":data.Values[thisone].ImageDate, "y":data.Values[thisone][index]});
+				}
+				
+				$(".plotLine").remove();				//add the default line
+				console.log(lineData);
+				//make the line function to convert the xy object to svg path syntax 
+				//var lineFunction = d3.svg.line() //TODO: CHECK IF THIS NEEDS TO BE A GLOBAL VARIABLE OR NOT
+				//	.x(function(d){return xscale(d.x);})
+				//	.y(function(d){return yscale(d.y);})
+				//	.interpolate("linear");
+				
+				var lineGraph = svg.append("path")
+					.attr("d", lineFunction(lineData))
+					.attr("stroke", "#FF0000")
+					.attr("stroke-width", 2)
+					.attr("fill", "none")
+					.attr("class","plotLine");
+			}
+			
+			
+			//define function to return stretch color array by index
+			function setcolor(data, index, stretch, n_stdev, len) {
+				var minv = stretch[index].mean - (stretch[index].stdev * n_stdev),
+					maxv = stretch[index].mean + (stretch[index].stdev * n_stdev),
+					color = [];
+				for (i = 0; i < len; i++) {
+					if (data.Values[i][index] < minv) data.Values[i][index] = minv;
+					if (data.Values[i][index] > maxv) data.Values[i][index] = maxv;
+					color[i] = ((data.Values[i][index] - minv) / (maxv - minv)) * 255;
+				}
+				return color;
+			}
+			
+			//define function to return scaled color arrays as RGB color
+			function scaledRGB(data, Rindex, Gindex, Bindex, stretch, n_stdev, len){
+				var colorR = setcolor(data, Rindex, stretch, n_stdev, len),
+					colorG = setcolor(data, Gindex, stretch, n_stdev, len),
+					colorB = setcolor(data, Bindex, stretch, n_stdev, len),
+					color = [];
+				for(var i=0;i<len;i++) {color[i] = d3.rgb(colorR[i],colorG[i],colorB[i]);}
+				return color;
+			}			
+			
+			//define function to calculate spectral indices from the raw band data
+			function calcIndices(){
+				//define and initialize variables		
+				var b1 = 0, 
+					b2 = 0, 
+					b3 = 0,
+					b4 = 0,
+					b5 = 0,
+					b7 = 0,
+					bcoef = [0.2043, 0.4158, 0.5524, 0.5741, 0.3124, 0.2303],
+					gcoef = [-0.1603, -0.2819, -0.4934, 0.7940, -0.0002, -0.1446],
+					wcoef = [0.0315, 0.2021, 0.3102, 0.1594,-0.6806, -0.6109],
+					i = 0;
+				
+				//calculate indices and include them in the json object
+				for(i=0; i<len; i++){
+					//pull out the values by band from json object so we don't have to deal with the long json text to 
+					//call a value when calculating indices 
+					b1 = data.Values[i].B1;
+					b2 = data.Values[i].B2;
+					b3 = data.Values[i].B3;
+					b4 = data.Values[i].B4;
+					b5 = data.Values[i].B5;
+					b7 = data.Values[i].B7;
+				
+					//calculate indices
+					data.Values[i]["TCB"]=(b1*bcoef[0])+(b2*bcoef[1])+(b3*bcoef[2])+(b4*bcoef[3])+(b5*bcoef[4])+(b7*bcoef[5]);		
+					data.Values[i]["TCG"]=(b1*gcoef[0])+(b2*gcoef[1])+(b3*gcoef[2])+(b4*gcoef[3])+(b5*gcoef[4])+(b7*gcoef[5]);
+					data.Values[i]["TCW"]=(b1*wcoef[0])+(b2*wcoef[1])+(b3*wcoef[2])+(b4*wcoef[3])+(b5*wcoef[4])+(b7*wcoef[5]);
+					data.Values[i]["TCA"]=Math.atan(data.Values[i].TCG/data.Values[i].TCB) * (180/Math.PI) * 100;
+					data.Values[i]["NBR"]=(b4-b7)/(b4+b7);
+					data.Values[i]["NDVI"]=(b4-b3)/(b4+b3);
+				}
+			}
+					
+			//define function to initialize the spectral trajectory
+			function plotInt(){
+				//get the range of the x values
+				var yearmin = d3.min(data.Values, function(d) {return d.ImageDate;}),
+					yearmax = d3.max(data.Values, function(d) {return d.ImageDate;});
+				
+				//adjust the ranges so there is some buffer
+				var xmin = yearmin-1, //
+					xmax = yearmax+1;
+				
+				//define the width of the svg plot area
+				var w = 740, 
+					h = 300; 
+				
+				//define the plot margins
+				var pt = 10, //plot top
+					pr = 20, //plot right
+					pl = 70, //plot left
+					pb = 37; //plot bottom
+				
+				//define the x scale
+				xscale = d3.scale.linear() //NEEDS TO BE A GLOBAL VARIABLE - IS USED HERE AND IN THE UPDATE FUNCTION
+					.domain([xmin, xmax])
+					.range([pl, w - pr]);
+				
+				//define the y scale
+				yscale = d3.scale.linear() //NEEDS TO BE A GLOBAL VARIABLE - IS USED HERE AND IN THE UPDATE FUNCTION
+					.domain([domain[index].min, domain[index].max])
+					.range([h - pb, pt]);
+						
+				//define the x axis
+				var xaxis = d3.svg.axis()
+					.scale(xscale)
+					.orient("bottom")
+					.tickFormat(d3.format("d"));
+				
+				//define the x axis
+				yaxis = d3.svg.axis() //NEEDS TO BE A GLOBAL VARIABLE - IS USED HERE AND IN THE UPDATE FUNCTION
+					.scale(yscale)
+					.orient("left");
+				
+				//define the zooming function - what gets scaled on zoom
+				function zoomed() {
+					svg.select(".y.axis").call(yaxis);
+					svg.selectAll("circle").attr("cy", function(d){return yscale(d[index]);});
+				}
+				
+				//define the zoom behavior
+				var zoom = d3.behavior.zoom()
+					.y(yscale)
+					.scaleExtent([1, 5])
+					.on("zoom", zoomed);
+					
+				//append the svg element to the html body - set the svg width and height
+				svg = d3.select(plot)
+					.append("svg")
+					.attr("width", w)
+					.attr("height", h)
+					.call(zoom);
+				
+				//call the zoom once - needed for the updating to work
+				svg.call(zoom);
+				
+				//make the default line data
+				var lineData = [ //needs to be local variable
+					{"x":yearmin ,"y":data.Values[0][index]},
+					{"x":yearmax ,"y":data.Values[len-1][index]}
+				];
+
+
+				//make the line function to convert the xy object to svg path syntax 
+				lineFunction = d3.svg.line() //global because it gets used when selecting new points
+					.x(function(d){return xscale(d.x);})
+					.y(function(d){return yscale(d.y);})
+					.interpolate("linear");
+				
+				//create the circles that will go into the svg
+				var circles = svg.selectAll("circle")
+					.data(data.Values)
+					.enter()
+					.append("circle")
+					.style("fill",function(d,i){return rgbColor[i]})
+					.attr("cx", function(d){return xscale(d.ImageDate);})
+					.attr("cy", function(d){return yscale(d[index]);})
+					.attr("r", 10)
+					.attr("class","unselected");
+				
+				//add the default line
+				var lineGraph = svg.append("path") //local because it will get overwritten
+					.attr("d", lineFunction(lineData))
+					.attr("stroke", "#FF0000")
+					.attr("stroke-width", 2)
+					.attr("fill", "none")
+					.attr("class","plotLine");
+				
+				//draw the x axis
+				svg.append("g")
+					.attr("class", "x axis")
+					.attr("transform", "translate(0," + (h - pb) + ")")
+					.call(xaxis);
+					
+				//draw the y axis
+				svg.append("g")
+					.attr("class", "y axis")
+					.attr("transform", "translate(" + pl + ",0)")
+					.call(yaxis);
+					
+				//add label for the x axis
+				svg.append("text")      
+					.attr("transform", "rotate(-90)")
+					.attr("x", (h-pb)/-2)
+					.attr("y", 20)
+					.style("text-anchor", "middle")
+					.text("TC Wetness")
+					.attr("id","specPlotIndex");
+				
+				//define clip path so that circles don't go outside the axes
+				svg.append("defs")
+					.append("clipPath")
+					  .attr("id", "clip")
+					.append("rect")
+					  .attr("x", 50)
+					  .attr("y", 10)
+					  .attr("width", w-pr)
+					  .attr("height", h-pb-pt);
+				
+				//add the path to the circles to activate the clipping
+				circles.attr("clip-path", "url(#clip)");
+				
+				//default the first and last circles to class "selected"
+				$("circle").eq(0).attr("class","selected");
+				$("circle").eq(len-1).attr("class","selected");
+			}
+			
+			//define function to update the D3 scatterplot when new selection are made
+			function update(data, index, rgbColor, domain){
+				
+				//update the y domain based on the new index
+				yscale.domain([domain[index].min, domain[index].max]); //yscale was defined in the plotInt function
+				
+				//define the zooming function - what gets scaled on zoom 
+				function zoomed() {
+					svg.select(".y.axis").call(yaxis);
+					svg.selectAll("circle").attr("cy", function(d){return yscale(d[index]);});
+				}
+				
+				//define the zoom behavior
+				var zoom = d3.behavior.zoom()
+					.y(yscale)
+					.scaleExtent([1, 5])
+					.on("zoom", zoomed);
+				
+				//call the function to make the scale change
+				svg.call(zoom); //svg was defined in the plotInt function
+				
+				//update the circles with new data
+				svg.selectAll("circle") //svg was defined in the plotInt function
+					.data(data.Values)					   
+					.transition()
+					.duration(500)
+					.attr("cx", function(d){return xscale(d.ImageDate);})
+					.attr("cy", function(d){return yscale(d[index]);})
+					.style("fill",function(d,i){return rgbColor[i]})
+
+					
+				/////////////////////////////////LINE UPDATE////////////////////////////////	
+				//retrieve the line data (this section could be made into a function cause it is also used in the changePlotLine function)
+				selectedCircles = $(".selected");
+				var lineData = [];
+				var i = 0;
+				for(i; i < selectedCircles.length; i++){
+					var thisone = $("circle").index(selectedCircles[i]);
+					lineData.push({"x":data.Values[thisone].ImageDate, "y":data.Values[thisone][index]});
+				}
+				
+				//update the line
+				svg.selectAll(".plotLine") //local because it will get overwritten
+					.transition()
+					.duration(500)
+					.attr("d", lineFunction(lineData));
+				/////////////////////////////////////////////////////////////////////////////
+					
+				//update y axis
+				svg.select(".y.axis") //svg was defined in the plotInt function
+					.transition()
+					.duration(500)
+					.call(yaxis);
+			}
+			
+			
+			//update the plot when buttons are clicked		
+			//right now the points and colors are redrawn each time, in the future could break this down
+			//by which button type is pressed, either index or color and only update either the point locations
+			//or the colors
+			$(document).ready(function(){
+				$(".dropdown-menu li").click(function() { //This will attach the function to all the input elements
+					var listid = $(this).closest("ul").attr('id'),
+						indexid = $(this).attr('id'),
+						newactive = "#"+listid+" #"+indexid,
+						activesearch = "#"+listid+" .active",
+						activeid = $(activesearch).attr('id'),
+						oldactive = "#"+listid+" #"+activeid;
+					
+					$(oldactive).removeClass('active');
+					$(newactive).addClass('active');
+					
+					var indexid = $("#index-list li.active").attr('id'),		
+						redid = $("#red-list li.active").attr('id'),
+						greenid = $("#green-list li.active").attr('id'),
+						blueid = $("#blue-list li.active").attr('id');
+					
+					rgbColor = scaledRGB(data, redid, greenid, blueid, stretch, 2, len);
+					update(data, indexid, rgbColor, domain);
+					$("#specPlotIndex").text($("#"+indexid).text());
+				});
+			});
+			
+
+			
+			//make the chip gallery expand on click
+			$(document).ready(function(){
+				$(".chip-gallery").click(function(e){
+					if(!e.ctrlKey){
+						var status = $(this).css("height");
+						if(status == "524px"){
+							$(this).css("height","auto");
+						} else {
+							$(this).css("height","524px");
+						}
+					}
+					
+				});
+			});
+			
+			
+			
+			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		
+		
+			///////////////SET GLOBAL VARIABLES//////////////////////////////////////////////////////////
+			var canvasIDs = [], 
+				imgIDs = [], 
+				sxOrig = [], //source x offset
+				syOrig = [], //source y offset
+				sWidthOrig = [], //width/height of chip area to show from (sx,sy)
+				sxZoom = [], //source x offset
+				syZoom = [], //source y offset
+				sWidthZoom = [], //width/height of chip area to show from (sx,sy)
+				i = 0, //iterator
+				n_chips = 40, //get this on the fly from the json file
+				zoomLevel = 0,
+				minZoom = 0,
+				maxZoom = 40;
+				box = 1;
+			///////////////////////////////////////////////////////////////////////////////////////////////
+			
+			
+			
+			///////////DEFINE THE FUNCTION TO ADD THE CANVAS AND IMAGE FOR EACH CHIP ON-THE-FLY////////////
+			function loadChipStrips(){
+				var canvasID = "", 
+					imgID = "",
+					appendThisCanvas = "",
+					appendThisImg = "";
+				
+				for(i=0; i < n_chips; i++){
+					canvasID = "chip"+i;
+					canvasIDs.push(canvasID);
+					imgID = "img"+i;
+					imgIDs.push(imgID);
+					sxOrig.push(0);
+					syOrig.push(255*i);
+					sWidthOrig.push(255);
+					sxZoom.push(sxOrig[i]);
+					syZoom.push(syOrig[i]);
+					sWidthZoom.push(sWidthOrig[i]);
+					appendThisCanvas = '<canvas id="'+canvasID+'" width="255" height="255"></canvas>'; // style="border:1px solid #d3d3d3;"
+					$(".chip-gallery").append(appendThisCanvas);
+					appendThisImg = '<img id="'+imgID+'"src="chips/chips_2012.png">';
+					$(".img-gallery").append(appendThisImg);
+				}
+			}
+			/////////////////////////////////////////////////////////////////////////////////////////////////
+			
+			loadChipStrips(); //run the function
+			
+
+			////////////////DEFINE FUNCTION TO DRAW ALL THE IMAGE CHIPS TO THE CANVASES/////////////////////
+			function drawAllChips(){
+				var canvasID = {}, //canvas id for a given chip
+					imgID = {}, //img id for a given chip
+					ctx = {}; //img id for a given chip 
+
+				for(i=0; i<n_chips; i++){
+					canvasID = document.getElementById(canvasIDs[i]);
+					imgID = document.getElementById(imgIDs[i]);
+					ctx = canvasID.getContext("2d");
+					ctx.mozImageSmoothingEnabled = false;
+					//ctx.webkitImageSmoothingEnabled = false;
+					ctx.msImageSmoothingEnabled = false;
+					ctx.imageSmoothingEnabled = false;
+					ctx.drawImage(imgID,sxZoom[i],syZoom[i],sWidthZoom[i],sWidthZoom[i],0,0,255,255);
+					ctx.strokeStyle="#FF0000";
+					ctx.lineWidth=1;
+					ctx.lineCap = 'square';
+					ctx.strokeRect(127.5-(box/2), 127.5-(box/2), box, box);	
+				}
+			}
+			///////////////////////////////////////////////////////////////////////////////////////////////
+			
+						
+			////////////REPLACE A CHIP WITH ONE SELECTED IN THE REMOTE WINDOW//////////////////////////////
+			function replaceChip(replaceThisChip,newSyOffset){
+				
+				//set some variables
+				var canvasID = {}, //canvas id for a given chip
+					imgID = {}, //img id for a given chip
+					ctx = {}; //img id for a given chip 
+				
+				//adjust the chip offset for the orig and zoom arrays
+				syOrig[replaceThisChip] = newSyOffset //set the new original offset
+				syZoom[replaceThisChip] = syOrig[replaceThisChip]+sAdj[zoomLevel]; //set the new zoom offset
+				
+				//do the drawing
+				canvasID = document.getElementById(canvasIDs[replaceThisChip]);
+				imgID = document.getElementById(imgIDs[replaceThisChip]);
+				ctx = canvasID.getContext("2d");
+				ctx.mozImageSmoothingEnabled = false;
+				//ctx.webkitImageSmoothingEnabled = false;
+				ctx.msImageSmoothingEnabled = false;
+				ctx.imageSmoothingEnabled = false;
+				ctx.drawImage(imgID,sxZoom[replaceThisChip],syZoom[replaceThisChip],sWidthZoom[replaceThisChip],sWidthZoom[replaceThisChip],0,0,255,255);
+				ctx.strokeStyle="#FF0000";
+				ctx.lineWidth=1;
+				ctx.lineCap = 'square';
+				ctx.strokeRect(127.5-(box/2), 127.5-(box/2), box, box);		
+			}
+			/////////////////////////////////////////////////////////////////////////////////////////////////
+			
+			
+			
+			//create the zoom adjustment array
+            var sAdj = [0],
+				starter = 127.5,
+				lwstarter = box,
+				lwAdj = [box],
+				zoomIn = 0;
+			
+			for(i=1; i<maxZoom+1; i++){
+				starter *= 0.9 
+				sAdj.push(127.5-starter);
+				lwstarter /= 0.9
+				lwAdj.push(lwstarter)
+			}
+  
+			function updateZoom(){
+				for(i = 0; i < n_chips; i++){
+					sxZoom[i] = sxOrig[i]+sAdj[zoomLevel];
+					syZoom[i] = syOrig[i]+sAdj[zoomLevel];
+					sWidthZoom[i] = sWidthOrig[i]-(sAdj[zoomLevel]*2);
+				}
+				box = lwAdj[zoomLevel];
+			}
+  
+			
+			$(document).ready(function(){ //not sure if this $(document).ready check is needed, but doesn't hurt
+				$(document).on("mousewheel","canvas",function(e){
+					//e.preventDefault(); //make sure that default browser behaviour is prevented
+					if(e.shiftKey){ //
+						e.preventDefault(); //make sure that default browser behaviour is prevented
+						if(e.deltaX <= -1 || e.deltaY >= 1){zoomIn = 1} else {zoomIn = 0}
+						if(zoomIn > 0){
+							if (zoomLevel < maxZoom){
+							zoomLevel++;
+							}
+						} else {
+							if (zoomLevel > minZoom){zoomLevel--;}
+						}
+
+						//redraw the chips
+						updateZoom(); //update the zoom arrays	
+						drawAllChips(); //redraw the chips with the new zoom
+						
+						//prepare zoom message
+						zoomInfo = {
+							"action":"zoom",
+							"zoomLevel":zoomLevel
+						}
+
+						//send the zoom array to the external window
+						if ((chipstripwindow != null) && chipstripwindow.closed == false){ 
+							//prepare zoom message
+							zoomInfo = {
+								"action":"zoom",
+								"zoomLevel":zoomLevel
+							}
+							//send the zoom message
+							chipstripwindow.postMessage(JSON.stringify(zoomInfo),"*");
+						}		
+					}
+				});
+			});
+			
+			
+			
+			
+			
+			///////////////////OPEN THE REMOTE CHIP STRIP WINDOW AND SEND MESSAGES/////////////////////
+			var chipstripwindow = null ;//keep track of whether the chipstrip window is open or not so it is not opened in multiple new window on each chip click
+			$("body").on("click", "canvas", function(e){ //need to use body because the canvases have probably not loaded yet
+				if (e.ctrlKey) { 
+					var pass_data = {
+						"action":"add_chips", //hard assign
+						"n_chips":"40", //get this from the img metadata
+						"src":"chips/chips_2012.png", //get this from the id of the .chipholder clicked
+						"canvasID":$(this).attr("id"),
+						"zoomLevel":zoomLevel
+					};
+					if ((chipstripwindow == null) || (chipstripwindow.closed)){      //if the window is not loaded then load it and send the message after it is fully loaded
+						chipstripwindow = window.open("./chip_strip_4.html","_blank","width=1080px, height=840px", "toolbar=0","titlebar=0","menubar=0","scrollbars=yes"); //open the remote chip strip window
+						$(chipstripwindow).load(function(){chipstripwindow.postMessage(JSON.stringify(pass_data),"*");}); //wait until the remote window finishes loading before sending the message
+					} else {                                                         //else if the window is already loaded, just send the message - no need to wait
+						chipstripwindow.postMessage(JSON.stringify(pass_data),"*");
+					}
+				}
+			});
+			///////////////////////////////////////////////////////////////////////////////////////////
+			
+			
+			//////////////////////////GET MESSAGES FROM REMOTE///////////////////////////////// 
+			//receive messages from the origin window
+			$(window).on("message onmessage",function(e){
+				var pass_data = JSON.parse(e.originalEvent.data);
+				if(pass_data.action == "replace_chip"){
+					replaceChip(pass_data.originChipIndex, pass_data.newSyOffset); //replace a chip with one selected in the remote window
+					//$(document).ready(function(){drawAllChips()}); //wait until the image has loaded and then draw the chips
+				} else if (pass_data.action == "zoom"){
+					zoomLevel = pass_data.zoomLevel;
+					updateZoom();
+					drawAllChips();
+				}
+				
+				//$("#message").append(e.originalEvent.data); //****need to use 'originalEvent' instead of 'event' since im using jquery to bind the event. the jquery event object is different from the javascript event object - originalEvent is a copied version of the original javascript event object
+			});	
+			//////////////////////////////////////////////////////////////////////////////////
+			
+
+			//calcIndices();
+			//rgbColor = scaledRGB(data, "TCB", "TCG", "TCW", stretch, 2, len); //get the scaled rgb color
+			//plotInt();
+
+		
+		</script>
+	</body>
+</html>
