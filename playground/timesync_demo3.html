@@ -737,7 +737,7 @@
 					//e.preventDefault(); //make sure that default browser behaviour is prevented
 					if(e.shiftKey){ //
 						e.preventDefault(); //make sure that default browser behaviour is prevented
-						if(e.deltaX == -1 || e.deltaY == 1){zoomIn = 1} else {zoomIn = 0}
+						if(e.deltaX <= -1 || e.deltaY >= 1){zoomIn = 1} else {zoomIn = 0}
 						if(zoomIn > 0){
 							if (zoomLevel < maxZoom){
 							zoomLevel++;
