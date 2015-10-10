@@ -408,7 +408,7 @@
 				for (i = 0; i < len; i++) {
 					if (data.Values[i][specIndex] < minv) data.Values[i][specIndex] = minv;
 					if (data.Values[i][specIndex] > maxv) data.Values[i][specIndex] = maxv;
-					color[i] = ((data.Values[i][specIndex] - minv) / (maxv - minv)) * 255;
+					color[i] = ((data.Values[i][specIndex] - minv) / (maxv - minv)) * 256;
 				}
 				return color;
 			}
