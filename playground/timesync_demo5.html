@@ -24,6 +24,7 @@
 				-ms-user-select: none;
 				user-select: none;
 			}
+
 			.axis path, 
 			.axis line {
 				fill: none;
@@ -34,31 +35,14 @@
 				font-family: sans-serif;
 				font-size: 11px;
 			}
-			.dropdown:hover .dropdown-menu {
-				display: block;
-			}
-			.dropdown-menu {
-				margin-top: 0;
-			}
+
 			.container{
 				margin-top:40px;
 			}
-			li:hover{
-				background-color:#f1f1f1;
-			}
-			.dropdown-menu .active{
-				background-color:#dbdbdb;
-			}
-			li{
-				padding-left:10px;
-				cursor:pointer;
-			}
-			.btn-default:focus{
-				background-color:white;
-			}
+
 			.chip-gallery{
-				height:524px;
-				width:1070px;
+				height:535px;
+				width:1080px;
 				overflow-y: auto;
 				border:1px solid #dbdbdb;
 				border-radius: 4px;
@@ -69,6 +53,10 @@
 				margin:3px;
 				vertical-align:top;
 				cursor: pointer;
+				border: 2px solid #dbdbdb;
+			}
+			.chip-gallery .selected{
+				border: 2px solid black;
 			}
 			.img-gallery{
 				display:none;
@@ -76,23 +64,28 @@
 			#plot{
 				border:1px solid #dbdbdb;
 				border-radius: 4px;
-				cursor: n-resize;
-				/*cursor: grab;*/
 			}
-			/*#plot:active{
-				cursor:grabbing;
-			}*/
+
 			circle{
 				cursor: pointer;
 			}
-			circle.selected{				
+			
+			circle.selected{
 				stroke:#FF0000;
 				stroke-width:1;
 			}
+			
 			circle:hover{
 				stroke:#FF0000;
 				stroke-width:1;
 			}
+			
+			svg{
+				margin:-1px;
+				cursor: n-resize;
+				display: block;
+			}
+			
 			#containerDiv{
 				display:table;
 				border-spacing: 5px;
@@ -102,7 +95,7 @@
 			#containerDiv div{
 				
 				
-				margin: 5px;
+				/*margin: 5px;*/
 			}
 			#plotSelectionDiv{
 				
@@ -113,6 +106,7 @@
 			.header{
 				padding-left:3px;
 				font-size: 12px;
+				font-weight: bold;
 				background:#f1f1f1;
 				
 			}
@@ -126,6 +120,57 @@
 
 			}
 			
+			/***********************BUTTON STYLE******************************/
+			li:hover{
+				background-color:#f1f1f1;
+			}
+			
+			.dropdown-menu .active{
+				background-color:#dbdbdb;
+			}
+			.dropdown-menu.plot li{
+				font-size:11px;
+				padding-left:5px;
+				cursor:pointer;
+				width:100px;
+				
+			}
+			.dropdown-menu.plot {
+				margin-top: 0;
+				min-width:0px;
+			}
+
+			
+			.btn-default:focus{
+				background-color:white;
+			}
+			
+			.dropdown button{
+				width:100px;
+			}			
+			
+			.dropdown:hover .dropdown-menu {
+				display: block;
+			}
+			
+
+			
+			.specPlotBtn{
+				font-size:11px;
+				text-align: left;
+				padding-left:5px;
+				padding-top:0px;
+				padding-bottom:1px;
+			}
+			
+			.buttonText{margin-right:2px;}
+			
+			.caret {
+				position: absolute;
+				left: 80%;
+				top: 65%;
+			}
+
 		</style>
 	</head>
 	<body> <!-- onload="drawAllChips()"!-->
@@ -136,13 +181,15 @@
 				</div>
 				
 				
-					<div id="plot" class="sectionDiv"></div>
-				
-				
-					<div class="dropdown" style="display:inline-block">
-						<button class="btn btn-default dropdown-toggle" type="button">Indices
-						<span class="caret"></span></button>
-						<ul class="dropdown-menu" id="index-list">
+					<div id="plot" class="sectionDiv">
+				<svg id="svg" width="740" height="300"></svg>
+				<div class="btn-group" role="group" aria-label="..." style="margin:-1px; display: inline-block;">
+					<!--<div class="dropdown" style="display:inline-block">!-->
+					<div class="btn-group dropdown" role="group">	
+						<button id="btnIndex" class="btn btn-default dropdown-toggle specPlotBtn" type="button">
+							<div><strong>Index</strong>:<br><small>TC Wetness</small><span class="caret"></span></div>
+						</button>
+						<ul class="dropdown-menu plot" id="index-list">
 							<li class="" id="B1">Band 1</li>
 							<li class="" id="B2">Band 2</li>
 							<li class="" href="#" id="B3">Band 3</li>
@@ -157,10 +204,12 @@
 							<li class="" href="#" id="NBR">NBR</li>
 						</ul>
 					</div>
-					<div class="dropdown" style="display:inline-block">
-						<button class="btn btn-default dropdown-toggle" type="button">Red
-						<span class="caret"></span></button>
-						<ul class="dropdown-menu" id="red-list">
+					<!--<div class="dropdown" style="display:inline-block">!-->
+					<div id="btnRed" class="btn-group dropdown" role="group">					
+						<button class="btn btn-default dropdown-toggle specPlotBtn" type="button">
+							<div><strong>R</strong><small>GB</small>:<br><small>TC Brightness</small><span class="caret"></span></div>
+						</button>
+						<ul class="dropdown-menu plot" id="red-list">
 							<li class="" href="#" id="B1">Band 1</li>
 							<li class="" href="#" id="B2">Band 2</li>
 							<li class="" href="#" id="B3">Band 3</li>
@@ -175,10 +224,12 @@
 							<li class="" href="#" id="NBR">NBR</li>
 						</ul>
 					</div>
-					<div class="dropdown" style="display:inline-block">
-						<button class="btn btn-default dropdown-toggle" type="button">Green
-						<span class="caret"></span></button>
-						<ul class="dropdown-menu" id="green-list">
+					<!--<div class="dropdown" style="display:inline-block">!-->
+					<div class="btn-group dropdown" role="group">
+						<button id="btnGreen" class="btn btn-default dropdown-toggle specPlotBtn" type="button">
+							<div><small>R</small><strong>G</strong><small>B</small>:<br><small>TC Greenness</small><span class="caret"></span></div>
+						</button>
+						<ul class="dropdown-menu plot" id="green-list">
 							<li class="" href="#" id="B1">Band 1</li>
 							<li class="" href="#" id="B2">Band 2</li>
 							<li class="" href="#" id="B3">Band 3</li>
@@ -193,10 +244,12 @@
 							<li class="" href="#" id="NBR">NBR</li>
 						</ul>
 					</div>
-					<div class="dropdown" style="display:inline-block">
-						<button class="btn btn-default dropdown-toggle" type="button">Blue
-						<span class="caret"></span></button>
-						<ul class="dropdown-menu" id="blue-list">
+					<!--<div class="dropdown" style="display:inline-block">!-->
+					<div class="btn-group dropdown" role="group">
+						<button id="btnBlue" class="btn btn-default dropdown-toggle specPlotBtn" type="button">
+							<div><small>RG</small><strong>B</strong>:<br><small>TC Wetness</small><span class="caret"></span></div>
+						</button>
+						<ul class="dropdown-menu plot" id="blue-list">
 							<li class="" href="#" id="B1">Band 1</li>
 							<li class="" href="#" id="B2">Band 2</li>
 							<li class="" href="#" id="B3">Band 3</li>
@@ -211,8 +264,15 @@
 							<li class="" href="#" id="NBR">NBR</li>
 						</ul>
 					</div>
+					<div class="btn-group" role="group">
+						<button id="btnLine" class="btn btn-default specPlotBtn" type="button">
+							<Strong>Display line</strong>:<br><span id="lineDisplayThumb" class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span>
+						</button>
+					</div>
+				</div>
 
-
+				</div>
+				
  			</div>
 			<div class="row">
 				<div class="col-md-12">
@@ -240,7 +300,7 @@
 			//function to retrieve json data
 			$.getJSON(jsonURL).done(function(jsonobject){
 				data = jsonobject
-				len = data.Values.length;
+				len = data.Values.length; // NEEDS TO BE A GLOBAL VARIABLE
 				//len = Object.keys(data.Values).length
 				calcIndices();
 				rgbColor = scaledRGB(data, "TCB", "TCG", "TCW", stretch, 2, len); //get the scaled rgb color
@@ -262,24 +322,46 @@
 				//});
 				
 			});
-					
+	
+			//define function to update the circle selection
+			function changeSelectedClass(seriesIndex){
+				thisCircle = $("circle").eq(seriesIndex);
+				thisCanvas = $("canvas").eq(seriesIndex);
+				var status = thisCircle.attr("class");
+				console.log(status)
+				if(status == "unselected"){
+					thisCircle.attr("class","selected");
+					thisCanvas.attr("class","selected");
+					changePlotLine();	
+				} else {
+					thisCircle.attr("class","unselected");
+					thisCanvas.attr("class","unselected");
+					changePlotLine();
+				}
+			}
+
 			//make the trajectory svg circles selectable
 			$(document).ready(function(){
-				$(document).on("click", "circle", function(e){ //need to use this style event binding for elements that don't exisit yet - these lines will run before the "circle" elements are created, alternatively could use the commented lines in the above jquery section
-					if(e.ctrlKey){
-						
+				$(document).on("click", "circle, canvas", function(e){ //need to use this style event binding for elements that don't exisit yet - these lines will run before the "circle" elements are created, alternatively could use the commented lines in the above jquery section
+					if(e.shiftKey){
 						e.preventDefault(); //make sure that default browser behaviour is prevented
-						var circleIndex = $("circle").index(this)
-						if(circleIndex != 0 &&  circleIndex != len-1){
-							var status = $(this).attr("class");
-							
-							if(status == "unselected"){
-								$(this).attr("class","selected");
-								changePlotLine();	
-							} else {
-								$(this).attr("class","unselected");
-								changePlotLine();
-							}	
+						var nodeType = $(this).prop('nodeName')
+						if(nodeType == "circle"){
+							var seriesIndex = $("circle").index(this);
+						} else{
+							var seriesIndex = $("canvas").index(this);
+						}
+						if(seriesIndex != 0 &&  seriesIndex != len-1){
+							changeSelectedClass(seriesIndex)
+							//	var status = $(this).attr("class");
+							//	
+							//	if(status == "unselected"){
+							//		$(this).attr("class","selected");
+							//		changePlotLine();	
+							//	} else {
+							//		$(this).attr("class","unselected");
+							//		changePlotLine();
+							//	}
 						}					
 					}
 				});
@@ -288,7 +370,7 @@
 			
 			//define function to add and remove line segments
 			function changePlotLine(){
-				var selectedCircles = $(".selected");
+				var selectedCircles = $("circle.selected");
 				var lineData = [];
 				var i = 0;
 				for(i; i < selectedCircles.length; i++){
@@ -296,7 +378,7 @@
 					lineData.push({"x":data.Values[thisone].ImageDate, "y":data.Values[thisone][specIndex]});
 				}
 				
-				$(".plotLine").remove();				//add the default line
+				$("#plotLine").remove();				//add the default line
 				//make the line function to convert the xy object to svg path syntax 
 				//var lineFunction = d3.svg.line() //TODO: CHECK IF THIS NEEDS TO BE A GLOBAL VARIABLE OR NOT
 				//	.x(function(d){return xscale(d.x);})
@@ -308,19 +390,19 @@
 					.attr("stroke", "#FF0000")
 					.attr("stroke-width", 2)
 					.attr("fill", "none")
-					.attr("class","plotLine");
+					.attr("id","plotLine");
 				
 				//define the zooming function - what gets scaled on zoom 
 				function zoomed() {
 					svg.select(".y.axis").call(yaxis);
 					svg.selectAll("circle").attr("cy", function(d){return yscale(d[specIndex]);});
-					svg.selectAll(".plotLine").attr("d", lineFunction(lineData));
+					svg.selectAll("#plotLine").attr("d", lineFunction(lineData));
 				}
 				
 				//define the zoom behavior
 				var zoom = d3.behavior.zoom()
 					.y(yscale)
-					.scaleExtent([1, 5])
+					.scaleExtent([.1, 5])
 					.on("zoom", zoomed);
 				
 				//call the function to make the scale change
@@ -433,7 +515,7 @@
 				function zoomed() {
 					svg.select(".y.axis").call(yaxis);
 					svg.selectAll("circle").attr("cy", function(d){return yscale(d[specIndex]);});
-					svg.selectAll(".plotLine").attr("d", lineFunction(lineData));
+					svg.selectAll("#plotLine").attr("d", lineFunction(lineData));
 				}
 				
 				//define the zoom behavior
@@ -443,12 +525,14 @@
 					.on("zoom", zoomed);
 					
 				//append the svg element to the html body - set the svg width and height
-				svg = d3.select(plot)
-					.append("svg")
-					.attr("width", w)
-					.attr("height", h)
-					.call(zoom);
+				//svg = d3.select(plot)
+				//	//.append("svg")
+				//	.insert("svg", ":first-child")
+				//	.attr("width", w)
+				//	.attr("height", h)
+				//	.call(zoom);
 				
+				svg = d3.select(svg);
 				//call the zoom once - needed for the updating to work
 				svg.call(zoom).on("dblclick.zoom", null);
 						
@@ -482,7 +566,7 @@
 					.attr("stroke", "#FF0000")
 					.attr("stroke-width", 2)
 					.attr("fill", "none")
-					.attr("class","plotLine");
+					.attr("id","plotLine");
 				
 				//draw the x axis
 				svg.append("g")
@@ -532,7 +616,7 @@
 				function zoomed() {
 					svg.select(".y.axis").call(yaxis);
 					svg.selectAll("circle").attr("cy", function(d){return yscale(d[specIndex]);});
-					svg.selectAll(".plotLine").attr("d", lineFunction(lineData));
+					svg.selectAll("#plotLine").attr("d", lineFunction(lineData));
 				}
 				
 				//define the zoom behavior
@@ -556,7 +640,7 @@
 					
 				/////////////////////////////////LINE UPDATE////////////////////////////////	
 				//retrieve the line data (this section could be made into a function cause it is also used in the changePlotLine function)
-				selectedCircles = $(".selected");
+				selectedCircles = $("circle.selected");
 				var lineData = [];
 				var i = 0;
 				for(i; i < selectedCircles.length; i++){
@@ -565,7 +649,7 @@
 				}
 				
 				//update the line
-				svg.selectAll(".plotLine") //local because it will get overwritten
+				svg.selectAll("#plotLine") //local because it will get overwritten
 					.transition()
 					.duration(500)
 					.attr("d", lineFunction(lineData));
@@ -597,6 +681,15 @@
 					$(oldactive).removeClass('active');
 					$(newactive).addClass('active');
 					
+					console.log(thisListID);
+					console.log($("#"+thisSpecIndexID).text());
+					if(thisListID == "index-list"){$("#btnIndex div").replaceWith('<div><strong>Index:</strong><br><small>'+$("#"+thisSpecIndexID).text()+'</small><span class="caret"></span></div>')};
+					if(thisListID == "red-list"){$("#btnRed div").replaceWith('<div><strong>R</strong><small>GB</small><br><small>'+$("#"+thisSpecIndexID).text()+'</small><span class="caret"></span></div>')};
+					if(thisListID == "green-list"){$("#btnGreen div").replaceWith('<div><small>R</small><strong>G</strong><small>B</small><br><small>'+$("#"+thisSpecIndexID).text()+'</small><span class="caret"></span></div>')};
+					if(thisListID == "blue-list"){$("#btnBlue div").replaceWith('<div><small>RG</small><strong>B</strong><br><small>'+$("#"+thisSpecIndexID).text()+'</small><span class="caret"></span></div>')};
+					
+					
+					
 					//get the active classes from the dropdown displays buttons
 					var activeSpecIndex = $("#index-list li.active").attr('id'),		
 						activeRedSpecIndex = $("#red-list li.active").attr('id'),
@@ -615,12 +708,46 @@
 				});
 			});
 			
+			
+			//mechanism to display the selected points and line in the trajectory plot
+			$("#btnLine").click(function(){
+				if ($("#lineDisplayThumb").attr("class") == "glyphicon glyphicon-thumbs-up"){
+					$("#lineDisplayThumb").removeClass("glyphicon glyphicon-thumbs-up")
+						.addClass("glyphicon glyphicon-thumbs-down");
+					$("circle.selected").css("stroke-width","0");
+					$("#plotLine").css("stroke-width","0");
+				} else{
+					$("#lineDisplayThumb").removeClass("glyphicon glyphicon-thumbs-down")
+						.addClass("glyphicon glyphicon-thumbs-up");
+					$("circle.selected").css("stroke-width","1");
+					$("#plotLine").css("stroke-width","2");
+				}
+			});
 
+			$(document).ready(function(){
+				$(".chip-gallery canvas").click(function(e){
+					if(e.shiftKey){
+						e.preventDefault(); //make sure that default browser behaviour is prevented
+						var canvasIndex = $(".chip-gallery canvas").index(this)
+						if(canvasIndex != 0 &&  canvasIndex != len-1){
+							var status = $(this).attr("class");
+							
+							if(status == "unselected"){
+								$(this).attr("class","selected");
+								//changePlotLine();	
+							} else {
+								$(this).attr("class","unselected");
+								//changePlotLine();
+							}	
+						}
+					}
+				});
+			});
 			
 			//make the chip gallery expand on click
 			$(document).ready(function(){
 				$(".chip-gallery").click(function(e){
-					if(!e.ctrlKey){
+					if(!e.ctrlKey && !e.shiftKey){
 						var status = $(this).css("height");
 						if(status == "524px"){
 							$(this).css("height","auto");
@@ -634,14 +761,14 @@
 			
 			
 			
-			///////////////////////////////////////////////////////BELOW ARE CHIP SCRIPTS///////////////////////////////////////////////////////
-			//////////////BELOW ARE CHIP SCRIPTS////////////////////////////////////////BELOW ARE CHIP SCRIPTS//////////////////////////////////
-			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			////////////////////////////////////BELOW ARE CHIP SCRIPTS//////////////////////////////////////////////////////////////////////////
-			///////////////////////////////////////////////////////////////////////////////////////BELOW ARE CHIP SCRIPTS///////////////////////
-			////////////////////////////BELOW ARE CHIP SCRIPTS//////////////////////////////////////////////////////////////////////////////////
-			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			///////////////////////////////////////////////////BELOW ARE CHIP SCRIPTS/////////////////////////////////BELOW ARE CHIP SCRIPTS////
+///////////////////////////////////////////////////////BELOW ARE CHIP SCRIPTS///////////////////////////////////////////////////////
+//////////////BELOW ARE CHIP SCRIPTS////////////////////////////////////////BELOW ARE CHIP SCRIPTS//////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////BELOW ARE CHIP SCRIPTS//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////BELOW ARE CHIP SCRIPTS///////////////////////
+////////////////////////////BELOW ARE CHIP SCRIPTS//////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////BELOW ARE CHIP SCRIPTS/////////////////////////////////BELOW ARE CHIP SCRIPTS////
 		
 		
 			///////////////SET GLOBAL VARIABLES//////////////////////////////////////////////////////////
@@ -712,11 +839,12 @@
 				for(var i=0; i<n_chips; i++){
 					chipInfo.chips.canvasIDs.push("chip"+i)
 					chipInfo.chips.imgIDs.push("img"+i)
-					appendThisCanvas = '<canvas id="'+chipInfo.chips.canvasIDs[i]+'" width="255" height="255"></canvas>'; // style="border:1px solid #d3d3d3;"
+					appendThisCanvas = '<canvas class="unselected" id="'+chipInfo.chips.canvasIDs[i]+'" width="255" height="255"></canvas>'; // style="border:1px solid #d3d3d3;"
 					$(".chip-gallery").append(appendThisCanvas);
 					appendThisImg = '<img id="'+chipInfo.chips.imgIDs[i]+'"src="'+images[i]+'">';
 					$(".img-gallery").append(appendThisImg);
 				}
+				$("#chip0, #chip"+(n_chips-1)).removeClass("unselected").addClass("selected")
 			}
 
 			
