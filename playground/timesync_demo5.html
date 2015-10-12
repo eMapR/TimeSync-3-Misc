@@ -108,6 +108,8 @@
 				font-size: 12px;
 				font-weight: bold;
 				background:#f1f1f1;
+				margin-bottom:1px;
+				padding-bottom:3px;
 				
 			}
 			
@@ -170,7 +172,20 @@
 				left: 80%;
 				top: 65%;
 			}
+			
+			/************table*********************/
+			table, th, td {
+				margin:-1px;
+				border: 1px solid #dbdbdb;
+				border-collapse: collapse;
+				
+			}
+			table{
+				border-radius: 4px;
+			}
 
+			
+			
 		</style>
 	</head>
 	<body> <!-- onload="drawAllChips()"!-->
@@ -179,107 +194,130 @@
 				<div id="plotSelectionDiv" class="sectionDiv">
 					<p class="header">Plots</p>
 				</div>
-				
-				
-					<div id="plot" class="sectionDiv">
-				<svg id="svg" width="740" height="300"></svg>
-				<div class="btn-group" role="group" aria-label="..." style="margin:-1px; display: inline-block;">
-					<!--<div class="dropdown" style="display:inline-block">!-->
-					<div class="btn-group dropdown" role="group">	
-						<button id="btnIndex" class="btn btn-default dropdown-toggle specPlotBtn" type="button">
-							<div><strong>Index</strong>:<br><small>TC Wetness</small><span class="caret"></span></div>
-						</button>
-						<ul class="dropdown-menu plot" id="index-list">
-							<li class="" id="B1">Band 1</li>
-							<li class="" id="B2">Band 2</li>
-							<li class="" href="#" id="B3">Band 3</li>
-							<li class="" href="#" id="B4">Band 4</li>
-							<li class="" href="#" id="B5">Band 5</li>
-							<li class="" href="#" id="B7">Band 7</li>
-							<li class="" href="#" id="TCB">TC Brightness</li>
-							<li class="" href="#" id="TCG">TC Greenness</li>
-							<li class="active" href="#" id="TCW">TC Wetness</li>
-							<li class="" href="#" id="TCA">TC Angle</li>
-							<li class="" href="#" id="NDVI">NDVI</li>
-							<li class="" href="#" id="NBR">NBR</li>
-						</ul>
-					</div>
-					<!--<div class="dropdown" style="display:inline-block">!-->
-					<div id="btnRed" class="btn-group dropdown" role="group">					
-						<button class="btn btn-default dropdown-toggle specPlotBtn" type="button">
-							<div><strong>R</strong><small>GB</small>:<br><small>TC Brightness</small><span class="caret"></span></div>
-						</button>
-						<ul class="dropdown-menu plot" id="red-list">
-							<li class="" href="#" id="B1">Band 1</li>
-							<li class="" href="#" id="B2">Band 2</li>
-							<li class="" href="#" id="B3">Band 3</li>
-							<li class="" href="#" id="B4">Band 4</li>
-							<li class="" href="#" id="B5">Band 5</li>
-							<li class="" href="#" id="B7">Band 7</li>
-							<li class="active" href="#" id="TCB">TC Brightness</li>
-							<li class="" href="#" id="TCG">TC Greenness</li>
-							<li class="" href="#" id="TCW">TC Wetness</li>
-							<li class="" href="#" id="TCA">TC Angle</li>
-							<li class="" href="#" id="NDVI">NDVI</li>
-							<li class="" href="#" id="NBR">NBR</li>
-						</ul>
-					</div>
-					<!--<div class="dropdown" style="display:inline-block">!-->
-					<div class="btn-group dropdown" role="group">
-						<button id="btnGreen" class="btn btn-default dropdown-toggle specPlotBtn" type="button">
-							<div><small>R</small><strong>G</strong><small>B</small>:<br><small>TC Greenness</small><span class="caret"></span></div>
-						</button>
-						<ul class="dropdown-menu plot" id="green-list">
-							<li class="" href="#" id="B1">Band 1</li>
-							<li class="" href="#" id="B2">Band 2</li>
-							<li class="" href="#" id="B3">Band 3</li>
-							<li class="" href="#" id="B4">Band 4</li>
-							<li class="" href="#" id="B5">Band 5</li>
-							<li class="" href="#" id="B7">Band 7</li>
-							<li class="" href="#" id="TCB">TC Brightness</li>
-							<li class="active" href="#" id="TCG">TC Greenness</li>
-							<li class="" href="#" id="TCW">TC Wetness</li>
-							<li class="" href="#" id="TCA">TC Angle</li>
-							<li class="" href="#" id="NDVI">NDVI</li>
-							<li class="" href="#" id="NBR">NBR</li>
-						</ul>
-					</div>
-					<!--<div class="dropdown" style="display:inline-block">!-->
-					<div class="btn-group dropdown" role="group">
-						<button id="btnBlue" class="btn btn-default dropdown-toggle specPlotBtn" type="button">
-							<div><small>RG</small><strong>B</strong>:<br><small>TC Wetness</small><span class="caret"></span></div>
-						</button>
-						<ul class="dropdown-menu plot" id="blue-list">
-							<li class="" href="#" id="B1">Band 1</li>
-							<li class="" href="#" id="B2">Band 2</li>
-							<li class="" href="#" id="B3">Band 3</li>
-							<li class="" href="#" id="B4">Band 4</li>
-							<li class="" href="#" id="B5">Band 5</li>
-							<li class="" href="#" id="B7">Band 7</li>
-							<li class="" href="#" id="TCB">TC Brightness</li>
-							<li class="" href="#" id="TCG">TC Greenness</li>
-							<li class="active" href="#" id="TCW">TC Wetness</li>
-							<li class="" href="#" id="TCA">TC Angle</li>
-							<li class="" href="#" id="NDVI">NDVI</li>
-							<li class="" href="#" id="NBR">NBR</li>
-						</ul>
-					</div>
-					<div class="btn-group" role="group">
-						<button id="btnLine" class="btn btn-default specPlotBtn" type="button">
-							<Strong>Display line</strong>:<br><span id="lineDisplayThumb" class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span>
-						</button>
+				<div id="plot" class="sectionDiv">
+					<p class="header">Spectral Trajectory</p>
+					<svg id="svg" width="740" height="300"></svg>
+					<div class="btn-group" role="group" aria-label="..." style="margin:-1px; display: inline-block;">
+						<div class="btn-group dropdown" role="group">	
+							<button id="btnIndex" class="btn btn-default dropdown-toggle specPlotBtn" type="button">
+								<div><strong>Index</strong>:<br><small>TC Wetness</small><span class="caret"></span></div>
+							</button>
+							<ul class="dropdown-menu plot" id="index-list">
+								<li class="" id="B1">Band 1</li>
+								<li class="" id="B2">Band 2</li>
+								<li class="" href="#" id="B3">Band 3</li>
+								<li class="" href="#" id="B4">Band 4</li>
+								<li class="" href="#" id="B5">Band 5</li>
+								<li class="" href="#" id="B7">Band 7</li>
+								<li class="" href="#" id="TCB">TC Brightness</li>
+								<li class="" href="#" id="TCG">TC Greenness</li>
+								<li class="active" href="#" id="TCW">TC Wetness</li>
+								<li class="" href="#" id="TCA">TC Angle</li>
+								<li class="" href="#" id="NDVI">NDVI</li>
+								<li class="" href="#" id="NBR">NBR</li>
+							</ul>
+						</div>
+						<div id="btnRed" class="btn-group dropdown" role="group">					
+							<button class="btn btn-default dropdown-toggle specPlotBtn" type="button">
+								<div><strong>R</strong><small>GB</small>:<br><small>TC Brightness</small><span class="caret"></span></div>
+							</button>
+							<ul class="dropdown-menu plot" id="red-list">
+								<li class="" href="#" id="B1">Band 1</li>
+								<li class="" href="#" id="B2">Band 2</li>
+								<li class="" href="#" id="B3">Band 3</li>
+								<li class="" href="#" id="B4">Band 4</li>
+								<li class="" href="#" id="B5">Band 5</li>
+								<li class="" href="#" id="B7">Band 7</li>
+								<li class="active" href="#" id="TCB">TC Brightness</li>
+								<li class="" href="#" id="TCG">TC Greenness</li>
+								<li class="" href="#" id="TCW">TC Wetness</li>
+								<li class="" href="#" id="TCA">TC Angle</li>
+								<li class="" href="#" id="NDVI">NDVI</li>
+								<li class="" href="#" id="NBR">NBR</li>
+							</ul>
+						</div>
+						<div class="btn-group dropdown" role="group">
+							<button id="btnGreen" class="btn btn-default dropdown-toggle specPlotBtn" type="button">
+								<div><small>R</small><strong>G</strong><small>B</small>:<br><small>TC Greenness</small><span class="caret"></span></div>
+							</button>
+							<ul class="dropdown-menu plot" id="green-list">
+								<li class="" href="#" id="B1">Band 1</li>
+								<li class="" href="#" id="B2">Band 2</li>
+								<li class="" href="#" id="B3">Band 3</li>
+								<li class="" href="#" id="B4">Band 4</li>
+								<li class="" href="#" id="B5">Band 5</li>
+								<li class="" href="#" id="B7">Band 7</li>
+								<li class="" href="#" id="TCB">TC Brightness</li>
+								<li class="active" href="#" id="TCG">TC Greenness</li>
+								<li class="" href="#" id="TCW">TC Wetness</li>
+								<li class="" href="#" id="TCA">TC Angle</li>
+								<li class="" href="#" id="NDVI">NDVI</li>
+								<li class="" href="#" id="NBR">NBR</li>
+							</ul>
+						</div>
+						<div class="btn-group dropdown" role="group">
+							<button id="btnBlue" class="btn btn-default dropdown-toggle specPlotBtn" type="button">
+								<div><small>RG</small><strong>B</strong>:<br><small>TC Wetness</small><span class="caret"></span></div>
+							</button>
+							<ul class="dropdown-menu plot" id="blue-list">
+								<li class="" href="#" id="B1">Band 1</li>
+								<li class="" href="#" id="B2">Band 2</li>
+								<li class="" href="#" id="B3">Band 3</li>
+								<li class="" href="#" id="B4">Band 4</li>
+								<li class="" href="#" id="B5">Band 5</li>
+								<li class="" href="#" id="B7">Band 7</li>
+								<li class="" href="#" id="TCB">TC Brightness</li>
+								<li class="" href="#" id="TCG">TC Greenness</li>
+								<li class="active" href="#" id="TCW">TC Wetness</li>
+								<li class="" href="#" id="TCA">TC Angle</li>
+								<li class="" href="#" id="NDVI">NDVI</li>
+								<li class="" href="#" id="NBR">NBR</li>
+							</ul>
+						</div>
+						<div class="btn-group" role="group">
+							<button id="btnLine" class="btn btn-default specPlotBtn" type="button">
+								<Strong>Display line</strong>:<br><span id="lineDisplayThumb" class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span>
+							</button>
+						</div>
 					</div>
 				</div>
-
-				</div>
 				
- 			</div>
-			<div class="row">
-				<div class="col-md-12">
-					<div class="chip-gallery"></div>
-					<div class="img-gallery"></div>	
+				
+				<div class="sectionDiv">
+					<p class="header" style="display:inline-block">Segments</p>
+					<p class="header" style="display:inline-block">Vertices</p>
+					<table style="width:300px;">
+						<tr style="background-color:#f1f1f1;; font-size:11px;">
+							<td style="padding-left:3px;">Start</td>
+							<td>End</td>		
+							<td>Change Process</td>
+							<td>Ephemeral</td>
+						</tr>
+						<tr>
+							<td>&nbsp;</td>
+							<td>&nbsp;</td>		
+							<td>&nbsp;</td>
+							<td>&nbsp;</td>
+						</tr>
+						<tr>
+							<td>&nbsp;</td>
+							<td>&nbsp;</td>		
+							<td>&nbsp;</td>
+							<td>&nbsp;</td>
+						</tr>
+					</table>
 				</div>
 			</div>
+				
+
+
+				
+					
+					<div class="chip-gallery" style="margin-left:10px; margin-top:0px">
+					<p class="header">Image Chip Gallery</p>
+					</div>
+					<div class="img-gallery"></div>	
+
 
 		
 		
