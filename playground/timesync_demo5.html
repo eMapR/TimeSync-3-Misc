@@ -6,6 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge"> <!--needed so that D3 will work in IE!-->
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+		<link rel="stylesheet" href="timesync_style.css">
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
@@ -13,190 +14,26 @@
 		<script type="text/javascript" src="jquery.mousewheel.min.js"></script>
 		<script type="text/javascript" src="specIndexStretch.js"></script>
 		<style>
-			html {
-				overflow-y: scroll;
-			}			
-			body {
-				-webkit-touch-callout: none;
-				-webkit-user-select: none;
-				-khtml-user-select: none;
-				-moz-user-select: none;
-				-ms-user-select: none;
-				user-select: none;
-			}
 
-			.axis path, 
-			.axis line {
-				fill: none;
-				stroke: black;
-				shape-rendering: crispEdges;
-			}
-			.axis text, #specPlotIndex {
-				font-family: sans-serif;
-				font-size: 11px;
-			}
-
-			.container{
-				margin-top:40px;
-			}
-
-			.chip-gallery{
-				height:535px;
-				width:1080px;
-				overflow-y: auto;
-				border:1px solid #dbdbdb;
-				border-radius: 4px;
-				margin-top:10px;
-			}
-			.chip-gallery canvas{
-				display:inline;
-				margin:3px;
-				vertical-align:top;
-				cursor: pointer;
-				border: 2px solid #dbdbdb;
-			}
-			.chip-gallery .selected{
-				border: 2px solid black;
-			}
-			.img-gallery{
-				display:none;
-			}
-			#plot{
-				border:1px solid #dbdbdb;
-				border-radius: 4px;
-			}
-
-			circle{
-				cursor: pointer;
-			}
-			
-			circle.selected{
-				stroke:#FF0000;
-				stroke-width:1;
-			}
-			
-			circle:hover{
-				stroke:#FF0000;
-				stroke-width:1;
-			}
-			
-			svg{
-				margin:-1px;
-				cursor: n-resize;
-				display: block;
-			}
-			
-			#containerDiv{
-				display:table;
-				border-spacing: 5px;
-				margin:5px;
-			}
-			
-			#containerDiv div{
-				
-				
-				/*margin: 5px;*/
-			}
-			#plotSelectionDiv{
-				
-				width:70px;
-
-				
-			}
-			.header{
-				padding-left:3px;
-				font-size: 12px;
-				font-weight: bold;
-				background:#f1f1f1;
-				margin-bottom:1px;
-				padding-bottom:3px;
-				
-			}
-			
-			.sectionDiv{
-				
-				display: table-cell;
-				vertical-align:top;
-				border:1px solid #dbdbdb;
-				border-radius: 4px;
-
-			}
-			
-			/***********************BUTTON STYLE******************************/
-			li:hover{
-				background-color:#f1f1f1;
-			}
-			
-			.dropdown-menu .active{
-				background-color:#dbdbdb;
-			}
-			.dropdown-menu.plot li{
-				font-size:11px;
-				padding-left:5px;
-				cursor:pointer;
-				width:100px;
-				
-			}
-			.dropdown-menu.plot {
-				margin-top: 0;
-				min-width:0px;
-			}
-
-			
-			.btn-default:focus{
-				background-color:white;
-			}
-			
-			.dropdown button{
-				width:100px;
-			}			
-			
-			.dropdown:hover .dropdown-menu {
-				display: block;
-			}
-			
-
-			
-			.specPlotBtn{
-				font-size:11px;
-				text-align: left;
-				padding-left:5px;
-				padding-top:0px;
-				padding-bottom:1px;
-			}
-			
-			.buttonText{margin-right:2px;}
-			
-			.caret {
-				position: absolute;
-				left: 80%;
-				top: 65%;
-			}
-			
-			/************table*********************/
-			table, th, td {
-				margin:-1px;
-				border: 1px solid #dbdbdb;
-				border-collapse: collapse;
-				
-			}
-			table{
-				border-radius: 4px;
-			}
 
 			
 			
 		</style>
 	</head>
 	<body> <!-- onload="drawAllChips()"!-->
-
+			
+			<div id="topSection">
+				<p style="display:inline-block;"><strong>TimeSync - v3.0</strong></p>
+				<p style="display:inline-block;">Chip Size: <input type="text" name="FirstName" value="255"></p>
+				<p style="display:inline-block;">Plot Size: <input type="text" name="FirstName" value="1"></p>
+			</div>
 			<div id="containerDiv">
 				<div id="plotSelectionDiv" class="sectionDiv">
 					<p class="header">Plots</p>
 				</div>
 				<div id="plot" class="sectionDiv">
 					<p class="header">Spectral Trajectory</p>
-					<svg id="svg" width="740" height="300"></svg>
+					<svg id="svg" width="740" height="250"></svg>
 					<div class="btn-group" role="group" aria-label="..." style="margin:-1px; display: inline-block;">
 						<div class="btn-group dropdown" role="group">	
 							<button id="btnIndex" class="btn btn-default dropdown-toggle specPlotBtn" type="button">
@@ -284,8 +121,12 @@
 				
 				
 				<div class="sectionDiv">
-					<p class="header" style="display:inline-block">Segments</p>
-					<p class="header" style="display:inline-block">Vertices</p>
+					<p class="header">Trajectory Forms</p>
+					<ul class="test">
+						<li class="selected" style="border-top-left-radius:4px;">Segments
+						<li class="unselected" style="margin-left:-1px; border-top-right-radius:4px;">Vertices
+					</ul>
+
 					<table style="width:300px;">
 						<tr style="background-color:#f1f1f1;; font-size:11px;">
 							<td style="padding-left:3px;">Start</td>
@@ -307,16 +148,25 @@
 						</tr>
 					</table>
 				</div>
-			</div>
-				
+				<div id="commentsSection" class="sectionDiv">
+					<p class="header">Comments</p>
 
+				</div>
+
+
+
+
+			</div>
+			
+			<div id="chipGallerySection">
+				<p class="header">Image Chip Gallery</p>
+				<div class="chip-gallery"></div>
+			</div>
+			<div class="img-gallery"></div>	
 
 				
 					
-					<div class="chip-gallery" style="margin-left:10px; margin-top:0px">
-					<p class="header">Image Chip Gallery</p>
-					</div>
-					<div class="img-gallery"></div>	
+
 
 
 		
@@ -520,7 +370,7 @@
 				
 				//define the width of the svg plot area
 				var w = 740, 
-					h = 300; 
+					h = 250; 
 				
 				//define the plot margins
 				var pt = 10, //plot top
@@ -877,7 +727,7 @@
 				for(var i=0; i<n_chips; i++){
 					chipInfo.chips.canvasIDs.push("chip"+i)
 					chipInfo.chips.imgIDs.push("img"+i)
-					appendThisCanvas = '<canvas class="unselected" id="'+chipInfo.chips.canvasIDs[i]+'" width="255" height="255"></canvas>'; // style="border:1px solid #d3d3d3;"
+					appendThisCanvas = '<canvas class="unselected" id="'+chipInfo.chips.canvasIDs[i]+'" width="255" height="272"></canvas>'; // style="border:1px solid #d3d3d3;"
 					$(".chip-gallery").append(appendThisCanvas);
 					appendThisImg = '<img id="'+chipInfo.chips.imgIDs[i]+'"src="'+images[i]+'">';
 					$(".img-gallery").append(appendThisImg);
@@ -954,7 +804,9 @@
 				ctx.strokeStyle="#FF0000";
 				ctx.lineWidth=1;
 				ctx.lineCap = 'square';
-				ctx.strokeRect(127.5-(chipInfo.box/2), 127.5-(chipInfo.box/2), chipInfo.box, chipInfo.box);	
+				ctx.strokeRect(127.5-(chipInfo.box/2), 127.5-(chipInfo.box/2), chipInfo.box, chipInfo.box);
+				ctx.font = "11px";
+				ctx.fillText("Image Date",100,267); //NEED TO GET THE "IMAGE DATE" PASSED IN AS A PARAMETER FROM THE JSON OBJECT OR SIMILAR
 			}
 			
 							
