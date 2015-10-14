@@ -20,7 +20,7 @@
 			
 		</style>
 	</head>
-	<body> <!-- onload="drawAllChips()"!-->
+	<body> <!-- onload="drawAllChips()" -->
 			
 			<div id="topSection">
 				<p style="display:inline-block;"><strong>TimeSync - v3.0</strong></p>
@@ -30,6 +30,37 @@
 			<div id="containerDiv">
 				<div id="plotSelectionDiv" class="sectionDiv">
 					<p class="header">Plots</p>
+					<ul> <!-- the <li>'s will be filled in on-the-fly -->
+						<li class="plotList selected">123
+						<li class="plotList unselected">456
+						<li class="plotList unselected">789
+						<li class="plotList unselected">456
+						<li class="plotList unselected">789
+						<li class="plotList unselected">456
+						<li class="plotList unselected">789
+						<li class="plotList unselected">456
+						<li class="plotList unselected">789
+						<li class="plotList unselected">456
+						<li class="plotList unselected">789
+						<li class="plotList unselected">456
+						<li class="plotList unselected">789
+						<li class="plotList unselected">456
+						<li class="plotList unselected">789
+						<li class="plotList unselected">456
+						<li class="plotList unselected">789
+						<li class="plotList unselected">456
+						<li class="plotList unselected">789						
+						<li class="plotList unselected">456
+						<li class="plotList unselected">789
+						<li class="plotList unselected">456
+						<li class="plotList unselected">789
+						<li class="plotList unselected">456
+						<li class="plotList unselected">789						
+						<li class="plotList unselected">456
+						<li class="plotList unselected">789
+						<li class="plotList unselected">456
+						<li class="plotList unselected">789
+					</ul>
 				</div>
 				<div id="plot" class="sectionDiv">
 					<p class="header">Spectral Trajectory</p>
@@ -123,30 +154,64 @@
 				<div class="sectionDiv">
 					<p class="header">Trajectory Forms</p>
 					<ul class="test">
-						<li class="selected" style="border-top-left-radius:4px;">Segments
-						<li class="unselected" style="margin-left:-1px; border-top-right-radius:4px;">Vertices
+						<li id="segmentsFormTab" class="selected" style="border-top-left-radius:4px;">Segments
+						<li id="verticesFormTab" class="unselected" style="margin-left:-1px; border-top-right-radius:4px;">Vertices
 					</ul>
-
-					<table style="width:300px;">
-						<tr style="background-color:#f1f1f1;; font-size:11px;">
-							<td style="padding-left:3px;">Start</td>
-							<td>End</td>		
-							<td>Change Process</td>
-							<td>Ephemeral</td>
+					
+					
+					<table id="segmentsForm">
+						<tr class="trHeader">
+							<th>Start</th>
+							<th>End</th>		
+							<th>Change Process</th>
+							<th>Ephemeral</th>
 						</tr>
-						<tr>
+						<tr class="inactive">
 							<td>&nbsp;</td>
 							<td>&nbsp;</td>		
-							<td>&nbsp;</td>
+							<td class="changeProcessInput"></td>
 							<td>&nbsp;</td>
 						</tr>
-						<tr>
+						<tr class="inactive">
 							<td>&nbsp;</td>
 							<td>&nbsp;</td>		
-							<td>&nbsp;</td>
+							<td class="changeProcessInput"></td>
 							<td>&nbsp;</td>
 						</tr>
 					</table>
+					
+					<div id="changeProcessList" style="display:none;">
+						<ul>
+							<li>Stable</li>
+							<li>Recovery</li>
+							<li>Harvest</li>
+							<li>Fire</li>
+							<li>Stress</li>
+							<li>Site-preparation fire</li>
+							<li>Delay</li>
+							<li>Mechanical</li>
+							<li>Other disturbance</li>
+							<li>Wind</li>
+							<li>Water</li>
+							<li>Debris</li>
+							<li>Volcano</li>
+							<li>Other non-disturbance</li>
+						</ul>
+					</div>
+				
+					<table id="verticesForm">
+						<tr class="trHeader">
+							<th>Date</th>
+							<th>Land Use</th>		
+						</tr>
+						<tr>
+							<td>&nbsp;</td>
+							<td>&nbsp;</td>		
+						</tr>
+					</table>
+				
+				
+				
 				</div>
 				<div id="commentsSection" class="sectionDiv">
 					<p class="header">Comments</p>
@@ -275,9 +340,6 @@
 				
 				lineGraph = svg.append("path")
 					.attr("d", lineFunction(lineData))
-					.attr("stroke", "#FF0000")
-					.attr("stroke-width", 2)
-					.attr("fill", "none")
 					.attr("id","plotLine");
 				
 				//define the zooming function - what gets scaled on zoom 
@@ -451,9 +513,6 @@
 				//add the default line
 				var lineGraph = svg.append("path") //local because it will get overwritten
 					.attr("d", lineFunction(lineData))
-					.attr("stroke", "#FF0000")
-					.attr("stroke-width", 2)
-					.attr("fill", "none")
 					.attr("id","plotLine");
 				
 				//draw the x axis
@@ -632,15 +691,74 @@
 				});
 			});
 			
+			//controls the trajectory form section tabs and tables 
+			$("#segmentsFormTab").click(function(){
+				var status = $("#segmentsFormTab").attr("class");
+				if(status == "unselected"){
+					$("#segmentsFormTab").attr("class","selected");
+					$("#verticesFormTab").attr("class","unselected");
+					$("#segmentsForm").show();
+					$("#verticesForm").hide();
+				}
+			});
+			$("#verticesFormTab").click(function(){
+				var status = $("#verticesFormTab").attr("class");
+				if(status == "unselected"){
+					$("#verticesFormTab").attr("class","selected");
+					$("#segmentsFormTab").attr("class","unselected");
+					$("#verticesForm").show();
+					$("#segmentsForm").hide();
+				}
+			});
+			
+			//change process dropdown list controls
+			$(document).ready(function(){
+                $(".changeProcessInput").click(function(e){
+					if($("#changeProcessList").css("display") == "none"){
+						$(".changeProcessInput.active").removeClass("active");
+						console.log($(this));
+						$(this).addClass("active");
+						var rowPos = $(this).position(),
+							bottomTop = rowPos.top,
+							bottomLeft = rowPos.left,
+							bottomWidth = $(this).css("width"),
+							bottomHeight = $(this).css("height");
+							
+						$("#changeProcessList").css({
+							position: "absolute",
+							top: bottomTop-bottomHeight,
+							left: bottomLeft,
+							width: (parseInt(bottomWidth)+1+"px"), //THIS COULD BE HARDWIRED WHEN WE FIGURE OUT WHAT SIZE EVERYTHING SHOULD BE
+							marginLeft: "-1px"
+						}).show();
+						e.stopPropagation();
+					} else {
+						$("#changeProcessList").css("display", "none");
+					}
+                });
+				
+            });			
+			$(document).click(function(){ //click anywhere to get rid of the dropdown
+				if($("#changeProcessList").css("display") == "block") {
+					$("#changeProcessList").hide();
+				}
+			});
+			
+			//
+			$("#changeProcessList li").click(function(){
+				console.log($(this).text());
+				$("td.changeProcessInput.active").text($(this).text());
+			});
+			
 			//make the chip gallery expand on click
 			$(document).ready(function(){
 				$(".chip-gallery").click(function(e){
 					if(!e.ctrlKey && !e.shiftKey){
 						var status = $(this).css("height");
-						if(status == "524px"){
+						if(status == "565px"){
 							$(this).css("height","auto");
 						} else {
-							$(this).css("height","524px");
+							$(this).css("height","565px");
 						}
 					}
 					
@@ -791,6 +909,7 @@
 				canvasID = document.getElementById(chipInfo.chips.canvasIDs[thisChip]);
 				imgID = document.getElementById(chipInfo.chips.imgIDs[thisChip]);
 				ctx = canvasID.getContext("2d");
+				ctx.clearRect(0, 0, canvasID.width, canvasID.height);
 				ctx.mozImageSmoothingEnabled = false;
 				ctx.msImageSmoothingEnabled = false;
 				ctx.imageSmoothingEnabled = false;
