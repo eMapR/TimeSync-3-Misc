@@ -170,7 +170,7 @@
 								<td>&nbsp;</td>
 								<td>&nbsp;</td>		
 								<td class="changeProcessInput formDrop"></td>
-								<td><input autocomplete="off" type="checkbox"></td>
+								<td><input class="ephemeralChkBx" autocomplete="off" type="checkbox"></td>
 							</tr> -->
 						</table>
 						
@@ -192,25 +192,28 @@
 								<li>Other non-disturbance</li>
 							</ul>
 						</div>
+					
 					</div>
 					
+					
 					<div id="verticesFormDiv">
+						
 						<table id="verticesFormTbl">
 							<tr class="trHeader">
 								<th>Date</th>
 								<th>Land Use</th>
 							</tr>
 	<!-- 						<tr class="vertex">
-								<td>&nbsp;</td>
-								<td>&nbsp;</td>		
+								<td></td>
+								<td class="landUseInput formDrop"></td>		
 							</tr> -->
 						</table>
 						
 						<div id="landUseDiv" class="dropThis">
 							<div id="dominentLandUseDiv" class="landUseDiv">
-								<p class="header">Dominant Use (9 pixels):</p>
-								<div id="dominantUse">&nbsp;</div>
-								<div id="landUseList" class="clickAway"> <!-- class="dropThis clickAway" -->
+								<p class="subHeader">Dominant Use (9 pixels):</p>
+								<div id="dominantUse"></div>
+								<div id="landUseList" class="clickAway">
 									<ul>
 										<li>FOR (forest)</li>
 										<li>NFV (non-forest vegetation)</li>
@@ -219,24 +222,24 @@
 										<li>NVA (non-vegetated anthropogenic)</li>
 									</ul>
 								</div>
-								<p id="dominantChkBx"><input autocomplete="off" type="checkbox"> Dominant > 50% </p>
+								<p style="font-size:11px"><input class="landUseChkBx" id="dominantChkBx" autocomplete="off" type="checkbox"> Dominant > 50% </p>
 							</div>
 							<div id="otherLandUseDiv" class="landUseDiv">
-								<p class="header">Other land use</p>
+								<p class="subHeader">Other land use:</p>
 								<ul id="otherLandUseList">
-									<li><input autocomplete="off" type="checkbox"> FOR (forest)</li>
-									<li><input autocomplete="off" type="checkbox"> NFV (non-forest vegetation)</li>
-									<li><input autocomplete="off" type="checkbox"> NVN (non-vegetated natural)</li>
-									<li><input autocomplete="off" type="checkbox"> ARG (agriculture)</li>
-									<li><input autocomplete="off" type="checkbox"> NVA (non-vegetated anthropogenic)</li>
+									<li><input class="landUseChkBx" id="forChkBx" autocomplete="off" type="checkbox"> FOR (forest)</li>
+									<li><input class="landUseChkBx" id="nfvChkBx" autocomplete="off" type="checkbox"> NFV (non-forest vegetation)</li>
+									<li><input class="landUseChkBx" id="nvnChkBx" autocomplete="off" type="checkbox"> NVN (non-vegetated natural)</li>
+									<li><input class="landUseChkBx" id="argChkBx" autocomplete="off" type="checkbox"> ARG (agriculture)</li>
+									<li><input class="landUseChkBx" id="nvaChkBx" autocomplete="off" type="checkbox"> NVA (non-vegetated anthropogenic)</li>
 								</ul>
 							</div>
 							<div id="doneBtn">Done</div>
-							<!-- <button type="button" class="btn btn-xs btn-default btn-block" style="margin-top:3px;">Done</button> -->
 						</div>
+					
 					</div>
-				
 				</div>
+				
 				<div id="commentsSection" class="sectionDiv">
 					<p class="header">Comments</p>
 
@@ -261,6 +264,25 @@
 		
 		
 		<script>
+			
+//			var lineInfo = {
+//					vertices:[
+//						{year:0,index:0,landUse:"",dominant:"",
+//							otherUses:{
+//								FOR:"",
+//								NFV:"",
+//								NVN:"",
+//								ARG:"",
+//								NVA:""
+//							}
+//						},
+//					],
+//					segments:[
+//						{startYear:1984,endYear:2014,startIndex:0,endIndex:0,changeProcess:"stable",ephemeral:"false"}
+//					]
+//				};
+		
+		    var lineInfo = {vertices:[],segments:[]}
 		
 		
 			//////////DEFINE GLOBAL VARIABLES/////////////////////////////////////////////////////////						
@@ -336,12 +358,15 @@
 			
 			
 			//define function to add and remove line segments
+			var selectedCircles = [] //global
 			function changePlotLine(){
-				var selectedCircles = $("circle.selected"),
+				var selectedCirclesTemp = $("circle.selected"),
 					lineData = [],
 					i = 0;
-				for(i; i < selectedCircles.length; i++){
-					var thisone = $("circle").index(selectedCircles[i]);
+				selectedCircles = [];
+				for(i; i < selectedCirclesTemp.length; i++){
+					var thisone = $("circle").index(selectedCirclesTemp[i]);
+					selectedCircles.push(thisone);
 					lineData.push({"x":data.Values[thisone].ImageDate, "y":data.Values[thisone][specIndex]});
 				}
 				
@@ -371,7 +396,7 @@
 				
 				//call the function to make the scale change
 				svg.call(zoom).on("dblclick.zoom", null);//svg was defined in the plotInt function
-				updateSegmentForm(selectedCircles);
+				updateSegmentForm();
 				
 			}
 			
@@ -522,7 +547,7 @@
 					.style("fill",function(d,i){return rgbColor[i]})
 					.attr("cx", function(d){return xscale(d.ImageDate);})
 					.attr("cy", function(d){return yscale(d[specIndex]);})
-					.attr("r", 10)
+					.attr("r", 9)
 					.attr("class","unselected");
 				
 				//add the default line
@@ -567,28 +592,23 @@
 				//default the first and last circles to class "selected"
 				$("circle").eq(0).attr("class","selected");
 				$("circle").eq(len-1).attr("class","selected");
-				var vertices = $("circle.selected");
-				updateSegmentForm(vertices);
+				//var vertices = $("circle.selected");
+				
+				//fill in the global selectedCircles variable for the first time
+				var selectedCirclesTemp = $("circle.selected"),
+					i = 0;
+				for(i; i < selectedCirclesTemp.length; i++){
+					selectedCircles.push($("circle").index(selectedCirclesTemp[i]));
+				}
+				updateSegmentForm();
 			}
 			
-			//function to sync the segments form to the selected vertices
-			function updateSegmentForm(vertices){
-				$(".segment").remove();
-				$(".vertex").remove();
-				var yearStart = 0,
-					yearEnd = 0,
-					len = vertices.length,
-					i = 0;
-				for(i; i < len-1; i++){
-					yearStart = years[$("circle").index(vertices[i])];
-					yearEnd =   years[$("circle").index(vertices[i+1])];
-					$("#segmentsFormTbl").append('<tr class="segment"><td>'+yearStart+'</td><td>'+yearEnd+'</td><td class="changeProcessInput formDrop"></td><td><input autocomplete="off" type="checkbox"></td></tr>');
-				}
-				for(i=0; i < len; i++){
-					yearStart = years[$("circle").index(vertices[i])];
-					$("#verticesFormTbl").append('<tr class="vertex"><td>'+yearStart+'</td><td class="landUseInput formDrop"></td></tr>');
-				}
-			}
+
+			
+			
+
+			
+			
 			
 			
 			//define function to update the D3 scatterplot when new selection are made
@@ -624,11 +644,12 @@
 					
 				/////////////////////////////////LINE UPDATE////////////////////////////////	
 				//retrieve the line data (this section could be made into a function cause it is also used in the changePlotLine function)
-				selectedCircles = $("circle.selected");
+				//selectedCircles = $("circle.selected");
 				var lineData = [];
 				var i = 0;
 				for(i; i < selectedCircles.length; i++){
-					var thisone = $("circle").index(selectedCircles[i]);
+					//var thisone = $("circle").index(selectedCircles[i]);
+					var thisone = selectedCircles[i];
 					lineData.push({"x":data.Values[thisone].ImageDate, "y":data.Values[thisone][specIndex]});
 				}
 				
@@ -706,26 +727,51 @@
 				}
 			});
 
-			$(document).ready(function(){
-				$(".chip-gallery canvas").click(function(e){
-					if(e.shiftKey){
-						e.preventDefault(); //make sure that default browser behaviour is prevented
-						var canvasIndex = $(".chip-gallery canvas").index(this)
-						if(canvasIndex != 0 &&  canvasIndex != len-1){
-							var status = $(this).attr("class");
-							
-							if(status == "unselected"){
-								$(this).attr("class","selected");
-								//changePlotLine();	
-							} else {
-								$(this).attr("class","unselected");
-								//changePlotLine();
-							}	
-						}
-					}
-				});
-			});
+
 			
+			
+			
+///////////////////////////////////////////////////////BELOW ARE LINE INFO FORM SCRIPTS/////////////////////////////////////////////////////////////////
+//////////////BELOW ARE LINE INFO FORM SCRIPTS////////////////////////////////////////BELOW ARE LINE INFO FORM SCRIPTS//////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////BELOW ARE LINE INFO FORM SCRIPTS////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////BELOW ARE LINE INFO FORM SCRIPTS/////////////////////////////////
+////////////////////////////BELOW ARE LINE INFO FORM SCRIPTS////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////BELOW ARE LINE INFO FORM SCRIPTS/////////////////////////////////BELOW ARE LINE INFO FORM SCRIPTS////			
+			
+			
+			
+			//function to sync the segments form to the selected vertices
+			function updateSegmentForm(){
+				$(".segment").remove();
+				$(".vertex").remove();
+				lineInfo = {vertices:[],segments:[]}
+				var yearStart = 0,
+					yearEnd = 0,
+					len = selectedCircles.length,
+					startIndex = 0,
+					endIndex = 0,
+					i = 0;
+				for(i; i < len-1; i++){
+					startIndex = selectedCircles[i];
+					endIndex = selectedCircles[i+1];
+					yearStart = years[startIndex];
+					yearEnd =   years[endIndex];
+					$("#segmentsFormTbl").append('<tr class="segment"><td>'+yearStart+'</td><td>'+yearEnd+'</td><td class="changeProcessInput formDrop"></td><td><input class="ephemeralChkBx" autocomplete="off" type="checkbox"></td></tr>');
+					lineInfo.segments.push({startYear:yearStart,endYear:yearEnd,startIndex:startIndex,endIndex:endIndex,changeProcess:"",ephemeral:""});
+				}
+				for(i=0; i < len; i++){
+					startIndex = selectedCircles[i];
+					yearStart = years[startIndex];
+					$("#verticesFormTbl").append('<tr class="vertex"><td>'+yearStart+'</td><td class="landUseInput formDrop"></td></tr>');
+					lineInfo.vertices.push({year:yearStart,index:startIndex,landUse:"",dominant:"",otherUses:{FOR:"",NFV:"",NVN:"",ARG:"",NVA:""}});
+				}
+				
+				//start filling out the table - probably don't need to do this here - for testing
+				fillInLineInfo();
+			}
+		
 			//controls the trajectory form section tabs and tables 
 			$("#segmentsFormTab").click(function(){
 				var status = $("#segmentsFormTab").attr("class");
@@ -748,9 +794,7 @@
 			
 			//change process dropdown list controls
 			$(document).ready(function(){
-                //$(document).on("click",".changeProcessInput",function(e){ //listen for a click on a changeProcessInput <li>
 				$(document).on("click",".formDrop",function(e){ //listen for a click on a changeProcessInput <li>					
-					//$(".changeProcessInput.active").removeClass("active"); //clear any .changeProcessInput "active" classes so that this will be the only one
 					$(".formDrop.active").removeClass("active"); //clear any .changeProcessInput "active" classes so that this will be the only one
 					$(this).addClass("active"); //set this .changeProcessInput <td> as the "active" class so that when a selection is made from the #changeProcessList dropdown it knows which <td> to place it in
 					var rowPos = $(this).position(),
@@ -759,58 +803,118 @@
 						bottomWidth = $(this).css("width"),
 						bottomHeight = $(this).css("height"),
 						parentID = $(this).closest("div").attr("id");
+					
+					$(this).closest("tr").addClass("active")
+					
+					//if the element clicked is for landUseInput then fill in the dropdown with saved info
+					if($(this).hasClass("landUseInput") == true){
+
+						var thisOne = $("tr.vertex .landUseInput").index(this);
+						var thisIndex = lineInfo.vertices[thisOne].index;
+						$("circle:eq("+thisIndex+")").attr("class","highlight");
+						lineInfo.vertices[thisOne].landUse
+						$("#dominantUse").text(lineInfo.vertices[thisOne].landUse);
+						$("#dominantChkBx").prop("checked", lineInfo.vertices[thisOne].dominant);
+						$("#forChkBx").prop("checked", lineInfo.vertices[thisOne].otherUses.FOR);
+						$("#nfvChkBx").prop("checked", lineInfo.vertices[thisOne].otherUses.NFV);
+						$("#nvnChkBx").prop("checked", lineInfo.vertices[thisOne].otherUses.NVN);
+						$("#argChkBx").prop("checked", lineInfo.vertices[thisOne].otherUses.ARG);
+						$("#nvaChkBx").prop("checked", lineInfo.vertices[thisOne].otherUses.NVA);
+					}
+					
+					
+					
+					
+					//drop it's dropdown based on the position of the clicked element
 					$("#"+parentID+" .dropThis").css({
-					//$("#changeProcessList").css({
 						position: "absolute",
 						top: (bottomTop+parseFloat(bottomHeight)-1),
 						left: bottomLeft,
 						width: (parseFloat(bottomWidth)+1+"px"), //THIS COULD BE HARDWIRED WHEN WE FIGURE OUT WHAT SIZE EVERYTHING SHOULD BE
 						marginLeft: "-1px"
 					}).show();
+					
 					e.stopPropagation();
                 });
             });			
 			
-			$("#dominantUse").click(function(e){
+			
+			//this function fill in the lineInfo object for the segments - not the vertices
+			function fillInLineInfo(){
+				var changeProcess = "",
+					ephemeral = "",
+					len = lineInfo.vertices.length,
+					i = 0;
+				for(i; i<len-1;i++){
+					changeProcess = $(".changeProcessInput:eq("+i+")").text();
+					ephemeral = $(".ephemeralChkBx:eq("+i+")").prop("checked");
+					lineInfo.segments[i].changeProcess = changeProcess;
+					lineInfo.segments[i].ephemeral = ephemeral;
+				}
+			}
+			
+			
+			
+			//shows the landUseList when the dominantUse id is clicked
+			$("#dominantUse").click(function(e){			
 				$("#landUseList").show();
 				e.stopPropagation();
+				
 			});
 			
+			//make the the .clickAway class hide anytime a click is made
 			$(document).ready(function(){
 				$(document).on("click", function(){ //click anywhere to get rid of the .dropThis dropdowns
+					//if($(".clickAway").css("display") == "block"){
 						$(".clickAway").hide();
+						for(var i=0;i<selectedCircles.length;i++){
+							$("circle:eq("+selectedCircles[i]+")").attr("class","selected")
+						}
+					//}
 				});
 			});
 			
+			//hide the #landUseDiv dropdown when its done button is clicked and fill in the lineInfo.vertices object
 			$("#doneBtn").click(function(){
 				$("#landUseDiv").hide();
+				for(var i=0;i<selectedCircles.length;i++){
+					$("circle:eq("+selectedCircles[i]+")").attr("class","selected")
+				}
+				//fill in the lineInfo object
+				var thisOne = $(".landUseInput").index($(".landUseInput.active"));
+				lineInfo.vertices[thisOne].landUse = $("#dominantUse").text();
+				lineInfo.vertices[thisOne].dominant = $("#dominantChkBx").prop("checked");
+				lineInfo.vertices[thisOne].otherUses.FOR = $("#forChkBx").prop("checked"); 
+				lineInfo.vertices[thisOne].otherUses.NFV = $("#nfvChkBx").prop("checked");
+				lineInfo.vertices[thisOne].otherUses.NVN = $("#nvnChkBx").prop("checked");
+				lineInfo.vertices[thisOne].otherUses.ARG = $("#argChkBx").prop("checked");
+				lineInfo.vertices[thisOne].otherUses.NVA = $("#nvaChkBx").prop("checked");
 			});
 			
 
 			
+			//fill in the text for the change process and the fill in the lineInfo.segments array when a selection is made from the changeProcessList
 			$("#changeProcessList li").click(function(){
 				$("td.changeProcessInput.active").text($(this).text());
+				fillInLineInfo();
 			});
 			
+			//fill in the lineInfo.segments array when the ephemeral checkbox is clicked
+			$(document).ready(function(){
+				$(document).on("click",".ephemeralChkBx",function(){					
+					fillInLineInfo();
+				});
+			});
+			
+			
+			//fill in the text for the dominant land use
 			$("#landUseList li").click(function(){
 				$("#dominantUse").text($(this).text());
 				$("td.landUseInput.active").text($(this).text());
 			});
 			
-			//make the chip gallery expand on click
-			$(document).ready(function(){
-				$(".chip-gallery").click(function(e){
-					if(!e.ctrlKey && !e.shiftKey){
-						var status = $(this).css("height");
-						if(status == "565px"){
-							$(this).css("height","auto");
-						} else {
-							$(this).css("height","565px");
-						}
-					}
-					
-				});
-			});
+			
+
 			
 			
 			
@@ -905,7 +1009,6 @@
 			function start(){
 				makeChipInfo()
 				drawAllChips()
-				console.log(chipInfo);
 			}
 
 			
@@ -1032,6 +1135,44 @@
 					}
 				});
 			});
+			
+			
+			//make the chip gallery expand on click
+			$(document).ready(function(){
+				$(".chip-gallery").click(function(e){
+					if(!e.ctrlKey && !e.shiftKey){
+						var status = $(this).css("height");
+						if(status == "565px"){
+							$(this).css("height","auto");
+						} else {
+							$(this).css("height","565px");
+						}
+					}
+					
+				});
+			});
+			
+			$(document).ready(function(){
+				$(".chip-gallery canvas").click(function(e){
+					if(e.shiftKey){
+						e.preventDefault(); //make sure that default browser behaviour is prevented
+						var canvasIndex = $(".chip-gallery canvas").index(this)
+						if(canvasIndex != 0 &&  canvasIndex != len-1){
+							var status = $(this).attr("class");
+							
+							if(status == "unselected"){
+								$(this).attr("class","selected");
+								//changePlotLine();	
+							} else {
+								$(this).attr("class","unselected");
+								//changePlotLine();
+							}	
+						}
+					}
+				});
+			});
+			
+			
 			
 			
 			///////////////////OPEN THE REMOTE CHIP STRIP WINDOW AND SEND MESSAGES/////////////////////

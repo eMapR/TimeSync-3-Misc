@@ -42,6 +42,11 @@ circle.selected{
 	stroke-width:1;
 }
 
+circle.highlight{
+	stroke:#32CD32; /*'#FF0000;*/
+	stroke-width:4;
+}
+
 circle:hover{
 	stroke:#ED2939; /*'#FF0000;*/
 	stroke-width:1;
@@ -180,6 +185,13 @@ svg{
 	padding-bottom:3px;
 	
 }
+.subHeader{
+	padding-left:3px;
+	font-size: 11px;
+	font-weight: bold;
+	margin-bottom:1px;
+	padding-bottom:3px;
+}
 
 .sectionDiv{	
 	display: table-cell;
@@ -191,6 +203,11 @@ svg{
 
 #commentsSection{
 	width:100%;
+}
+
+
+tr.active{
+	background-color:pink;
 }
 /*#########################################################################################*/
 
@@ -216,11 +233,6 @@ svg{
 	font-size: 11px;
 }
 
-#landUseList  li{
- 	padding-left:3px;
-	cursor:pointer;
-}
-
 #landUseBtn{
 	width:200px;
 	margin-left:3px;
@@ -239,12 +251,14 @@ svg{
 }
 #doneBtn{
 	border:1px solid #afafaf;
-	border-radius:0px 0px 4px 4px;
-	margin:3px -1px -1px -1px;
+	border-radius:4px;
+	margin:7px 3px 3px 3px;
 	text-align:center;
 	font-size: 11px;
 	font-weight: bold;
 	cursor:pointer;
+	height:40px;
+	padding-top:10px;
 }
 #doneBtn:hover{
 	background-color:#f1f1f1;
@@ -255,7 +269,15 @@ svg{
 	font-size: 11px;
 	cursor:pointer;
 	padding-left:3px;
+	height:20px;
 }
+
+.formDrop{
+	cursor:pointer;
+}
+/*#landUseDiv{
+	background-color:#f6f6f6;
+}*/
 /*#########################################################################################*/
 
 /*############## TRAJECTORY PLOT BUTTONS ####################################################*/
@@ -338,10 +360,6 @@ table td, table th{
 
 .trHeader{
 	background-color:#f1f1f1;
-}
-
-.changeProcessInput{
-	cursor:pointer;
 }
 
 #changeProcessList ul{
