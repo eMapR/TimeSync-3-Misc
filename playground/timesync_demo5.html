@@ -158,59 +158,83 @@
 						<li id="verticesFormTab" class="unselected" style="margin-left:-1px; border-top-right-radius:4px;">Vertices
 					</ul>
 					
-					
-					<table id="segmentsForm">
-						<tr class="trHeader">
-							<th>Start</th>
-							<th>End</th>		
-							<th>Change Process</th>
-							<th>Ephemeral</th>
-						</tr>
-						<tr class="inactive">
-							<td>&nbsp;</td>
-							<td>&nbsp;</td>		
-							<td class="changeProcessInput"></td>
-							<td>&nbsp;</td>
-						</tr>
-						<tr class="inactive">
-							<td>&nbsp;</td>
-							<td>&nbsp;</td>		
-							<td class="changeProcessInput"></td>
-							<td>&nbsp;</td>
-						</tr>
-					</table>
-					
-					<div id="changeProcessList" style="display:none;">
-						<ul>
-							<li>Stable</li>
-							<li>Recovery</li>
-							<li>Harvest</li>
-							<li>Fire</li>
-							<li>Stress</li>
-							<li>Site-preparation fire</li>
-							<li>Delay</li>
-							<li>Mechanical</li>
-							<li>Other disturbance</li>
-							<li>Wind</li>
-							<li>Water</li>
-							<li>Debris</li>
-							<li>Volcano</li>
-							<li>Other non-disturbance</li>
-						</ul>
+					<div id="segmentsFormDiv">
+						<table id="segmentsFormTbl">
+							<tr class="trHeader">
+								<th>Start</th>
+								<th>End</th>		
+								<th>Change Process</th>
+								<th>Ephemeral</th>
+							</tr>
+	<!-- 						<tr class="segment">
+								<td>&nbsp;</td>
+								<td>&nbsp;</td>		
+								<td class="changeProcessInput formDrop"></td>
+								<td><input autocomplete="off" type="checkbox"></td>
+							</tr> -->
+						</table>
+						
+						<div id="changeProcessList" class="dropThis clickAway">
+							<ul>
+								<li>Stable</li>
+								<li>Recovery</li>
+								<li>Harvest</li>
+								<li>Fire</li>
+								<li>Stress</li>
+								<li>Site-preparation fire</li>
+								<li>Delay</li>
+								<li>Mechanical</li>
+								<li>Other disturbance</li>
+								<li>Wind</li>
+								<li>Water</li>
+								<li>Debris</li>
+								<li>Volcano</li>
+								<li>Other non-disturbance</li>
+							</ul>
+						</div>
 					</div>
-				
-					<table id="verticesForm">
-						<tr class="trHeader">
-							<th>Date</th>
-							<th>Land Use</th>		
-						</tr>
-						<tr>
-							<td>&nbsp;</td>
-							<td>&nbsp;</td>		
-						</tr>
-					</table>
-				
-				
+					
+					<div id="verticesFormDiv">
+						<table id="verticesFormTbl">
+							<tr class="trHeader">
+								<th>Date</th>
+								<th>Land Use</th>
+							</tr>
+	<!-- 						<tr class="vertex">
+								<td>&nbsp;</td>
+								<td>&nbsp;</td>		
+							</tr> -->
+						</table>
+						
+						<div id="landUseDiv" class="dropThis">
+							<div id="dominentLandUseDiv" class="landUseDiv">
+								<p class="header">Dominant Use (9 pixels):</p>
+								<div id="dominantUse">&nbsp;</div>
+								<div id="landUseList" class="clickAway"> <!-- class="dropThis clickAway" -->
+									<ul>
+										<li>FOR (forest)</li>
+										<li>NFV (non-forest vegetation)</li>
+										<li>NVN (non-vegetated natural)</li>
+										<li>ARG (agriculture)</li>
+										<li>NVA (non-vegetated anthropogenic)</li>
+									</ul>
+								</div>
+								<p id="dominantChkBx"><input autocomplete="off" type="checkbox"> Dominant > 50% </p>
+							</div>
+							<div id="otherLandUseDiv" class="landUseDiv">
+								<p class="header">Other land use</p>
+								<ul id="otherLandUseList">
+									<li><input autocomplete="off" type="checkbox"> FOR (forest)</li>
+									<li><input autocomplete="off" type="checkbox"> NFV (non-forest vegetation)</li>
+									<li><input autocomplete="off" type="checkbox"> NVN (non-vegetated natural)</li>
+									<li><input autocomplete="off" type="checkbox"> ARG (agriculture)</li>
+									<li><input autocomplete="off" type="checkbox"> NVA (non-vegetated anthropogenic)</li>
+								</ul>
+							</div>
+							<div id="doneBtn">Done</div>
+							<!-- <button type="button" class="btn btn-xs btn-default btn-block" style="margin-top:3px;">Done</button> -->
+						</div>
+					</div>
 				
 				</div>
 				<div id="commentsSection" class="sectionDiv">
@@ -281,7 +305,6 @@
 				thisCircle = $("circle").eq(seriesIndex);
 				thisCanvas = $("canvas").eq(seriesIndex);
 				var status = thisCircle.attr("class");
-				console.log(status)
 				if(status == "unselected"){
 					thisCircle.attr("class","selected");
 					thisCanvas.attr("class","selected");
@@ -306,15 +329,6 @@
 						}
 						if(seriesIndex != 0 &&  seriesIndex != len-1){
 							changeSelectedClass(seriesIndex)
-							//	var status = $(this).attr("class");
-							//	
-							//	if(status == "unselected"){
-							//		$(this).attr("class","selected");
-							//		changePlotLine();	
-							//	} else {
-							//		$(this).attr("class","unselected");
-							//		changePlotLine();
-							//	}
 						}					
 					}
 				});
@@ -323,9 +337,9 @@
 			
 			//define function to add and remove line segments
 			function changePlotLine(){
-				var selectedCircles = $("circle.selected");
-				var lineData = [];
-				var i = 0;
+				var selectedCircles = $("circle.selected"),
+					lineData = [],
+					i = 0;
 				for(i; i < selectedCircles.length; i++){
 					var thisone = $("circle").index(selectedCircles[i]);
 					lineData.push({"x":data.Values[thisone].ImageDate, "y":data.Values[thisone][specIndex]});
@@ -356,8 +370,9 @@
 					.on("zoom", zoomed);
 				
 				//call the function to make the scale change
-				svg.call(zoom).on("dblclick.zoom", null)//svg was defined in the plotInt function
-
+				svg.call(zoom).on("dblclick.zoom", null);//svg was defined in the plotInt function
+				updateSegmentForm(selectedCircles);
+				
 			}
 			
 			//define function to return stretch color array by index
@@ -552,7 +567,29 @@
 				//default the first and last circles to class "selected"
 				$("circle").eq(0).attr("class","selected");
 				$("circle").eq(len-1).attr("class","selected");
+				var vertices = $("circle.selected");
+				updateSegmentForm(vertices);
 			}
+			
+			//function to sync the segments form to the selected vertices
+			function updateSegmentForm(vertices){
+				$(".segment").remove();
+				$(".vertex").remove();
+				var yearStart = 0,
+					yearEnd = 0,
+					len = vertices.length,
+					i = 0;
+				for(i; i < len-1; i++){
+					yearStart = years[$("circle").index(vertices[i])];
+					yearEnd =   years[$("circle").index(vertices[i+1])];
+					$("#segmentsFormTbl").append('<tr class="segment"><td>'+yearStart+'</td><td>'+yearEnd+'</td><td class="changeProcessInput formDrop"></td><td><input autocomplete="off" type="checkbox"></td></tr>');
+				}
+				for(i=0; i < len; i++){
+					yearStart = years[$("circle").index(vertices[i])];
+					$("#verticesFormTbl").append('<tr class="vertex"><td>'+yearStart+'</td><td class="landUseInput formDrop"></td></tr>');
+				}
+			}
+			
 			
 			//define function to update the D3 scatterplot when new selection are made
 			function update(data, specIndex, rgbColor, domain){
@@ -628,8 +665,6 @@
 					$(oldactive).removeClass('active');
 					$(newactive).addClass('active');
 					
-					console.log(thisListID);
-					console.log($("#"+thisSpecIndexID).text());
 					if(thisListID == "index-list"){$("#btnIndex div").replaceWith('<div><strong>Index:</strong><br><small>'+$("#"+thisSpecIndexID).text()+'</small><span class="caret"></span></div>')};
 					if(thisListID == "red-list"){$("#btnRed div").replaceWith('<div><strong>R</strong><small>GB</small><br><small>'+$("#"+thisSpecIndexID).text()+'</small><span class="caret"></span></div>')};
 					if(thisListID == "green-list"){$("#btnGreen div").replaceWith('<div><small>R</small><strong>G</strong><small>B</small><br><small>'+$("#"+thisSpecIndexID).text()+'</small><span class="caret"></span></div>')};
@@ -697,8 +732,8 @@
 				if(status == "unselected"){
 					$("#segmentsFormTab").attr("class","selected");
 					$("#verticesFormTab").attr("class","unselected");
-					$("#segmentsForm").show();
-					$("#verticesForm").hide();
+					$("#segmentsFormDiv").show();
+					$("#verticesFormDiv").hide();
 				}
 			});
 			$("#verticesFormTab").click(function(){
@@ -706,48 +741,60 @@
 				if(status == "unselected"){
 					$("#verticesFormTab").attr("class","selected");
 					$("#segmentsFormTab").attr("class","unselected");
-					$("#verticesForm").show();
-					$("#segmentsForm").hide();
+					$("#verticesFormDiv").show();
+					$("#segmentsFormDiv").hide();
 				}
 			});
 			
 			//change process dropdown list controls
 			$(document).ready(function(){
-                $(".changeProcessInput").click(function(e){
-					if($("#changeProcessList").css("display") == "none"){
-						$(".changeProcessInput.active").removeClass("active");
-						console.log($(this));
-						$(this).addClass("active");
-						var rowPos = $(this).position(),
-							bottomTop = rowPos.top,
-							bottomLeft = rowPos.left,
-							bottomWidth = $(this).css("width"),
-							bottomHeight = $(this).css("height");
-							
-						$("#changeProcessList").css({
-							position: "absolute",
-							top: bottomTop-bottomHeight,
-							left: bottomLeft,
-							width: (parseInt(bottomWidth)+1+"px"), //THIS COULD BE HARDWIRED WHEN WE FIGURE OUT WHAT SIZE EVERYTHING SHOULD BE
-							marginLeft: "-1px"
-						}).show();
-						e.stopPropagation();
-					} else {
-						$("#changeProcessList").css("display", "none");
-					}
+                //$(document).on("click",".changeProcessInput",function(e){ //listen for a click on a changeProcessInput <li>
+				$(document).on("click",".formDrop",function(e){ //listen for a click on a changeProcessInput <li>					
+					//$(".changeProcessInput.active").removeClass("active"); //clear any .changeProcessInput "active" classes so that this will be the only one
+					$(".formDrop.active").removeClass("active"); //clear any .changeProcessInput "active" classes so that this will be the only one
+					$(this).addClass("active"); //set this .changeProcessInput <td> as the "active" class so that when a selection is made from the #changeProcessList dropdown it knows which <td> to place it in
+					var rowPos = $(this).position(),
+						bottomTop = rowPos.top,
+						bottomLeft = rowPos.left,
+						bottomWidth = $(this).css("width"),
+						bottomHeight = $(this).css("height"),
+						parentID = $(this).closest("div").attr("id");
+					$("#"+parentID+" .dropThis").css({
+					//$("#changeProcessList").css({
+						position: "absolute",
+						top: (bottomTop+parseFloat(bottomHeight)-1),
+						left: bottomLeft,
+						width: (parseFloat(bottomWidth)+1+"px"), //THIS COULD BE HARDWIRED WHEN WE FIGURE OUT WHAT SIZE EVERYTHING SHOULD BE
+						marginLeft: "-1px"
+					}).show();
+					e.stopPropagation();
                 });
-				
             });			
-			$(document).click(function(){ //click anywhere to get rid of the dropdown
-				if($("#changeProcessList").css("display") == "block") {
-					$("#changeProcessList").hide();
-				}
+			
+			$("#dominantUse").click(function(e){
+				$("#landUseList").show();
+				e.stopPropagation();
 			});
 			
-			//
+			$(document).ready(function(){
+				$(document).on("click", function(){ //click anywhere to get rid of the .dropThis dropdowns
+						$(".clickAway").hide();
+				});
+			});
+			
+			$("#doneBtn").click(function(){
+				$("#landUseDiv").hide();
+			});
+			
+
+			
 			$("#changeProcessList li").click(function(){
-				console.log($(this).text());
 				$("td.changeProcessInput.active").text($(this).text());
+			});
+			
+			$("#landUseList li").click(function(){
+				$("#dominantUse").text($(this).text());
+				$("td.landUseInput.active").text($(this).text());
 			});
 			
 			//make the chip gallery expand on click
@@ -811,8 +858,8 @@
 				"chips/test_chip_2013.png",
 				"chips/test_chip_2014.png"
 			];
-			
-
+			years = [];
+			for(var i=0;i<images.length;i++){years.push(1985+i)}
 			
 			var chipInfo = {
 					box: 1,
