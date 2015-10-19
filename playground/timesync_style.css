@@ -44,7 +44,7 @@ circle.selected{
 
 circle.highlight{
 	stroke:#32CD32; /*'#FF0000;*/
-	stroke-width:4;
+	stroke-width:5;
 }
 
 circle:hover{
@@ -69,7 +69,7 @@ svg{
 
 
 /*############## CHIP GALLERY ###############################################################*/
-.chip-gallery{
+#chip-gallery{
 	height:565px;
 	/*width:1080px;*/
 	width:auto;
@@ -77,21 +77,21 @@ svg{
 	/*border:1px solid #afafaf;*/
 	/*border-radius: 4px;*/
 }
-.chip-gallery canvas{
+#chip-gallery canvas{
 	display:inline;
 	margin:3px;
 	vertical-align:top;
 	cursor: pointer;
 	border: 2px solid white; /*#dbdbdb*/
 }
-.chip-gallery .selected{
+#chip-gallery .selected{
 	border: 2px solid black;
 }
 /*#################################################################################################*/
 
 
 
-.img-gallery{
+#img-gallery{
 	display:none;
 }
 
@@ -207,7 +207,7 @@ svg{
 
 
 tr.active{
-	background-color:pink;
+	background-color:#32CD32;
 }
 /*#########################################################################################*/
 
@@ -279,6 +279,49 @@ tr.active{
 	background-color:#f6f6f6;
 }*/
 /*#########################################################################################*/
+
+/*############## COMMENTS SECTION ####################################################*/
+.listFormat{
+	list-style-type: none;
+ 	padding-left:0px;
+	margin:0px;
+	font-size: 11px;
+}
+
+
+
+.tableDisplay{
+	display:table;
+	border-spacing: 0px;
+	margin-left:3px;
+}
+
+.tableDisplayCell{
+	display: table-cell;
+	vertical-align:top;
+}
+
+
+
+
+#commentsChkBxDiv p{
+	margin-left:-3px;
+}
+
+#uncertaintyDiv{
+	margin-top:10px;
+}
+
+
+#commentInput{
+	height:250px;
+	width:98%;
+}
+
+#commentInputDiv{
+	padding-left:15px;
+	
+}
 
 /*############## TRAJECTORY PLOT BUTTONS ####################################################*/
 li:hover{

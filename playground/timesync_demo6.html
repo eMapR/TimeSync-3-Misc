@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html lan="en">
+	<head>
+		<title>TimeSync</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge"> <!--needed so that D3 will work in IE!-->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+		<link rel="stylesheet" href="timesync_style.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
+		<!--<script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>!-->
+		<script type="text/javascript" src="jquery.mousewheel.min.js"></script>
+		<script type="text/javascript" src="specIndexStretch.js"></script>
+		<style>
+
+
+			
+			
+		</style>
+	</head>
+	<body> <!-- onload="drawAllChips()" -->
+			
+			<div id="topSection">
+				<p style="display:inline-block;"><strong>TimeSync - v3.0</strong></p>
+				<p style="display:inline-block;">Chip Size: <input type="text" name="FirstName" value="255"></p>
+				<p style="display:inline-block;">Plot Size: <input type="text" name="FirstName" value="1"></p>
+			</div>
+			<div id="containerDiv">
+				<div id="plotSelectionDiv" class="sectionDiv">
+					<p class="header">Plots</p>
+					<ul> <!-- the <li>'s will be filled in on-the-fly -->
+						<li class="plotList selected">123
+						<li class="plotList unselected">456
+						<li class="plotList unselected">789
+						<li class="plotList unselected">456
+						<li class="plotList unselected">789
+						<li class="plotList unselected">456
+						<li class="plotList unselected">789
+						<li class="plotList unselected">456
+						<li class="plotList unselected">789
+						<li class="plotList unselected">456
+						<li class="plotList unselected">789
+						<li class="plotList unselected">456
+						<li class="plotList unselected">789
+						<li class="plotList unselected">456
+						<li class="plotList unselected">789
+						<li class="plotList unselected">456
+						<li class="plotList unselected">789
+						<li class="plotList unselected">456
+						<li class="plotList unselected">789						
+						<li class="plotList unselected">456
+						<li class="plotList unselected">789
+						<li class="plotList unselected">456
+						<li class="plotList unselected">789
+						<li class="plotList unselected">456
+						<li class="plotList unselected">789						
+						<li class="plotList unselected">456
+						<li class="plotList unselected">789
+						<li class="plotList unselected">456
+						<li class="plotList unselected">789
+					</ul>
+				</div>
+				<div id="plot" class="sectionDiv">
+					<p class="header">Spectral Trajectory</p>
+					<svg id="svg" width="740" height="250"></svg>
+					<div class="btn-group" role="group" aria-label="..." style="margin:-1px; display: inline-block;">
+						<div class="btn-group dropdown" role="group">	
+							<button id="btnIndex" class="btn btn-default dropdown-toggle specPlotBtn" type="button">
+								<div><strong>Index</strong>:<br><small>TC Wetness</small><span class="caret"></span></div>
+							</button>
+							<ul class="dropdown-menu plot" id="index-list">
+								<li class="" id="B1">Band 1</li>
+								<li class="" id="B2">Band 2</li>
+								<li class="" href="#" id="B3">Band 3</li>
+								<li class="" href="#" id="B4">Band 4</li>
+								<li class="" href="#" id="B5">Band 5</li>
+								<li class="" href="#" id="B7">Band 7</li>
+								<li class="" href="#" id="TCB">TC Brightness</li>
+								<li class="" href="#" id="TCG">TC Greenness</li>
+								<li class="active" href="#" id="TCW">TC Wetness</li>
+								<li class="" href="#" id="TCA">TC Angle</li>
+								<li class="" href="#" id="NDVI">NDVI</li>
+								<li class="" href="#" id="NBR">NBR</li>
+							</ul>
+						</div>
+						<div id="btnRed" class="btn-group dropdown" role="group">					
+							<button class="btn btn-default dropdown-toggle specPlotBtn" type="button">
+								<div><strong>R</strong><small>GB</small>:<br><small>TC Brightness</small><span class="caret"></span></div>
+							</button>
+							<ul class="dropdown-menu plot" id="red-list">
+								<li class="" href="#" id="B1">Band 1</li>
+								<li class="" href="#" id="B2">Band 2</li>
+								<li class="" href="#" id="B3">Band 3</li>
+								<li class="" href="#" id="B4">Band 4</li>
+								<li class="" href="#" id="B5">Band 5</li>
+								<li class="" href="#" id="B7">Band 7</li>
+								<li class="active" href="#" id="TCB">TC Brightness</li>
+								<li class="" href="#" id="TCG">TC Greenness</li>
+								<li class="" href="#" id="TCW">TC Wetness</li>
+								<li class="" href="#" id="TCA">TC Angle</li>
+								<li class="" href="#" id="NDVI">NDVI</li>
+								<li class="" href="#" id="NBR">NBR</li>
+							</ul>
+						</div>
+						<div class="btn-group dropdown" role="group">
+							<button id="btnGreen" class="btn btn-default dropdown-toggle specPlotBtn" type="button">
+								<div><small>R</small><strong>G</strong><small>B</small>:<br><small>TC Greenness</small><span class="caret"></span></div>
+							</button>
+							<ul class="dropdown-menu plot" id="green-list">
+								<li class="" href="#" id="B1">Band 1</li>
+								<li class="" href="#" id="B2">Band 2</li>
+								<li class="" href="#" id="B3">Band 3</li>
+								<li class="" href="#" id="B4">Band 4</li>
+								<li class="" href="#" id="B5">Band 5</li>
+								<li class="" href="#" id="B7">Band 7</li>
+								<li class="" href="#" id="TCB">TC Brightness</li>
+								<li class="active" href="#" id="TCG">TC Greenness</li>
+								<li class="" href="#" id="TCW">TC Wetness</li>
+								<li class="" href="#" id="TCA">TC Angle</li>
+								<li class="" href="#" id="NDVI">NDVI</li>
+								<li class="" href="#" id="NBR">NBR</li>
+							</ul>
+						</div>
+						<div class="btn-group dropdown" role="group">
+							<button id="btnBlue" class="btn btn-default dropdown-toggle specPlotBtn" type="button">
+								<div><small>RG</small><strong>B</strong>:<br><small>TC Wetness</small><span class="caret"></span></div>
+							</button>
+							<ul class="dropdown-menu plot" id="blue-list">
+								<li class="" href="#" id="B1">Band 1</li>
+								<li class="" href="#" id="B2">Band 2</li>
+								<li class="" href="#" id="B3">Band 3</li>
+								<li class="" href="#" id="B4">Band 4</li>
+								<li class="" href="#" id="B5">Band 5</li>
+								<li class="" href="#" id="B7">Band 7</li>
+								<li class="" href="#" id="TCB">TC Brightness</li>
+								<li class="" href="#" id="TCG">TC Greenness</li>
+								<li class="active" href="#" id="TCW">TC Wetness</li>
+								<li class="" href="#" id="TCA">TC Angle</li>
+								<li class="" href="#" id="NDVI">NDVI</li>
+								<li class="" href="#" id="NBR">NBR</li>
+							</ul>
+						</div>
+						<div class="btn-group" role="group">
+							<button id="btnLine" class="btn btn-default specPlotBtn" type="button">
+								<Strong>Display line</strong>:<br><span id="lineDisplayThumb" class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span>
+							</button>
+						</div>
+					</div>
+				</div>
+				
+				
+				<div class="sectionDiv">
+					<p class="header">Trajectory Forms</p>
+					<ul class="test">
+						<li id="segmentsFormTab" class="selected" style="border-top-left-radius:4px;">Segments
+						<li id="verticesFormTab" class="unselected" style="margin-left:-1px; border-top-right-radius:4px;">Vertices
+					</ul>
+					
+					<div id="segmentsFormDiv">
+						<table id="segmentsFormTbl">
+							<tr class="trHeader">
+								<th>Start</th>
+								<th>End</th>		
+								<th>Change Process</th>
+								<th>Ephemeral</th>
+							</tr>
+	<!-- 						<tr class="segment">
+								<td>&nbsp;</td>
+								<td>&nbsp;</td>		
+								<td class="changeProcessInput formDrop"></td>
+								<td><input class="ephemeralChkBx" autocomplete="off" type="checkbox"></td>
+							</tr> -->
+						</table>
+						
+						<div id="changeProcessList" class="dropThis">  <!-- clickAway -->
+							<ul>
+								<li>Stable</li>
+								<li>Recovery</li>
+								<li>Harvest</li>
+								<li>Fire</li>
+								<li>Stress</li>
+								<li>Site-preparation fire</li>
+								<li>Delay</li>
+								<li>Mechanical</li>
+								<li>Other disturbance</li>
+								<li>Wind</li>
+								<li>Water</li>
+								<li>Debris</li>
+								<li>Volcano</li>
+								<li>Other non-disturbance</li>
+							</ul>
+						</div>
+					
+					</div>
+					
+					
+					<div id="verticesFormDiv">
+						
+						<table id="verticesFormTbl">
+							<tr class="trHeader">
+								<th>Date</th>
+								<th>Land Use</th>
+							</tr>
+	<!-- 						<tr class="vertex">
+								<td></td>
+								<td class="landUseInput formDrop"></td>		
+							</tr> -->
+						</table>
+						
+						<div id="landUseDiv" class="dropThis">
+							<div id="dominentLandUseDiv" class="landUseDiv">
+								<p class="subHeader">Dominant Use (9 pixels):</p>
+								<div id="dominantUse"></div>
+								<div id="landUseList" > <!-- class="clickAway" -->
+									<ul>
+										<li>FOR (forest)</li>
+										<li>NFV (non-forest vegetation)</li>
+										<li>NVN (non-vegetated natural)</li>
+										<li>ARG (agriculture)</li>
+										<li>NVA (non-vegetated anthropogenic)</li>
+									</ul>
+								</div>
+								<p style="font-size:11px"><input class="landUseChkBx" id="dominantChkBx" autocomplete="off" type="checkbox"> Dominant > 50% </p>
+							</div>
+							<div id="otherLandUseDiv" class="landUseDiv">
+								<p class="subHeader">Other land use:</p>
+								<ul id="otherLandUseList">
+									<li><input class="landUseChkBx" id="forChkBx" autocomplete="off" type="checkbox"> FOR (forest)</li>
+									<li><input class="landUseChkBx" id="nfvChkBx" autocomplete="off" type="checkbox"> NFV (non-forest vegetation)</li>
+									<li><input class="landUseChkBx" id="nvnChkBx" autocomplete="off" type="checkbox"> NVN (non-vegetated natural)</li>
+									<li><input class="landUseChkBx" id="argChkBx" autocomplete="off" type="checkbox"> ARG (agriculture)</li>
+									<li><input class="landUseChkBx" id="nvaChkBx" autocomplete="off" type="checkbox"> NVA (non-vegetated anthropogenic)</li>
+								</ul>
+							</div>
+							<div id="doneBtn">Done</div>
+						</div>
+					
+					</div>
+				</div>
+				
+				<div id="commentsSection" class="sectionDiv">
+					<p class="header">Comments</p>
+					<div class="tableDisplay">
+						<div id="commentsChkBxDiv" class="tableDisplayCell">
+							<div id="commentsDiv">
+								<p class="subHeader">Other</p>
+								<ul id="commentsList" class="listFormat">
+									<li><input class="commentsChkBx" id="WetlandChkBx" autocomplete="off" type="checkbox"> Wetland</li>
+									<li><input class="commentsChkBx" id="GEChkBx" autocomplete="off" type="checkbox"> Graphic example</li>
+								</ul>
+							</div>
+							<div id="uncertaintyDiv">
+								<p class="subHeader">Uncertainty</p>
+								<ul id="uncertaintyList" class="listFormat">
+									<li><input class="uncertaintyChkBx" id="vertexChkBx" autocomplete="off" type="checkbox"> Vertex</li>
+									<li><input class="uncertaintyChkBx" id="disturbanceChkBx" autocomplete="off" type="checkbox"> Disturbance</li>
+									<li><input class="uncertaintyChkBx" id="CAchkBx" autocomplete="off" type="checkbox"> Causal Agent</li>
+									<li><input class="uncertaintyChkBx" id="LUchkBx" autocomplete="off" type="checkbox"> Land use</li>
+									<li><input class="uncertaintyChkBx" id="LUCchkBx" autocomplete="off" type="checkbox"> Land use change</li>
+								</ul>
+							</div>
+						</div>
+						<div id="commentInputDiv" class="tableDisplayCell">
+							<textarea id="commentInput" autocomplete="off"></textarea>
+						</div>
+					</div>
+				</div>
+
+
+
+
+			</div>
+			
+			<div id="chipGallerySection">
+				<p class="header">Image Chip Gallery</p>
+				<div id="chip-gallery"></div>
+			</div>
+			<div id="img-gallery"></div>	
+
+				
+					
+
+
+
+		
+		
+		<script>
+			
+//			var lineInfo = {
+//					vertices:[
+//						{year:0,index:0,landUse:"",dominant:"",
+//							otherUses:{
+//								FOR:"",
+//								NFV:"",
+//								NVN:"",
+//								ARG:"",
+//								NVA:""
+//							}
+//						},
+//					],
+//					segments:[
+//						{startYear:1984,endYear:2014,startIndex:0,endIndex:0,changeProcess:"stable",ephemeral:"false"}
+//					]
+//				};
+		
+		    var lineInfo = {vertices:[],segments:[]}
+		
+		
+			//////////DEFINE GLOBAL VARIABLES/////////////////////////////////////////////////////////						
+			var n_stdev = 2,
+				data = {}, // = getJson("./test3.json"), //get the data
+				len = 0, // = Object.keys(data.Values).length, //get the number of years
+				specIndex = "TCW", //default index to display	
+				rgbColor,
+				jsonURL = "./test3.json";
+			
+			
+			/////////////DEFINE FUNCTIONS////////////////////////////////////////////////////////////////
+			
+			//function to retrieve json data
+			$.getJSON(jsonURL).done(function(jsonobject){
+				data = jsonobject
+				len = data.Values.length; // NEEDS TO BE A GLOBAL VARIABLE
+				//len = Object.keys(data.Values).length
+				calcIndices();
+				rgbColor = scaledRGB(data, "TCB", "TCG", "TCW", stretch, 2, len); //get the scaled rgb color
+				plotInt();
+				
+				////make the trajectory svg circles selectable
+				//$(document).ready(function(){
+				//	$("circle").click(function(e){
+				//		if(e.ctrlKey){
+				//			e.preventDefault(); //make sure that default browser behaviour is prevented
+				//			var status = $(this).attr("class");
+				//			if(status == "unselected"){
+				//				$(this).attr("class","selected");
+				//			} else {
+				//				$(this).attr("class","unselected");
+				//			}	
+				//		}
+				//	});
+				//});
+				
+			});
+	
+			//define function to update the circle selection
+			function changeSelectedClass(seriesIndex){
+				thisCircle = $("circle").eq(seriesIndex);
+				thisCanvas = $("canvas").eq(seriesIndex);
+				var status = thisCircle.attr("class");
+				if(status == "unselected"){
+					thisCircle.attr("class","selected");
+					thisCanvas.attr("class","selected");
+					changePlotLine();	
+				} else {
+					thisCircle.attr("class","unselected");
+					thisCanvas.attr("class","unselected");
+					changePlotLine();
+				}
+			}
+
+			//make the trajectory svg circles selectable
+			$(document).ready(function(){
+				$(document).on("click", "circle, canvas", function(e){ //need to use this style event binding for elements that don't exisit yet - these lines will run before the "circle" elements are created, alternatively could use the commented lines in the above jquery section
+					if(e.shiftKey){
+						if($("tr").hasClass("active") == false){
+							e.preventDefault(); //make sure that default browser behaviour is prevented
+							var nodeType = $(this).prop('nodeName')
+							if(nodeType == "circle"){
+								var seriesIndex = $("circle").index(this);
+							} else{
+								var seriesIndex = $("canvas").index(this);
+							}
+							if(seriesIndex != 0 &&  seriesIndex != len-1){
+								changeSelectedClass(seriesIndex)
+							}					
+						}
+					}
+				});
+			});
+			
+			
+			//define function to add and remove line segments
+			var selectedCircles = [] //global
+			function changePlotLine(){
+				var selectedCirclesTemp = $("circle.selected"),
+					lineData = [],
+					i = 0;
+				selectedCircles = [];
+				for(i; i < selectedCirclesTemp.length; i++){
+					var thisone = $("circle").index(selectedCirclesTemp[i]);
+					selectedCircles.push(thisone);
+					lineData.push({"x":data.Values[thisone].ImageDate, "y":data.Values[thisone][specIndex]});
+				}
+				
+				$("#plotLine").remove();				//add the default line
+				//make the line function to convert the xy object to svg path syntax 
+				//var lineFunction = d3.svg.line() //TODO: CHECK IF THIS NEEDS TO BE A GLOBAL VARIABLE OR NOT
+				//	.x(function(d){return xscale(d.x);})
+				//	.y(function(d){return yscale(d.y);})
+				//	.interpolate("linear");
+				
+				lineGraph = svg.append("path")
+					.attr("d", lineFunction(lineData))
+					.attr("id","plotLine")
+					.attr("clip-path", "url(#clip)");
+				
+				//define the zooming function - what gets scaled on zoom 
+				function zoomed() {
+					svg.select(".y.axis").call(yaxis);
+					svg.selectAll("circle").attr("cy", function(d){return yscale(d[specIndex]);});
+					svg.selectAll("#plotLine").attr("d", lineFunction(lineData));
+				}
+				
+				//define the zoom behavior
+				var zoom = d3.behavior.zoom()
+					.y(yscale)
+					.scaleExtent([.1, 5])
+					.on("zoom", zoomed);
+				
+				//call the function to make the scale change
+				svg.call(zoom).on("dblclick.zoom", null);//svg was defined in the plotInt function
+				updateSegmentForm();
+				
+			}
+			
+			//define function to return stretch color array by index
+			function setcolor(data, specIndex, stretch, n_stdev, len) {
+				var minv = stretch[specIndex].mean - (stretch[specIndex].stdev * n_stdev),
+					maxv = stretch[specIndex].mean + (stretch[specIndex].stdev * n_stdev),
+					color = [],
+					i = 0;
+				for (i; i < len; i++) {
+					if (data.Values[i][specIndex] < minv) data.Values[i][specIndex] = minv;
+					if (data.Values[i][specIndex] > maxv) data.Values[i][specIndex] = maxv;
+					color[i] = ((data.Values[i][specIndex] - minv) / (maxv - minv)) * 256;
+				}
+				return color;
+			}
+			
+			//define function to return scaled color arrays as RGB color
+			function scaledRGB(data, RspecIndex, GspecIndex, BspecIndex, stretch, n_stdev, len){
+				var colorR = setcolor(data, RspecIndex, stretch, n_stdev, len),
+					colorG = setcolor(data, GspecIndex, stretch, n_stdev, len),
+					colorB = setcolor(data, BspecIndex, stretch, n_stdev, len),
+					color = [],
+					i = 0;
+				for(i;i<len;i++) {color[i] = d3.rgb(colorR[i],colorG[i],colorB[i]);}
+				return color;
+			}			
+			
+			//define function to calculate spectral indices from the raw band data
+			function calcIndices(){
+				//define and initialize variables		
+				var b1 = 0, 
+					b2 = 0, 
+					b3 = 0,
+					b4 = 0,
+					b5 = 0,
+					b7 = 0,
+					bcoef = [0.2043, 0.4158, 0.5524, 0.5741, 0.3124, 0.2303],
+					gcoef = [-0.1603, -0.2819, -0.4934, 0.7940, -0.0002, -0.1446],
+					wcoef = [0.0315, 0.2021, 0.3102, 0.1594,-0.6806, -0.6109],
+					i = 0;
+				
+				//calculate indices and include them in the json object
+				for(i; i<len; i++){
+					//pull out the values by band from json object so we don't have to deal with the long json text to 
+					//call a value when calculating indices 
+					b1 = data.Values[i].B1;
+					b2 = data.Values[i].B2;
+					b3 = data.Values[i].B3;
+					b4 = data.Values[i].B4;
+					b5 = data.Values[i].B5;
+					b7 = data.Values[i].B7;
+				
+					//calculate indices
+					data.Values[i]["TCB"]=(b1*bcoef[0])+(b2*bcoef[1])+(b3*bcoef[2])+(b4*bcoef[3])+(b5*bcoef[4])+(b7*bcoef[5]);		
+					data.Values[i]["TCG"]=(b1*gcoef[0])+(b2*gcoef[1])+(b3*gcoef[2])+(b4*gcoef[3])+(b5*gcoef[4])+(b7*gcoef[5]);
+					data.Values[i]["TCW"]=(b1*wcoef[0])+(b2*wcoef[1])+(b3*wcoef[2])+(b4*wcoef[3])+(b5*wcoef[4])+(b7*wcoef[5]);
+					data.Values[i]["TCA"]=Math.atan(data.Values[i].TCG/data.Values[i].TCB) * (180/Math.PI) * 100;
+					data.Values[i]["NBR"]=(b4-b7)/(b4+b7);
+					data.Values[i]["NDVI"]=(b4-b3)/(b4+b3);
+				}
+			}
+					
+			//define function to initialize the spectral trajectory
+			function plotInt(){
+				//get the range of the x values
+				var yearmin = d3.min(data.Values, function(d) {return d.ImageDate;}),
+					yearmax = d3.max(data.Values, function(d) {return d.ImageDate;});
+				
+				//adjust the ranges so there is some buffer
+				var xmin = yearmin-1, //
+					xmax = yearmax+1;
+				
+				//define the width of the svg plot area
+				var w = 740, 
+					h = 250; 
+				
+				//define the plot margins
+				var pt = 10, //plot top
+					pr = 20, //plot right
+					pl = 70, //plot left
+					pb = 37; //plot bottom
+				
+				//define the x scale
+				xscale = d3.scale.linear() //NEEDS TO BE A GLOBAL VARIABLE - IS USED HERE AND IN THE UPDATE FUNCTION
+					.domain([xmin, xmax])
+					.range([pl, w - pr]);
+				
+				//define the y scale
+				yscale = d3.scale.linear() //NEEDS TO BE A GLOBAL VARIABLE - IS USED HERE AND IN THE UPDATE FUNCTION
+					.domain([domain[specIndex].min, domain[specIndex].max])
+					.range([h - pb, pt]);
+						
+				//define the x axis
+				var xaxis = d3.svg.axis()
+					.scale(xscale)
+					.orient("bottom")
+					.tickFormat(d3.format("d"));
+				
+				//define the x axis
+				yaxis = d3.svg.axis() //NEEDS TO BE A GLOBAL VARIABLE - IS USED HERE AND IN THE UPDATE FUNCTION
+					.scale(yscale)
+					.orient("left");
+				
+				//define the zooming function - what gets scaled on zoom
+				function zoomed() {
+					svg.select(".y.axis").call(yaxis);
+					svg.selectAll("circle").attr("cy", function(d){return yscale(d[specIndex]);});
+					svg.selectAll("#plotLine").attr("d", lineFunction(lineData));
+				}
+				
+				//define the zoom behavior
+				var zoom = d3.behavior.zoom()
+					.y(yscale)
+					.scaleExtent([1, 5])
+					.on("zoom", zoomed);
+					
+				//append the svg element to the html body - set the svg width and height
+				//svg = d3.select(plot)
+				//	//.append("svg")
+				//	.insert("svg", ":first-child")
+				//	.attr("width", w)
+				//	.attr("height", h)
+				//	.call(zoom);
+				
+				svg = d3.select(svg);
+				//call the zoom once - needed for the updating to work
+				svg.call(zoom).on("dblclick.zoom", null);
+						
+				//make the default line data
+				var lineData = [ //needs to be local variable
+					{"x":yearmin ,"y":data.Values[0][specIndex]},
+					{"x":yearmax ,"y":data.Values[len-1][specIndex]}
+				];
+
+
+				//make the line function to convert the xy object to svg path syntax 
+				lineFunction = d3.svg.line() //global because it gets used when selecting new points
+					.x(function(d){return xscale(d.x);})
+					.y(function(d){return yscale(d.y);})
+					.interpolate("linear");
+				
+				//create the circles that will go into the svg
+				var circles = svg.selectAll("circle")
+					.data(data.Values)
+					.enter()
+					.append("circle")
+					.style("fill",function(d,i){return rgbColor[i]})
+					.attr("cx", function(d){return xscale(d.ImageDate);})
+					.attr("cy", function(d){return yscale(d[specIndex]);})
+					.attr("r", 9)
+					.attr("class","unselected");
+				
+				//add the default line
+				var lineGraph = svg.append("path") //local because it will get overwritten
+					.attr("d", lineFunction(lineData))
+					.attr("id","plotLine");
+				
+				//draw the x axis
+				svg.append("g")
+					.attr("class", "x axis")
+					.attr("transform", "translate(0," + (h - pb) + ")")
+					.call(xaxis);
+					
+				//draw the y axis
+				svg.append("g")
+					.attr("class", "y axis")
+					.attr("transform", "translate(" + pl + ",0)")
+					.call(yaxis);
+					
+				//add label for the x axis
+				svg.append("text")      
+					.attr("transform", "rotate(-90)")
+					.attr("x", (h-pb)/-2)
+					.attr("y", 20)
+					.style("text-anchor", "middle")
+					.text("TC Wetness")
+					.attr("id","specPlotIndex");
+				
+				//define clip path so that circles don't go outside the axes
+				svg.append("defs")
+					.append("clipPath")
+					  .attr("id", "clip")
+					.append("rect")
+					  .attr("x", 50)
+					  .attr("y", 10)
+					  .attr("width", w-pr)
+					  .attr("height", h-pb-pt);
+				
+				//add the path to the circles to activate the clipping
+				circles.attr("clip-path", "url(#clip)");
+				lineGraph.attr("clip-path", "url(#clip)");
+				
+				//default the first and last circles to class "selected"
+				$("circle").eq(0).attr("class","selected");
+				$("circle").eq(len-1).attr("class","selected");
+				//var vertices = $("circle.selected");
+				
+				//fill in the global selectedCircles variable for the first time
+				var selectedCirclesTemp = $("circle.selected"),
+					i = 0;
+				for(i; i < selectedCirclesTemp.length; i++){
+					selectedCircles.push($("circle").index(selectedCirclesTemp[i]));
+				}
+				updateSegmentForm();
+			}
+			
+
+			
+			
+
+			
+			
+			
+			
+			//define function to update the D3 scatterplot when new selection are made
+			function update(data, specIndex, rgbColor, domain){
+				//update the y domain based on the new index
+				yscale.domain([domain[specIndex].min, domain[specIndex].max]); //yscale was defined in the plotInt function
+				
+				//define the zooming function - what gets scaled on zoom 
+				function zoomed() {
+					svg.select(".y.axis").call(yaxis);
+					svg.selectAll("circle").attr("cy", function(d){return yscale(d[specIndex]);});
+					svg.selectAll("#plotLine").attr("d", lineFunction(lineData));
+				}
+				
+				//define the zoom behavior
+				var zoom = d3.behavior.zoom()
+					.y(yscale)
+					.scaleExtent([1, 5])
+					.on("zoom", zoomed);
+				
+				//call the function to make the scale change
+				svg.call(zoom).on("dblclick.zoom", null)//svg was defined in the plotInt function
+				
+				//update the circles with new data
+				svg.selectAll("circle") //svg was defined in the plotInt function
+					.data(data.Values)					   
+					.transition()
+					.duration(500)
+					.attr("cx", function(d){return xscale(d.ImageDate);})
+					.attr("cy", function(d){return yscale(d[specIndex]);})
+					.style("fill",function(d,i){return rgbColor[i]})
+
+					
+				/////////////////////////////////LINE UPDATE////////////////////////////////	
+				//retrieve the line data (this section could be made into a function cause it is also used in the changePlotLine function)
+				//selectedCircles = $("circle.selected");
+				var lineData = [];
+				var i = 0;
+				for(i; i < selectedCircles.length; i++){
+					//var thisone = $("circle").index(selectedCircles[i]);
+					var thisone = selectedCircles[i];
+					lineData.push({"x":data.Values[thisone].ImageDate, "y":data.Values[thisone][specIndex]});
+				}
+				
+				//update the line
+				svg.selectAll("#plotLine") //local because it will get overwritten
+					.transition()
+					.duration(500)
+					.attr("d", lineFunction(lineData));
+
+				/////////////////////////////////////////////////////////////////////////////
+					
+				//update y axis
+				svg.select(".y.axis") //svg was defined in the plotInt function
+					.transition()
+					.duration(500)
+					.call(yaxis);
+			}
+			
+			
+			//update the plot when buttons are clicked		
+			//right now the points and colors are redrawn each time, in the future could break this down
+			//by which button type is pressed, either index or color and only update either the point locations
+			//or the colors
+			$(document).ready(function(){
+				$(".dropdown-menu li").click(function() { //This will attach the function to all the input elements
+					
+					//figure out which dropdown was selected and change its active status 
+					var thisListID = $(this).closest("ul").attr('id'),
+						thisSpecIndexID = $(this).attr('id'),
+						newactive = "#"+thisListID+" #"+thisSpecIndexID,
+						activesearch = "#"+thisListID+" .active",
+						activeid = $(activesearch).attr('id'),
+						oldactive = "#"+thisListID+" #"+activeid;
+					
+					$(oldactive).removeClass('active');
+					$(newactive).addClass('active');
+					
+					if(thisListID == "index-list"){$("#btnIndex div").replaceWith('<div><strong>Index:</strong><br><small>'+$("#"+thisSpecIndexID).text()+'</small><span class="caret"></span></div>')};
+					if(thisListID == "red-list"){$("#btnRed div").replaceWith('<div><strong>R</strong><small>GB</small><br><small>'+$("#"+thisSpecIndexID).text()+'</small><span class="caret"></span></div>')};
+					if(thisListID == "green-list"){$("#btnGreen div").replaceWith('<div><small>R</small><strong>G</strong><small>B</small><br><small>'+$("#"+thisSpecIndexID).text()+'</small><span class="caret"></span></div>')};
+					if(thisListID == "blue-list"){$("#btnBlue div").replaceWith('<div><small>RG</small><strong>B</strong><br><small>'+$("#"+thisSpecIndexID).text()+'</small><span class="caret"></span></div>')};
+					
+					
+					
+					//get the active classes from the dropdown displays buttons
+					var activeSpecIndex = $("#index-list li.active").attr('id'),		
+						activeRedSpecIndex = $("#red-list li.active").attr('id'),
+						activeGreenSpecIndex = $("#green-list li.active").attr('id'),
+						activeBlueSpecIndex = $("#blue-list li.active").attr('id');
+					
+					//get the RBG color
+					rgbColor = scaledRGB(data, activeRedSpecIndex, activeGreenSpecIndex, activeBlueSpecIndex, stretch, 2, len);
+					
+					//reset the global varible so that other functions know what it is know
+					specIndex=activeSpecIndex 
+					
+					//update the plot
+					update(data, specIndex, rgbColor, domain);
+					$("#specPlotIndex").text($("#"+specIndex).text());
+				});
+			});
+			
+			
+			//mechanism to display the selected points and line in the trajectory plot
+			$("#btnLine").click(function(){
+				if ($("#lineDisplayThumb").attr("class") == "glyphicon glyphicon-thumbs-up"){
+					$("#lineDisplayThumb").removeClass("glyphicon glyphicon-thumbs-up")
+						.addClass("glyphicon glyphicon-thumbs-down");
+					$("circle.selected").css("stroke-width","0");
+					$("#plotLine").css("stroke-width","0");
+				} else{
+					$("#lineDisplayThumb").removeClass("glyphicon glyphicon-thumbs-down")
+						.addClass("glyphicon glyphicon-thumbs-up");
+					$("circle.selected").css("stroke-width","1");
+					$("#plotLine").css("stroke-width","2");
+				}
+			});
+
+
+			
+			
+			
+///////////////////////////////////////////////////////BELOW ARE LINE INFO FORM SCRIPTS/////////////////////////////////////////////////////////////////
+//////////////BELOW ARE LINE INFO FORM SCRIPTS////////////////////////////////////////BELOW ARE LINE INFO FORM SCRIPTS//////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////BELOW ARE LINE INFO FORM SCRIPTS////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////BELOW ARE LINE INFO FORM SCRIPTS/////////////////////////////////
+////////////////////////////BELOW ARE LINE INFO FORM SCRIPTS////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////BELOW ARE LINE INFO FORM SCRIPTS/////////////////////////////////BELOW ARE LINE INFO FORM SCRIPTS////			
+			
+			
+			
+			//function to sync the segments form to the selected vertices
+			function updateSegmentForm(){
+				$(".segment").remove();
+				$(".vertex").remove();
+				lineInfo = {vertices:[],segments:[]}
+				var yearStart = 0,
+					yearEnd = 0,
+					len = selectedCircles.length,
+					startIndex = 0,
+					endIndex = 0,
+					i = 0;
+				for(i; i < len-1; i++){
+					startIndex = selectedCircles[i];
+					endIndex = selectedCircles[i+1];
+					yearStart = years[startIndex];
+					yearEnd =   years[endIndex];
+					$("#segmentsFormTbl").append('<tr class="segment"><td>'+yearStart+'</td><td>'+yearEnd+'</td><td class="changeProcessInput formDrop"></td><td><input class="ephemeralChkBx" autocomplete="off" type="checkbox"></td></tr>');
+					lineInfo.segments.push({startYear:yearStart,endYear:yearEnd,startIndex:startIndex,endIndex:endIndex,changeProcess:"",ephemeral:""});
+				}
+				for(i=0; i < len; i++){
+					startIndex = selectedCircles[i];
+					yearStart = years[startIndex];
+					$("#verticesFormTbl").append('<tr class="vertex"><td>'+yearStart+'</td><td class="landUseInput formDrop"></td></tr>');
+					lineInfo.vertices.push({year:yearStart,index:startIndex,landUse:"",dominant:"",otherUses:{FOR:"",NFV:"",NVN:"",ARG:"",NVA:""}});
+				}
+				
+				//start filling out the table - probably don't need to do this here - for testing
+				fillInLineInfo();
+			}
+		
+			//controls the trajectory form section tabs and tables 
+			$("#segmentsFormTab").click(function(){
+				var status = $("#segmentsFormTab").attr("class");
+				if(status == "unselected"){
+					$("#segmentsFormTab").attr("class","selected");
+					$("#verticesFormTab").attr("class","unselected");
+					$("#segmentsFormDiv").show();
+					$("#verticesFormDiv").hide();
+				}
+			});
+			$("#verticesFormTab").click(function(){
+				var status = $("#verticesFormTab").attr("class");
+				if(status == "unselected"){
+					$("#verticesFormTab").attr("class","selected");
+					$("#segmentsFormTab").attr("class","unselected");
+					$("#verticesFormDiv").show();
+					$("#segmentsFormDiv").hide();
+				}
+			});
+			
+			
+			
+			//function to show a dropdown for the land use and change process inputs
+			function dropInputLists(thisInput){
+					console.log("in dropInputLists");
+					var rowPos = thisInput.position(),
+						bottomTop = rowPos.top,
+						bottomLeft = rowPos.left,
+						bottomWidth = thisInput.css("width"),
+						bottomHeight = thisInput.css("height"),
+						parentID = thisInput.closest("div").attr("id");
+					
+					//drop its dropdown based on the position of the clicked element
+					$("#"+parentID+" .dropThis").css({
+						position: "absolute",
+						top: (bottomTop+parseFloat(bottomHeight)-1),
+						left: bottomLeft,
+						width: (parseFloat(bottomWidth)+1+"px"), //THIS COULD BE HARDWIRED WHEN WE FIGURE OUT WHAT SIZE EVERYTHING SHOULD BE
+						marginLeft: "-1px"
+					}).show();
+			}
+
+			
+		
+			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			////////////////CHANGE PROCESS INPUT DROP DOWNS AND HIGHLIGHTING CIRCLES PERTAINING TO THE SELECTED ROW/////////////
+			//DROP DOWN
+			$(document).ready(function(){
+				$(document).on("click",".changeProcessInput",function(e){ //listen for a click on a changeProcessInput <li>					
+					$(".changeProcessInput.active").removeClass("active"); //clear any .changeProcessInput "active" classes so that this will be the only one
+					var thisInput = $(this); //store the reference to element as a variable, so we don't have to keep making jquery reference - gets used a lot
+					$("tr.segment.active").removeClass("active"); //make sure there are no active rows for changeProcessInput
+					$("circle.highlight").attr("class","selected"); //make sure there are no highlighed circles
+					$("cicle")//make circles unselectable during input
+					
+					thisInput.addClass("active"); //set this .changeProcessInput <td> as the "active" class so that when a selection is made from the #changeProcessList dropdown it knows which <td> to place it in
+					dropInputLists(thisInput);
+					thisInput.closest("tr").addClass("active");					
+					
+					var thisOne = $("tr.segment .changeProcessInput").index(thisInput); //find what change process row was selected
+					var startIndex = lineInfo.segments[thisOne].startIndex; //pull out the start index for the selected row
+					var endIndex = lineInfo.segments[thisOne].endIndex; //pull out the end index for the selected row
+					$("circle:eq("+startIndex+")").attr("class","highlight"); //highlight the start circle for the selected row (segment)
+					$("circle:eq("+endIndex+")").attr("class","highlight"); //highlight the end circle for the selected row (segment)
+					
+					$("circle").css("cursor","not-allowed");
+					$("canvas").css("cursor","not-allowed");
+
+					e.stopPropagation();
+                });
+            });			
+			
+			//HIDE
+			$(document).ready(function(){
+				$(document).on("click", function(){ //click anywhere to get rid of the #changeProcessList drop down
+					if($("#changeProcessList").css("display") == "block"){
+						$("#changeProcessList").hide();
+						$("tr.segment.active").removeClass("active");
+						$("circle").css("cursor","pointer");
+						$("canvas").css("cursor","pointer");
+						$("circle.highlight").attr("class","selected");
+					}
+				});
+			});
+			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			
+			
+			//this function fill in the lineInfo object for the segments - not the vertices
+			function fillInLineInfo(){
+				var changeProcess = "",
+					ephemeral = "",
+					len = lineInfo.vertices.length,
+					i = 0;
+				for(i; i<len-1;i++){
+					changeProcess = $(".changeProcessInput:eq("+i+")").text();
+					ephemeral = $(".ephemeralChkBx:eq("+i+")").prop("checked");
+					lineInfo.segments[i].changeProcess = changeProcess;
+					lineInfo.segments[i].ephemeral = ephemeral;
+				}
+			}
+			
+			//fill in the text for the change process and the fill in the lineInfo.segments array when a selection is made from the changeProcessList
+			$("#changeProcessList li").click(function(){
+				$("td.changeProcessInput.active").text($(this).text());
+				fillInLineInfo();
+			});
+			
+			//fill in the lineInfo.segments array when the ephemeral checkbox is clicked
+			$(document).ready(function(){
+				$(document).on("click",".ephemeralChkBx",function(){					
+					fillInLineInfo();
+				});
+			});
+			
+
+			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			
+			
+			
+			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			////////////////LAND USE INPUT DROP DOWNS AND HIGHLIGHTING CIRCLES PERTAINING TO THE SELECTED ROW///////////////////
+			//DROP DOWN
+			$(document).ready(function(){
+				$(document).on("click",".landUseInput",function(e){ //listen for a click on a changeProcessInput <li>					
+					$(".landUseInput.active").removeClass("active"); //clear any .changeProcessInput "active" classes so that this will be the only one
+					var thisInput = $(this);
+					thisInput.addClass("active"); //set this .changeProcessInput <td> as the "active" class so that when a selection is made from the #changeProcessList dropdown it knows which <td> to place it in
+					dropInputLists(thisInput);
+					
+					thisInput.closest("tr").addClass("active");
+					
+					var thisOne = $("tr.vertex .landUseInput").index(thisInput);
+					var thisIndex = lineInfo.vertices[thisOne].index;
+					$("circle:eq("+thisIndex+")").attr("class","highlight");
+					
+					//fill in the land use dropdown div with the info for this particular row
+					lineInfo.vertices[thisOne].landUse
+					$("#dominantUse").text(lineInfo.vertices[thisOne].landUse);
+					$("#dominantChkBx").prop("checked", lineInfo.vertices[thisOne].dominant);
+					$("#forChkBx").prop("checked", lineInfo.vertices[thisOne].otherUses.FOR);
+					$("#nfvChkBx").prop("checked", lineInfo.vertices[thisOne].otherUses.NFV);
+					$("#nvnChkBx").prop("checked", lineInfo.vertices[thisOne].otherUses.NVN);
+					$("#argChkBx").prop("checked", lineInfo.vertices[thisOne].otherUses.ARG);
+					$("#nvaChkBx").prop("checked", lineInfo.vertices[thisOne].otherUses.NVA);
+					
+					$("circle").css("cursor","not-allowed");
+					$("canvas").css("cursor","not-allowed");
+
+					e.stopPropagation();
+                });
+            });			
+			
+			//HIDE
+			//hide the #landUseDiv dropdown when its done button is clicked and fill in the lineInfo.vertices object
+			$("#doneBtn").click(function(){
+				$("#landUseDiv").hide(); //hide the dropdown
+				
+				//remove the highlighted circle class - could find the highlighted class and only change that one (current implementation) or just reset all selected circles (commented out)
+				$("circle.highlight").attr("class","selected");			
+				$("tr.vertex.active").removeClass("active"); //remove the land use row from the active class			
+				$("circle").css("cursor","pointer");
+				$("canvas").css("cursor","pointer");
+				
+				//fill in the lineInfo object
+				var thisOne = $(".landUseInput").index($(".landUseInput.active"));
+				lineInfo.vertices[thisOne].landUse = $("#dominantUse").text();
+				lineInfo.vertices[thisOne].dominant = $("#dominantChkBx").prop("checked");
+				lineInfo.vertices[thisOne].otherUses.FOR = $("#forChkBx").prop("checked"); 
+				lineInfo.vertices[thisOne].otherUses.NFV = $("#nfvChkBx").prop("checked");
+				lineInfo.vertices[thisOne].otherUses.NVN = $("#nvnChkBx").prop("checked");
+				lineInfo.vertices[thisOne].otherUses.ARG = $("#argChkBx").prop("checked");
+				lineInfo.vertices[thisOne].otherUses.NVA = $("#nvaChkBx").prop("checked");
+			});
+			///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			
+			//shows the landUseList when the dominantUse id is clicked
+			$("#dominantUse").click(function(e){			
+				$("#landUseList").show();
+				e.stopPropagation();
+			});
+			
+			
+			//make the landUseList div list go hide after it has been clicked
+			$(document).ready(function(){
+				$("#landUseList").click(function(){ //click anywhere to get rid of the .dropThis dropdowns
+						$("#landUseList").hide();
+				});
+			});
+			
+			//fill in the text for the dominant land use
+			$("#landUseList li").click(function(){
+				$("#dominantUse").text($(this).text());
+				$("td.landUseInput.active").text($(this).text());
+			});
+			
+			//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			
+			
+
+			
+			
+			
+///////////////////////////////////////////////////////BELOW ARE CHIP SCRIPTS///////////////////////////////////////////////////////
+//////////////BELOW ARE CHIP SCRIPTS////////////////////////////////////////BELOW ARE CHIP SCRIPTS//////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////BELOW ARE CHIP SCRIPTS//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////BELOW ARE CHIP SCRIPTS///////////////////////
+////////////////////////////BELOW ARE CHIP SCRIPTS//////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////BELOW ARE CHIP SCRIPTS/////////////////////////////////BELOW ARE CHIP SCRIPTS////
+		
+		
+			///////////////SET GLOBAL VARIABLES//////////////////////////////////////////////////////////
+			
+			var images = [
+				"chips/test_chip_1985.png",
+				"chips/test_chip_1986.png",
+				"chips/test_chip_1987.png",
+				"chips/test_chip_1988.png",
+				"chips/test_chip_1989.png",
+				"chips/test_chip_1990.png",
+				"chips/test_chip_1991.png",
+				"chips/test_chip_1992.png",
+				"chips/test_chip_1993.png",
+				"chips/test_chip_1994.png",
+				"chips/test_chip_1995.png",
+				"chips/test_chip_1996.png",
+				"chips/test_chip_1997.png",
+				"chips/test_chip_1998.png",
+				"chips/test_chip_1999.png",
+				"chips/test_chip_2000.png",
+				"chips/test_chip_2001.png",
+				"chips/test_chip_2002.png",
+				"chips/test_chip_2003.png",
+				"chips/test_chip_2004.png",
+				"chips/test_chip_2005.png",
+				"chips/test_chip_2006.png",
+				"chips/test_chip_2007.png",
+				"chips/test_chip_2008.png",
+				"chips/test_chip_2009.png",
+				"chips/test_chip_2010.png",
+				"chips/test_chip_2011.png",
+				"chips/test_chip_2012.png",
+				"chips/test_chip_2013.png",
+				"chips/test_chip_2014.png"
+			];
+			years = [];
+			for(var i=0;i<images.length;i++){years.push(1985+i)}
+			
+			var chipInfo = {
+					box: 1,
+					zoomLevel:0,
+					chips:{
+						canvasIDs:[],
+						imgIDs:[],
+						sxOrig:[],
+						syOrig:[],
+						sWidthOrig:[],
+						sxZoom:[],
+						syZoom:[],
+						sWidthZoom:[],
+						chipsInStrip:[]
+					}
+				};
+			
+			var n_chips = images.length,
+				minZoom = 0,
+				maxZoom = 40,
+				sAdj = [0],
+				lwAdj = [chipInfo.box],
+				zoomIn = 0;
+			
+			///////////DEFINE THE FUNCTION TO ADD THE CANVAS AND IMAGE FOR EACH CHIP ON-THE-FLY////////////
+			function appendChips(){
+				var appendThisCanvas = "",
+					appendThisImg = "";
+					
+				for(var i=0; i<n_chips; i++){
+					chipInfo.chips.canvasIDs.push("chip"+i)
+					chipInfo.chips.imgIDs.push("img"+i)
+					appendThisCanvas = '<canvas class="unselected" id="'+chipInfo.chips.canvasIDs[i]+'" width="255" height="272"></canvas>'; // style="border:1px solid #d3d3d3;"
+					$("#chip-gallery").append(appendThisCanvas);
+					appendThisImg = '<img id="'+chipInfo.chips.imgIDs[i]+'"src="'+images[i]+'">';
+					$("#img-gallery").append(appendThisImg);
+				}
+				$("#chip0, #chip"+(n_chips-1)).removeClass("unselected").addClass("selected")
+			}
+
+			
+			//function to run functions that need all the elements to be loaded - also need to do them in order was the window is loaded
+			function start(){
+				makeChipInfo()
+				drawAllChips()
+			}
+
+			
+			////////////////DEFINE FUNCTION TO POPULATE CHIPINFO OBJECT/////////////////////////////////////
+			function makeChipInfo(){
+				//fill in chipInfo object
+				for(var i=0; i < n_chips; i++){					
+					//randomly select a chip from a strip to display - not needed once we have json file to tell us
+					var thisimg = document.getElementById(chipInfo.chips.imgIDs[i]);
+					var thisManyChips = thisimg.naturalHeight/255;
+					chipInfo.chips.chipsInStrip.push(thisManyChips);
+					var useThisChip = Math.floor((Math.random() * thisManyChips)); 
+					
+					//define/store some other info needed for zooming
+					chipInfo.chips.sxOrig.push(0);	//set/push the original source x offset to the sxOrig array
+					chipInfo.chips.syOrig.push(255*useThisChip); //set/push the original source y offset to the syOrig array
+					chipInfo.chips.sWidthOrig.push(255); //set/push the original source x width to the sWidthOrig array
+					chipInfo.chips.sxZoom.push(chipInfo.chips.sxOrig[i]);
+					chipInfo.chips.syZoom.push(chipInfo.chips.syOrig[i]);
+					chipInfo.chips.sWidthZoom.push(chipInfo.chips.sWidthOrig[i]);					
+				}
+				
+				//fill in zoom adjustment arrays sAdj and lwAdj
+				var starter = 127.5,
+					lwstarter = chipInfo.box;
+
+				for(var i=1; i<maxZoom+1; i++){
+					starter *= 0.9 
+					sAdj.push(127.5-starter);
+					lwstarter /= 0.9
+					lwAdj.push(lwstarter)
+				}
+			}
+
+			
+			////////////////DEFINE FUNCTION TO DRAW ALL THE IMAGE CHIPS TO THE CANVASES/////////////////////
+			function drawAllChips(){
+				for(var i=0; i<n_chips; i++){drawOneChip(i)}
+			}
+
+			
+			////////////DEFINE FUNCTION TO DRAW A NEW IMAGE SECTION TO A CANVAS////////////////////////////
+			function drawOneChip(thisChip){
+				var canvasID = {}, //canvas id for a given chip
+					imgID = {}, //img id for a given chip
+					ctx = {}; //img id for a given chip 
+				
+				canvasID = document.getElementById(chipInfo.chips.canvasIDs[thisChip]);
+				imgID = document.getElementById(chipInfo.chips.imgIDs[thisChip]);
+				ctx = canvasID.getContext("2d");
+				ctx.clearRect(0, 0, canvasID.width, canvasID.height);
+				ctx.mozImageSmoothingEnabled = false;
+				ctx.msImageSmoothingEnabled = false;
+				ctx.imageSmoothingEnabled = false;
+				ctx.drawImage(
+					imgID,
+					chipInfo.chips.sxZoom[thisChip],
+					chipInfo.chips.syZoom[thisChip],
+					chipInfo.chips.sWidthZoom[thisChip],
+					chipInfo.chips.sWidthZoom[thisChip],
+					0,0,255,255);
+				ctx.strokeStyle="#FF0000";
+				ctx.lineWidth=1;
+				ctx.lineCap = 'square';
+				ctx.strokeRect(127.5-(chipInfo.box/2), 127.5-(chipInfo.box/2), chipInfo.box, chipInfo.box);
+				ctx.font = "11px";
+				ctx.fillText("Image Date",100,267); //NEED TO GET THE "IMAGE DATE" PASSED IN AS A PARAMETER FROM THE JSON OBJECT OR SIMILAR
+			}
+			
+							
+			////////////REPLACE A CHIP WITH ONE SELECTED IN THE REMOTE WINDOW//////////////////////////////
+			function replaceChip(replaceThisChip,newSyOffset){
+				//adjust the chip offset for the orig and zoom arrays
+				chipInfo.chips.syOrig[replaceThisChip] = newSyOffset //set the new original offset
+				chipInfo.chips.syZoom[replaceThisChip] = chipInfo.chips.syOrig[replaceThisChip]+sAdj[chipInfo.zoomLevel]; //set the new zoom offset
+				
+				//draw the new chip
+				drawOneChip(replaceThisChip)	
+			}
+			/////////////////////////////////////////////////////////////////////////////////////////////////
+			
+			
+			function updateZoom(){
+				for(var i=0; i<n_chips; i++){
+					chipInfo.chips.sxZoom[i] = chipInfo.chips.sxOrig[i]+sAdj[chipInfo.zoomLevel];
+					chipInfo.chips.syZoom[i] = chipInfo.chips.syOrig[i]+sAdj[chipInfo.zoomLevel];
+					chipInfo.chips.sWidthZoom[i] = chipInfo.chips.sWidthOrig[i]-(sAdj[chipInfo.zoomLevel]*2);
+				}
+				chipInfo.box = lwAdj[chipInfo.zoomLevel];
+			}
+  
+			
+			$(document).ready(function(){ //not sure if this $(document).ready check is needed, but doesn't hurt
+				$(document).on("mousewheel","canvas",function(e){
+					if(e.shiftKey){ //
+						e.preventDefault(); //make sure that default browser behaviour is prevented
+						if(e.deltaX <= -1 || e.deltaY >= 1){zoomIn = 1} else {zoomIn = 0}
+						if(zoomIn > 0){
+							if (chipInfo.zoomLevel < maxZoom){chipInfo.zoomLevel++;}
+						} else {
+							if (chipInfo.zoomLevel > minZoom){chipInfo.zoomLevel--;}
+						}
+
+						//redraw the chips
+						updateZoom(); //update the zoom arrays	
+						drawAllChips(); //redraw the chips with the new zoom
+						
+						//prepare zoom message
+						zoomInfo = {
+							"action":"zoom",
+							"zoomLevel":chipInfo.zoomLevel
+						}
+
+						//send the zoom array to the external window
+						if ((chipstripwindow != null) && chipstripwindow.closed == false){ 
+							//prepare zoom message
+							zoomInfo = {
+								"action":"zoom",
+								"zoomLevel":chipInfo.zoomLevel
+							}
+							//send the zoom message
+							chipstripwindow.postMessage(JSON.stringify(zoomInfo),"*");
+						}		
+					}
+				});
+			});
+			
+			
+			//make the chip gallery expand on click
+			$(document).ready(function(){
+				$("#chip-gallery").click(function(e){
+					if(!e.ctrlKey && !e.shiftKey){
+						var status = $(this).css("height");
+						if(status == "565px"){
+							$(this).css("height","auto");
+						} else {
+							$(this).css("height","565px");
+						}
+					}
+					
+				});
+			});
+			
+			$(document).ready(function(){
+				$("#chip-gallery canvas").click(function(e){
+					if(e.shiftKey){
+						if($("tr").hasClass("active") == false){
+							e.preventDefault(); //make sure that default browser behaviour is prevented
+							var canvasIndex = $("#chip-gallery canvas").index(this)
+							if(canvasIndex != 0 &&  canvasIndex != len-1){
+								var status = $(this).attr("class");
+								
+								if(status == "unselected"){
+									$(this).attr("class","selected");
+									//changePlotLine();	
+								} else {
+									$(this).attr("class","unselected");
+									//changePlotLine();
+								}	
+							}
+						}
+					}
+				});
+			});
+			
+			
+			
+			
+			///////////////////OPEN THE REMOTE CHIP STRIP WINDOW AND SEND MESSAGES/////////////////////
+			var chipstripwindow = null ;//keep track of whether the chipstrip window is open or not so it is not opened in multiple new window on each chip click
+			$("body").on("click", "canvas", function(e){ //need to use body because the canvases have probably not loaded yet
+				if (e.ctrlKey) { 					
+					var thisImg = (parseInt($(this).attr("id").replace( /^\D+/g, ''))); //extract the chip index
+					var pass_data = {
+						"action":"add_chips", //hard assign
+						"n_chips":chipInfo.chips.chipsInStrip[thisImg], //"n_chips":"40", //get this from the img metadata
+						"src":images[thisImg], //"src":"chips/chips_2012.png", //get this from the id of the .chipholder clicked
+						"canvasID":$(this).attr("id"),
+						"zoomLevel":chipInfo.zoomLevel
+					};
+					
+					if ((chipstripwindow == null) || (chipstripwindow.closed)){      //if the window is not loaded then load it and send the message after it is fully loaded
+						chipstripwindow = window.open("./chip_strip_5.html","_blank","width=1080px, height=840px", "toolbar=0","titlebar=0","menubar=0","scrollbars=yes"); //open the remote chip strip window
+						$(chipstripwindow).load(function(){chipstripwindow.postMessage(JSON.stringify(pass_data),"*");}); //wait until the remote window finishes loading before sending the message
+					} else {                                                         //else if the window is already loaded, just send the message - no need to wait
+						chipstripwindow.postMessage(JSON.stringify(pass_data),"*");
+					}
+				}
+			});
+			
+			
+			//////////////////////////GET MESSAGES FROM REMOTE////////////////////////////////////////////
+			//receive messages from the origin window
+			$(window).on("message onmessage",function(e){
+				var pass_data = JSON.parse(e.originalEvent.data);
+				if(pass_data.action == "replace_chip"){
+					replaceChip(pass_data.originChipIndex, pass_data.newSyOffset); //replace a chip with one selected in the remote window
+					//$(document).ready(function(){drawAllChips()}); //wait until the image has loaded and then draw the chips
+				} else if (pass_data.action == "zoom"){
+					chipInfo.zoomLevel = pass_data.zoomLevel;
+					updateZoom();
+					drawAllChips();
+				}
+				
+				//$("#message").append(e.originalEvent.data); //****need to use 'originalEvent' instead of 'event' since im using jquery to bind the event. the jquery event object is different from the javascript event object - originalEvent is a copied version of the original javascript event object
+			});	
+
+			
+			/////////////////////////LOAD THE CHIPS////////////////////////////////////////////////////////
+			appendChips();
+			window.onload = start;
+		
+		</script>
+	</body>
+</html>
