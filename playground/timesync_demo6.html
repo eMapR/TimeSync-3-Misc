@@ -23,9 +23,39 @@
 	<body> <!-- onload="drawAllChips()" -->
 			
 			<div id="topSection">
-				<p style="display:inline-block;"><strong>TimeSync - v3.0</strong></p>
-				<p style="display:inline-block;">Chip Size: <input type="text" name="FirstName" value="255"></p>
-				<p style="display:inline-block;">Plot Size: <input type="text" name="FirstName" value="1"></p>
+				<p id="title" style="display:inline-block;">TimeSync - v3.0</p>
+				<div id="chipInputs" style="display:inline-block;">
+					<div id="chipSizeDiv" style="display:inline-block;">
+						<p style="display:inline-block;">Chip Size:</p>
+						<div style="display:inline-block;">
+							<div id="chipSize" class="chipInputsEdit">195</div>
+							<div id="chipSizeList" class="dropThis">
+								<ul>
+									<li>95</li>
+									<li>195</li>
+									<li>255</li>
+								</ul>
+							</div>
+						</div>
+					</div>
+					<div style="display:inline-block;">
+						<p style="display:inline-block;">Plot Size:</p>
+						<div style="display:inline-block;">
+							<div id="plotSize" class="chipInputsEdit">1</div>
+							<div id="plotSizeList" class="dropThis">
+								<ul>
+									<li>1</li>
+									<li>9</li>
+									<li>25</li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+				
+				
+				
+				<!-- <input id="plotSize" autocomplete="off" type="text" name="FirstName" value="1"></p> -->
 			</div>
 			<div id="containerDiv">
 				<div id="plotSelectionDiv" class="sectionDiv">
@@ -539,18 +569,10 @@
 					.y(yscale)
 					.scaleExtent([1, 5])
 					.on("zoom", zoomed);
-					
-				//append the svg element to the html body - set the svg width and height
-				//svg = d3.select(plot)
-				//	//.append("svg")
-				//	.insert("svg", ":first-child")
-				//	.attr("width", w)
-				//	.attr("height", h)
-				//	.call(zoom);
+									
+				svg = d3.select(svg); //retrieve the svg reference
 				
-				svg = d3.select(svg);
-				//call the zoom once - needed for the updating to work
-				svg.call(zoom).on("dblclick.zoom", null);
+				svg.call(zoom).on("dblclick.zoom", null); //call the zoom once - needed for the updating to work
 						
 				//make the default line data
 				var lineData = [ //needs to be local variable
@@ -823,22 +845,20 @@
 			
 			
 			//function to show a dropdown for the land use and change process inputs
-			function dropInputLists(thisInput){
-					console.log("in dropInputLists");
+			function dropInputLists(thisInput, thisList){
 					var rowPos = thisInput.position(),
 						bottomTop = rowPos.top,
 						bottomLeft = rowPos.left,
 						bottomWidth = thisInput.css("width"),
-						bottomHeight = thisInput.css("height"),
-						parentID = thisInput.closest("div").attr("id");
-					
+						bottomHeight = thisInput.css("height")
+
 					//drop its dropdown based on the position of the clicked element
-					$("#"+parentID+" .dropThis").css({
+					$("#"+thisList).css({
 						position: "absolute",
 						top: (bottomTop+parseFloat(bottomHeight)-1),
 						left: bottomLeft,
-						width: (parseFloat(bottomWidth)+1+"px"), //THIS COULD BE HARDWIRED WHEN WE FIGURE OUT WHAT SIZE EVERYTHING SHOULD BE
-						marginLeft: "-1px"
+						width: (parseFloat(bottomWidth)+"px")//+1, //THIS COULD BE HARDWIRED WHEN WE FIGURE OUT WHAT SIZE EVERYTHING SHOULD BE
+						//marginLeft: "-1px"
 					}).show();
 			}
 
@@ -856,7 +876,7 @@
 					$("cicle")//make circles unselectable during input
 					
 					thisInput.addClass("active"); //set this .changeProcessInput <td> as the "active" class so that when a selection is made from the #changeProcessList dropdown it knows which <td> to place it in
-					dropInputLists(thisInput);
+					dropInputLists(thisInput, "changeProcessList");
 					thisInput.closest("tr").addClass("active");					
 					
 					var thisOne = $("tr.segment .changeProcessInput").index(thisInput); //find what change process row was selected
@@ -875,7 +895,9 @@
 			//HIDE
 			$(document).ready(function(){
 				$(document).on("click", function(){ //click anywhere to get rid of the #changeProcessList drop down
-					if($("#changeProcessList").css("display") == "block"){
+					if($("#plotSizeList").css("display") == "block"){
+						$("#plotSizeList").hide();
+					} else if($("#changeProcessList").css("display") == "block"){
 						$("#changeProcessList").hide();
 						$("tr.segment.active").removeClass("active");
 						$("circle").css("cursor","pointer");
@@ -928,7 +950,7 @@
 					$(".landUseInput.active").removeClass("active"); //clear any .changeProcessInput "active" classes so that this will be the only one
 					var thisInput = $(this);
 					thisInput.addClass("active"); //set this .changeProcessInput <td> as the "active" class so that when a selection is made from the #changeProcessList dropdown it knows which <td> to place it in
-					dropInputLists(thisInput);
+					dropInputLists(thisInput, "landUseDiv");
 					
 					thisInput.closest("tr").addClass("active");
 					
@@ -1053,6 +1075,9 @@
 			
 			var chipInfo = {
 					box: 1,
+					chipSize:195,
+					halfChipSize:97.5,
+					offset:30,
 					zoomLevel:0,
 					chips:{
 						canvasIDs:[],
@@ -1074,6 +1099,44 @@
 				lwAdj = [chipInfo.box],
 				zoomIn = 0;
 			
+			
+			$("#plotSize").click(function(e){
+				var boxSize = $("#plotSize").text()
+				var thisInput = $("#plotSize"); 
+				dropInputLists(thisInput, "plotSizeList");
+				e.stopPropagation();
+		
+			});
+			$("#plotSizeList li").click(function(){
+				plotSize = $(this).text();
+				$("#plotSize").text(plotSize)
+				chipInfo.box = Math.sqrt(plotSize);
+				$("#plotSizeList").hide();
+				updateChips();
+				drawAllChips();
+			});
+			
+			
+			$("#chipSize").click(function(e){
+				var boxSize = $("#chipSize").text()
+				var thisInput = $("#chipSize"); 
+				dropInputLists(thisInput, "chipSizeList");
+				e.stopPropagation();
+			});
+			$("#chipSizeList li").click(function(){
+				chipSize = $(this).text();
+				$("#chipSize").text(chipSize)
+				console.log(chipSize);
+				chipInfo.chipSize = chipSize;
+				chipInfo.halfChipSize = chipSize/2;
+				chipInfo.offset = (255 - chipSize)/2;
+				
+				$("#chipSizeList").hide();
+				updateChips();
+				updateChipSize();
+				drawAllChips();
+			});
+			
 			///////////DEFINE THE FUNCTION TO ADD THE CANVAS AND IMAGE FOR EACH CHIP ON-THE-FLY////////////
 			function appendChips(){
 				var appendThisCanvas = "",
@@ -1093,14 +1156,15 @@
 			
 			//function to run functions that need all the elements to be loaded - also need to do them in order was the window is loaded
 			function start(){
-				makeChipInfo()
-				drawAllChips()
+				makeChipInfo();
+				drawAllChips();
 			}
 
-			
+
 			////////////////DEFINE FUNCTION TO POPULATE CHIPINFO OBJECT/////////////////////////////////////
 			function makeChipInfo(){
-				//fill in chipInfo object
+				//fill in chipInfo object				
+				//var offset = (255 - chipInfo.chipSize)/2
 				for(var i=0; i < n_chips; i++){					
 					//randomly select a chip from a strip to display - not needed once we have json file to tell us
 					var thisimg = document.getElementById(chipInfo.chips.imgIDs[i]);
@@ -1109,26 +1173,54 @@
 					var useThisChip = Math.floor((Math.random() * thisManyChips)); 
 					
 					//define/store some other info needed for zooming
-					chipInfo.chips.sxOrig.push(0);	//set/push the original source x offset to the sxOrig array
-					chipInfo.chips.syOrig.push(255*useThisChip); //set/push the original source y offset to the syOrig array
-					chipInfo.chips.sWidthOrig.push(255); //set/push the original source x width to the sWidthOrig array
+					chipInfo.chips.sxOrig.push(chipInfo.offset);	//0  set/push the original source x offset to the sxOrig array
+					chipInfo.chips.syOrig.push(255*useThisChip+chipInfo.offset); //set/push the original source y offset to the syOrig array
+					chipInfo.chips.sWidthOrig.push(chipInfo.chipSize); //255  set/push the original source x width to the sWidthOrig array
 					chipInfo.chips.sxZoom.push(chipInfo.chips.sxOrig[i]);
 					chipInfo.chips.syZoom.push(chipInfo.chips.syOrig[i]);
 					chipInfo.chips.sWidthZoom.push(chipInfo.chips.sWidthOrig[i]);					
 				}
 				
 				//fill in zoom adjustment arrays sAdj and lwAdj
-				var starter = 127.5,
+				var starter = chipInfo.halfChipSize, //127.5,
 					lwstarter = chipInfo.box;
-
+		
 				for(var i=1; i<maxZoom+1; i++){
 					starter *= 0.9 
-					sAdj.push(127.5-starter);
+					sAdj.push(chipInfo.halfChipSize-starter); //127.5
 					lwstarter /= 0.9
 					lwAdj.push(lwstarter)
 				}
 			}
-
+			
+			//function to update chips when the plot size changes
+			function updateChips(){
+				var starter = chipInfo.halfChipSize, //127.5,
+					lwstarter = chipInfo.box;
+					
+				sAdj[0] = starter;
+				lwAdj[0] = chipInfo.box;
+				
+				for(var i=1; i<maxZoom+1; i++){
+					starter *= 0.9 
+					sAdj[i] = (chipInfo.halfChipSize-starter); //127.5
+					lwstarter /= 0.9;
+					lwAdj[i] = lwstarter;
+				}
+			}
+			
+			function updateChipSize(){
+				//var offset = (255 - chipInfo.chipSize)/2
+				for(var i=0; i < n_chips; i++){
+					chipInfo.chips.sxZoom[i] = chipInfo.chips.sxOrig[i]+chipInfo.offset;
+					chipInfo.chips.syZoom[i] = chipInfo.chips.syOrig[i]+chipInfo.offset;
+					chipInfo.chips.sWidthZoom[i] = chipInfo.chipSize;
+				}
+			}
+			
+			
+			
+			
 			
 			////////////////DEFINE FUNCTION TO DRAW ALL THE IMAGE CHIPS TO THE CANVASES/////////////////////
 			function drawAllChips(){
@@ -1155,11 +1247,11 @@
 					chipInfo.chips.syZoom[thisChip],
 					chipInfo.chips.sWidthZoom[thisChip],
 					chipInfo.chips.sWidthZoom[thisChip],
-					0,0,255,255);
+					chipInfo.offset,chipInfo.offset,chipInfo.chipSize,chipInfo.chipSize);
 				ctx.strokeStyle="#FF0000";
 				ctx.lineWidth=1;
 				ctx.lineCap = 'square';
-				ctx.strokeRect(127.5-(chipInfo.box/2), 127.5-(chipInfo.box/2), chipInfo.box, chipInfo.box);
+				ctx.strokeRect(chipInfo.halfChipSize-(chipInfo.box/2), chipInfo.halfChipSize-(chipInfo.box/2), chipInfo.box, chipInfo.box);
 				ctx.font = "11px";
 				ctx.fillText("Image Date",100,267); //NEED TO GET THE "IMAGE DATE" PASSED IN AS A PARAMETER FROM THE JSON OBJECT OR SIMILAR
 			}
