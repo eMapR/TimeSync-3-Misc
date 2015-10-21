@@ -1075,11 +1075,16 @@
 			
 			var chipInfo = {
 					box: 1,
+					boxZoom: 1,
 					chipSize:195,
 					halfChipSize:97.5,
 					offset:30,
-					zoomLevel:0,
+					canvasHeight:212,
+					dateYpos:207,
+					dateXpos:76.05,
+					zoomLevel:20, //0
 					chips:{
+						useThisChip:[],
 						canvasIDs:[],
 						imgIDs:[],
 						sxOrig:[],
@@ -1095,6 +1100,7 @@
 			var n_chips = images.length,
 				minZoom = 0,
 				maxZoom = 40,
+				stopZoom = 40,
 				sAdj = [0],
 				lwAdj = [chipInfo.box],
 				zoomIn = 0;
@@ -1105,18 +1111,29 @@
 				var thisInput = $("#plotSize"); 
 				dropInputLists(thisInput, "plotSizeList");
 				e.stopPropagation();
-		
 			});
 			$("#plotSizeList li").click(function(){
 				plotSize = $(this).text();
 				$("#plotSize").text(plotSize)
 				chipInfo.box = Math.sqrt(plotSize);
 				$("#plotSizeList").hide();
-				updateChips();
+				switch(chipInfo.box){
+					case 1:
+						stopZoom = 40;
+						break;
+					case 3:
+						stopZoom = 32;
+						break;
+					case 5:
+						stopZoom = 27;
+						break;
+				}
+				console.log(stopZoom);
+				updateChipInfo();
 				drawAllChips();
 			});
 			
-			
+			///////////CHIP SIZE CHANGE///////////////////////////////////////////////////////////////////////////////
 			$("#chipSize").click(function(e){
 				var boxSize = $("#chipSize").text()
 				var thisInput = $("#chipSize"); 
@@ -1124,16 +1141,19 @@
 				e.stopPropagation();
 			});
 			$("#chipSizeList li").click(function(){
-				chipSize = $(this).text();
+				chipSize = parseInt($(this).text());
 				$("#chipSize").text(chipSize)
-				console.log(chipSize);
 				chipInfo.chipSize = chipSize;
 				chipInfo.halfChipSize = chipSize/2;
 				chipInfo.offset = (255 - chipSize)/2;
+				chipInfo.canvasHeight = chipSize+17;
+				chipInfo.dateYpos = chipSize+12;
+				chipInfo.dateXpos = chipSize*0.39;
 				
 				$("#chipSizeList").hide();
-				updateChips();
-				updateChipSize();
+				$("canvas").remove();
+				appendChips();
+				updateChipInfo();
 				drawAllChips();
 			});
 			
@@ -1145,7 +1165,7 @@
 				for(var i=0; i<n_chips; i++){
 					chipInfo.chips.canvasIDs.push("chip"+i)
 					chipInfo.chips.imgIDs.push("img"+i)
-					appendThisCanvas = '<canvas class="unselected" id="'+chipInfo.chips.canvasIDs[i]+'" width="255" height="272"></canvas>'; // style="border:1px solid #d3d3d3;"
+					appendThisCanvas = '<canvas class="unselected" id="'+chipInfo.chips.canvasIDs[i]+'" width="'+chipInfo.chipSize+'" height="'+chipInfo.canvasHeight+'"></canvas>'; // style="border:1px solid #d3d3d3;"
 					$("#chip-gallery").append(appendThisCanvas);
 					appendThisImg = '<img id="'+chipInfo.chips.imgIDs[i]+'"src="'+images[i]+'">';
 					$("#img-gallery").append(appendThisImg);
@@ -1161,69 +1181,69 @@
 			}
 
 
-			////////////////DEFINE FUNCTION TO POPULATE CHIPINFO OBJECT/////////////////////////////////////
+			////////////////DEFINE FUNCTION TO INITIALLY POPULATE CHIPINFO OBJECT/////////////////////////////////////
 			function makeChipInfo(){
-				//fill in chipInfo object				
-				//var offset = (255 - chipInfo.chipSize)/2
 				for(var i=0; i < n_chips; i++){					
 					//randomly select a chip from a strip to display - not needed once we have json file to tell us
-					var thisimg = document.getElementById(chipInfo.chips.imgIDs[i]);
-					var thisManyChips = thisimg.naturalHeight/255;
-					chipInfo.chips.chipsInStrip.push(thisManyChips);
-					var useThisChip = Math.floor((Math.random() * thisManyChips)); 
+					var thisimg = document.getElementById(chipInfo.chips.imgIDs[i]),
+						thisManyChips = thisimg.naturalHeight/255,
+						useThisChip = Math.floor((Math.random() * thisManyChips)); 
 					
 					//define/store some other info needed for zooming
-					chipInfo.chips.sxOrig.push(chipInfo.offset);	//0  set/push the original source x offset to the sxOrig array
-					chipInfo.chips.syOrig.push(255*useThisChip+chipInfo.offset); //set/push the original source y offset to the syOrig array
-					chipInfo.chips.sWidthOrig.push(chipInfo.chipSize); //255  set/push the original source x width to the sWidthOrig array
-					chipInfo.chips.sxZoom.push(chipInfo.chips.sxOrig[i]);
-					chipInfo.chips.syZoom.push(chipInfo.chips.syOrig[i]);
-					chipInfo.chips.sWidthZoom.push(chipInfo.chips.sWidthOrig[i]);					
+					chipInfo.chips.chipsInStrip.push(thisManyChips);
+					chipInfo.chips.useThisChip.push(useThisChip);
+					
+					//chipInfo.chips.sxOrig.push(chipInfo.offset);	//0 chipInfo.offset set/push the original source x offset to the sxOrig array
+					//chipInfo.chips.syOrig.push((255*useThisChip)+chipInfo.offset); // +chipInfo.offset   set/push the original source y offset to the syOrig array
+					//chipInfo.chips.sWidthOrig.push(chipInfo.chipSize); //255  set/push the original source x width to the sWidthOrig array
+					//chipInfo.chips.sxZoom.push(chipInfo.chips.sxOrig[i]);
+					//chipInfo.chips.syZoom.push(chipInfo.chips.syOrig[i]);
+					//chipInfo.chips.sWidthZoom.push(chipInfo.chips.sWidthOrig[i]);					
 				}
 				
+				updateChipInfo()
+
+					
 				//fill in zoom adjustment arrays sAdj and lwAdj
-				var starter = chipInfo.halfChipSize, //127.5,
-					lwstarter = chipInfo.box;
+				//var starter = chipInfo.halfChipSize,
+				//	lwstarter = chipInfo.box;
 		
-				for(var i=1; i<maxZoom+1; i++){
-					starter *= 0.9 
-					sAdj.push(chipInfo.halfChipSize-starter); //127.5
-					lwstarter /= 0.9
-					lwAdj.push(lwstarter)
-				}
+				//for(var i=1; i<maxZoom+1; i++){
+				//	starter *= 0.9 
+				//	sAdj.push(chipInfo.halfChipSize-starter); 
+				//	lwstarter /= 0.9
+				//	lwAdj.push(lwstarter)
+				//}
 			}
 			
-			//function to update chips when the plot size changes
-			function updateChips(){
-				var starter = chipInfo.halfChipSize, //127.5,
-					lwstarter = chipInfo.box;
-					
-				sAdj[0] = starter;
-				lwAdj[0] = chipInfo.box;
+			
+			////////////////DEFINE FUNCTION TO UPDATE THE CHIPINFO OBJECT WHEN A NEW CHIP SIZE IS SELECTED////////////
+			function updateChipInfo(){
+				for(var i=0; i < n_chips; i++){										
+					//define/store some other info needed for zooming
+					chipInfo.chips.sxOrig[i] = chipInfo.offset;	//0 chipInfo.offset set/push the original source x offset to the sxOrig array
+					chipInfo.chips.syOrig[i] = (255*chipInfo.chips.useThisChip[i])+chipInfo.offset; // +chipInfo.offset   set/push the original source y offset to the syOrig array
+					chipInfo.chips.sWidthOrig[i] = chipInfo.chipSize; //255  set/push the original source x width to the sWidthOrig array
+					chipInfo.chips.sxZoom[i] = chipInfo.chips.sxOrig[i];
+					chipInfo.chips.syZoom[i] = chipInfo.chips.syOrig[i];
+					chipInfo.chips.sWidthZoom[i] = chipInfo.chips.sWidthOrig[i];					
+				}
 				
+				var starter = chipInfo.halfChipSize,
+					lwstarter = chipInfo.box;
+									
 				for(var i=1; i<maxZoom+1; i++){
 					starter *= 0.9 
-					sAdj[i] = (chipInfo.halfChipSize-starter); //127.5
+					sAdj[i] = (chipInfo.halfChipSize-starter);
 					lwstarter /= 0.9;
 					lwAdj[i] = lwstarter;
 				}
 			}
-			
-			function updateChipSize(){
-				//var offset = (255 - chipInfo.chipSize)/2
-				for(var i=0; i < n_chips; i++){
-					chipInfo.chips.sxZoom[i] = chipInfo.chips.sxOrig[i]+chipInfo.offset;
-					chipInfo.chips.syZoom[i] = chipInfo.chips.syOrig[i]+chipInfo.offset;
-					chipInfo.chips.sWidthZoom[i] = chipInfo.chipSize;
-				}
-			}
-			
-			
-			
-			
+						
 			
 			////////////////DEFINE FUNCTION TO DRAW ALL THE IMAGE CHIPS TO THE CANVASES/////////////////////
 			function drawAllChips(){
+				updateZoom();
 				for(var i=0; i<n_chips; i++){drawOneChip(i)}
 			}
 
@@ -1241,19 +1261,21 @@
 				ctx.mozImageSmoothingEnabled = false;
 				ctx.msImageSmoothingEnabled = false;
 				ctx.imageSmoothingEnabled = false;
+				
+				
 				ctx.drawImage(
 					imgID,
 					chipInfo.chips.sxZoom[thisChip],
 					chipInfo.chips.syZoom[thisChip],
 					chipInfo.chips.sWidthZoom[thisChip],
 					chipInfo.chips.sWidthZoom[thisChip],
-					chipInfo.offset,chipInfo.offset,chipInfo.chipSize,chipInfo.chipSize);
+					0,0,chipInfo.chipSize,chipInfo.chipSize); //chipInfo.offset,chipInfo.offset
 				ctx.strokeStyle="#FF0000";
 				ctx.lineWidth=1;
 				ctx.lineCap = 'square';
-				ctx.strokeRect(chipInfo.halfChipSize-(chipInfo.box/2), chipInfo.halfChipSize-(chipInfo.box/2), chipInfo.box, chipInfo.box);
+				ctx.strokeRect(chipInfo.halfChipSize-(chipInfo.boxZoom/2), chipInfo.halfChipSize-(chipInfo.boxZoom/2), chipInfo.boxZoom, chipInfo.boxZoom);
 				ctx.font = "11px";
-				ctx.fillText("Image Date",100,267); //NEED TO GET THE "IMAGE DATE" PASSED IN AS A PARAMETER FROM THE JSON OBJECT OR SIMILAR
+				ctx.fillText("Image Date",chipInfo.dateXpos,chipInfo.dateYpos); //NEED TO GET THE "IMAGE DATE" PASSED IN AS A PARAMETER FROM THE JSON OBJECT OR SIMILAR
 			}
 			
 							
@@ -1275,7 +1297,7 @@
 					chipInfo.chips.syZoom[i] = chipInfo.chips.syOrig[i]+sAdj[chipInfo.zoomLevel];
 					chipInfo.chips.sWidthZoom[i] = chipInfo.chips.sWidthOrig[i]-(sAdj[chipInfo.zoomLevel]*2);
 				}
-				chipInfo.box = lwAdj[chipInfo.zoomLevel];
+				chipInfo.boxZoom = lwAdj[chipInfo.zoomLevel];
 			}
   
 			
@@ -1285,13 +1307,13 @@
 						e.preventDefault(); //make sure that default browser behaviour is prevented
 						if(e.deltaX <= -1 || e.deltaY >= 1){zoomIn = 1} else {zoomIn = 0}
 						if(zoomIn > 0){
-							if (chipInfo.zoomLevel < maxZoom){chipInfo.zoomLevel++;}
+							if (chipInfo.zoomLevel < maxZoom & chipInfo.zoomLevel < stopZoom){chipInfo.zoomLevel++;}
 						} else {
 							if (chipInfo.zoomLevel > minZoom){chipInfo.zoomLevel--;}
 						}
 
 						//redraw the chips
-						updateZoom(); //update the zoom arrays	
+						//updateZoom(); //update the zoom arrays	
 						drawAllChips(); //redraw the chips with the new zoom
 						
 						//prepare zoom message
@@ -1387,7 +1409,7 @@
 					//$(document).ready(function(){drawAllChips()}); //wait until the image has loaded and then draw the chips
 				} else if (pass_data.action == "zoom"){
 					chipInfo.zoomLevel = pass_data.zoomLevel;
-					updateZoom();
+					//updateZoom();
 					drawAllChips();
 				}
 				
