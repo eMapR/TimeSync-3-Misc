@@ -231,6 +231,42 @@ tr.active{
 /*#########################################################################################*/
 
 
+#changeProcessList{
+	display:none;
+}
+.formDropSelection{
+	border:1px solid #afafaf;
+	margin:3px;
+	cursor:pointer;
+	padding-left:3px;
+	height:20px;
+	
+}
+#changeProcessList {
+	border:1px solid #afafaf;
+	border-radius:0px 0px 4px 4px;
+	margin:-4px 3px 3px 3px;
+	display:none;
+}
+
+#changeProcessList  ul{
+	list-style-type: none;
+ 	padding-left:0px;
+	margin:0px;
+	font-size: 11px;
+}
+#notesList{
+	border:1px solid #afafaf;
+	border-radius:0px 0px 4px 4px;
+	margin:-4px 3px 3px 3px;
+	list-style-type: none;
+ 	padding-left:0px;
+	font-size: 11px;
+	height:67px;
+}
+
+
+
 
 /*############## VERTICES FORM ####################################################*/
 #landUseList li{
@@ -265,7 +301,7 @@ tr.active{
 #dominantChkBx{
 	margin-left:3px;
 }
-#doneBtn{
+.doneBtn{
 	border:1px solid #afafaf;
 	border-radius:4px;
 	margin:7px 3px 3px 3px;
@@ -275,16 +311,16 @@ tr.active{
 	height:40px;
 	padding-top:10px;
 }
-#doneBtn:hover{
+.doneBtn:hover{
 	background-color:#f1f1f1;
 }
-#dominantUse{
+/*#dominantUse{
 	border:1px solid #afafaf;
 	margin:3px;
 	cursor:pointer;
 	padding-left:3px;
 	height:20px;
-}
+}*/
 
 .formDrop{
 	cursor:pointer;
