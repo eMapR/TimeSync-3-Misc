@@ -202,48 +202,27 @@
 							</tr> -->
 						</table>					
 					</div>
-					
-					
-					
-					
-
-					
-					
-					
-					
+									
 					<div id="changeProcessDiv" class="dropThis">
-
-						<div id="changeProcessSelection" class="formDropSelection"></div>
-							<ul id="changeProcessList">
-								<li>Fire</li>
-								<li>Harvest</li>
-								<li>Decline</li>
-								<li>Wind</li>
-								<li>Hydrology</li>
-								<li>Debris</li>
-								<li>Growth</li>
-								<li>Stable</li>
-								<li>Conversion</li>
-								<li>Other</li>
-							</ul>
-
-
+						<p class="subHeader">Change process:</p>
+						<div id="changeProcessSelection" class="formDropSelection"></div> <!-- <div id="theSelection"></div> -->
+						<ul id="changeProcessList">
+							<li>Fire</li>
+							<li>Harvest</li>
+							<li>Decline</li>
+							<li>Wind</li>
+							<li>Hydrology</li>
+							<li>Debris</li>
+							<li>Growth</li>
+							<li>Stable</li>
+							<li>Conversion</li>
+							<li>Other</li>
+						</ul>
 						<p class="subHeader">Notes:</p>
-						<ul id="notesList">
+						<ul id="CPnotesList">
 						</ul>
 						<div id="changeProcessDoneBtn" class="doneBtn">Done</div>
 					</div>
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
 					
 					
 					
@@ -259,36 +238,24 @@
 								<td class="landUseInput formDrop"></td>		
 							</tr> -->
 						</table>
-						
-						<div id="landUseDiv" class="dropThis">
-							<div id="dominentLandUseDiv" class="landUseDiv">
-								<p class="subHeader">Dominant Use (9 pixels):</p>
-								<div id="dominantUse" class="formDropSelection"></div>
-								<div id="landUseList" > <!-- class="clickAway" -->
-									<ul>
-										<li>FOR (forest)</li>
-										<li>NFV (non-forest vegetation)</li>
-										<li>NVN (non-vegetated natural)</li>
-										<li>ARG (agriculture)</li>
-										<li>NVA (non-vegetated anthropogenic)</li>
-									</ul>
-								</div>
-								<p style="font-size:11px"><input class="landUseChkBx" id="dominantChkBx" autocomplete="off" type="checkbox"> Dominant > 50% </p>
-							</div>
-							<div id="otherLandUseDiv" class="landUseDiv">
-								<p class="subHeader">Other land use:</p>
-								<ul id="otherLandUseList">
-									<li><input class="landUseChkBx" id="forChkBx" autocomplete="off" type="checkbox"> FOR (forest)</li>
-									<li><input class="landUseChkBx" id="nfvChkBx" autocomplete="off" type="checkbox"> NFV (non-forest vegetation)</li>
-									<li><input class="landUseChkBx" id="nvnChkBx" autocomplete="off" type="checkbox"> NVN (non-vegetated natural)</li>
-									<li><input class="landUseChkBx" id="argChkBx" autocomplete="off" type="checkbox"> ARG (agriculture)</li>
-									<li><input class="landUseChkBx" id="nvaChkBx" autocomplete="off" type="checkbox"> NVA (non-vegetated anthropogenic)</li>
-								</ul>
-							</div>
-							<div id="doneBtn" class="doneBtn">Done</div>
-						</div>
-					
 					</div>
+						
+					<div id="landUseDiv" class="dropThis">
+						<p class="subHeader">Land Use:</p>
+						<div id="landUseSelection" class="formDropSelection"></div> <!-- <div id="theSelection"></div> -->
+						<ul id="landUseList">
+							<li>Forest</li>
+							<li>Developed</li>
+							<li>Agriculture</li>
+							<li>Non-forest Wetland</li>
+							<li>Rangeland</li>
+							<li>Other</li>
+						</ul>
+						<p class="subHeader">Notes:</p>
+						<ul id="LUnotesList">
+						</ul>
+						<div id="LandUseDoneBtn" class="doneBtn">Done</div>
+					</div>				
 				</div>
 				
 				<div id="commentsSection" class="sectionDiv">
@@ -334,6 +301,56 @@
 //						{startYear:1984,endYear:2014,startIndex:0,endIndex:0,changeProcess:"stable",ephemeral:"false"}
 //					]
 //				};
+
+			var lineInfo = {
+					vertices:[{
+						year:0,
+						index:0,
+						landUse:{
+							dominant:"",
+							notes:{
+								wetland:null,
+								mining:null,
+								rowCrop:null,
+								orchardTreeFarm:null,
+								vineyardsOtherWoody:null
+							}
+						},
+						landCover:{
+							dominant:"",
+							other:{
+								trees:null,
+								shrubs:null,
+								grassForbHerb:null,
+								impervious:null,
+								naturalBarren:null,
+								SnowIce:null,
+								water:null
+							}
+						}	
+					}],
+					segments:[{
+						startYear:1984,
+						endYear:2014,
+						startIndex:0,
+						endIndex:0,
+						changeProcess:"",
+						notes:{
+							natural:null,
+							prescribed:null,
+							sitePrepFire:null,
+							airphotoOnly:null,
+							clearcut:null,
+							thinning:null,
+							flooding:null,
+							reserviorLakeFlux:null,
+							wetlandDrainage:null
+						}
+					}]
+				};
+	
+		
+		
 		
 		    var lineInfo = {vertices:[],segments:[]}
 		
@@ -789,10 +806,8 @@
 ////////////////////////////BELOW ARE LINE INFO FORM SCRIPTS////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////BELOW ARE LINE INFO FORM SCRIPTS/////////////////////////////////BELOW ARE LINE INFO FORM SCRIPTS////			
-			
-			
-			
-			//function to sync the segments form to the selected vertices
+	
+
 			function updateSegmentForm(){
 				$(".segment").remove();
 				$(".vertex").remove();
@@ -803,24 +818,99 @@
 					startIndex = 0,
 					endIndex = 0,
 					i = 0;
+				
+				//make empty segment entries
 				for(i; i < len-1; i++){
 					startIndex = selectedCircles[i];
 					endIndex = selectedCircles[i+1];
 					yearStart = years[startIndex];
 					yearEnd =   years[endIndex];
 					$("#segmentsFormTbl").append('<tr class="segment"><td>'+yearStart+'</td><td>'+yearEnd+'</td><td class="changeProcessInput formDrop"></td></tr>');
-					lineInfo.segments.push({startYear:yearStart,endYear:yearEnd,startIndex:startIndex,endIndex:endIndex,changeProcess:"",ephemeral:""});
+					lineInfo.segments.push({
+						startYear:yearStart,endYear:yearEnd,startIndex:startIndex,endIndex:endIndex,changeProcess:"",
+						notes:{
+							natural:null,
+							prescribed:null,
+							sitePrepFire:null,
+							airphotoOnly:null,
+							clearcut:null,
+							thinning:null,
+							flooding:null,
+							reserviorLakeFlux:null,
+							wetlandDrainage:null
+						}
+					});
 				}
+				
+				//make empty vertex entries
 				for(i=0; i < len; i++){
 					startIndex = selectedCircles[i];
 					yearStart = years[startIndex];
 					$("#verticesFormTbl").append('<tr class="vertex"><td>'+yearStart+'</td><td class="landUseInput formDrop"></td></tr>');
-					lineInfo.vertices.push({year:yearStart,index:startIndex,landUse:"",dominant:"",otherUses:{FOR:"",NFV:"",NVN:"",ARG:"",NVA:""}});
+					lineInfo.vertices.push({
+						year:yearStart,index:startIndex,
+						landUse:{
+							dominant:"",
+							notes:{
+								wetland:null,
+								mining:null,
+								rowCrop:null,
+								orchardTreeFarm:null,
+								vineyardsOtherWoody:null
+							}
+						
+						},
+						landCover:{
+							dominant:"",
+							other:{
+								trees:null,
+								shrubs:null,
+								grassForbHerb:null,
+								impervious:null,
+								naturalBarren:null,
+								SnowIce:null,
+								water:null
+							}
+						}
+					});
 				}
 				
+
+				
 				//start filling out the table - probably don't need to do this here - for testing
-				fillInLineInfo();
-			}
+				//fillInLineInfo();
+			}	
+			
+			
+			//function to sync the segments form to the selected vertices
+			//function updateSegmentForm(){
+			//	$(".segment").remove();
+			//	$(".vertex").remove();
+			//	lineInfo = {vertices:[],segments:[]}
+			//	var yearStart = 0,
+			//		yearEnd = 0,
+			//		len = selectedCircles.length,
+			//		startIndex = 0,
+			//		endIndex = 0,
+			//		i = 0;
+			//	for(i; i < len-1; i++){
+			//		startIndex = selectedCircles[i];
+			//		endIndex = selectedCircles[i+1];
+			//		yearStart = years[startIndex];
+			//		yearEnd =   years[endIndex];
+			//		$("#segmentsFormTbl").append('<tr class="segment"><td>'+yearStart+'</td><td>'+yearEnd+'</td><td class="changeProcessInput formDrop"></td></tr>');
+			//		lineInfo.segments.push({startYear:yearStart,endYear:yearEnd,startIndex:startIndex,endIndex:endIndex,changeProcess:"",ephemeral:""});
+			//	}
+			//	for(i=0; i < len; i++){
+			//		startIndex = selectedCircles[i];
+			//		yearStart = years[startIndex];
+			//		$("#verticesFormTbl").append('<tr class="vertex"><td>'+yearStart+'</td><td class="landUseInput formDrop"></td></tr>');
+			//		lineInfo.vertices.push({year:yearStart,index:startIndex,landUse:"",dominant:"",otherUses:{FOR:"",NFV:"",NVN:"",ARG:"",NVA:""}});
+			//	}
+			//	
+			//	//start filling out the table - probably don't need to do this here - for testing
+			//	fillInLineInfo();
+			//}
 		
 			//controls the trajectory form section tabs and tables 
 			$("#segmentsFormTab").click(function(){
@@ -866,21 +956,39 @@
 		
 			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			////////////////CHANGE PROCESS INPUT DROP DOWNS AND HIGHLIGHTING CIRCLES PERTAINING TO THE SELECTED ROW/////////////
-			//DROP DOWN
+			//DROP DOWN THE INPUT FORM
 			$(document).ready(function(){
 				$(document).on("click",".changeProcessInput",function(e){ //listen for a click on a changeProcessInput <li>					
 					$(".changeProcessInput.active").removeClass("active"); //clear any .changeProcessInput "active" classes so that this will be the only one
 					var thisInput = $(this); //store the reference to element as a variable, so we don't have to keep making jquery reference - gets used a lot
 					$("tr.segment.active").removeClass("active"); //make sure there are no active rows for changeProcessInput
 					$("circle.highlight").attr("class","selected"); //make sure there are no highlighed circles - MIGHT NOT NEED THIS???
-
 					
 					thisInput.addClass("active"); //set this .changeProcessInput <td> as the "active" class so that when a selection is made from the #changeProcessList dropdown it knows which <td> to place it in
 					dropInputLists(thisInput, "changeProcessDiv");
 					thisInput.closest("tr").addClass("active");					
 					
-					//point highlighting
+					//fill in info from table for this segment
 					var thisOne = $("tr.segment .changeProcessInput").index(thisInput); //find what change process row was selected
+					var selection = lineInfo.segments[thisOne].changeProcess
+					$("#changeProcessSelection").text(selection);
+					
+					//fill in the forms with info from the table - will be blank at first but will reflect the input information if the change process input is clicked on again					
+					appendCPnotes(selection);
+					
+					$("#CPnotesList li").each(function(i){
+						var thisLi = $(this)
+						var note = thisLi.attr("class");
+						noteNull = lineInfo.segments[thisOne].notes[note];
+						if(noteNull == null){
+							$("#CPnotesList li").eq(i).prepend('<span class="glyphicon glyphicon-unchecked"></span> ')
+						} else{
+							$("#CPnotesList li").eq(i).prepend('<span class="glyphicon glyphicon-ok"></span> ');
+							thisLi.addClass("selected");
+						}
+					});
+	
+					//point highlighting
 					var startIndex = lineInfo.segments[thisOne].startIndex; //pull out the start index for the selected row
 					var endIndex = lineInfo.segments[thisOne].endIndex; //pull out the end index for the selected row
 					$("circle:eq("+startIndex+")").attr("class","highlight"); //highlight the start circle for the selected row (segment)
@@ -892,26 +1000,48 @@
                 });
             });			
 			
+			//function to display the changeProcessList
 			$("#changeProcessSelection").click(function(e){			
 				$("#changeProcessList").show();
 				e.stopPropagation();
 			});
-			
-			//HIDE
-			//$(document).ready(function(){
-			//	$(document).on("click", function(){ //click anywhere to get rid of the #changeProcessList drop down
-			//		if($("#plotSizeList").css("display") == "block"){
-			//			$("#plotSizeList").hide();
-			//		} else if($("#changeProcessList").css("display") == "block"){
-			//			$("#changeProcessList").hide();
-			//			$("tr.segment.active").removeClass("active");
-			//			$("circle").css("cursor","pointer");
-			//			$("canvas").css("cursor","pointer");
-			//			$("circle.highlight").attr("class","selected");
-			//		}
-			//	});
-			//});
-			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+						
+			//function to append change process notes in the change process dropdown (conditional with the selection of the change process)
+			function appendCPnotes(selection){					
+				$("#CPnotesList").empty();
+				switch(selection){
+						case "Fire":
+							$("#CPnotesList").append('<li class="natural">Natural</li><li class="prescribed">Prescribed</li><li class="sitePrepFire">Site-prep fire</li><li class="airphotoOnly">Airphoto only</li>');								
+							break;
+						case "Harvest":
+							$("#CPnotesList").append('<li class="clearcut">Clearcut</li><li class="thinning">Thinning</li><li class="sitePrepFire">Site-prep fire</li><li class="airphotoOnly">Airphoto only</li>');								
+							break;
+						case "Decline":
+							$("#CPnotesList").append('<li class="airphotoOnly">Airphoto only</li>');								
+							break;
+						case "Wind":
+							$("#CPnotesList").append('<li class="airphotoOnly">Airphoto only</li>');								
+							break;
+						case "Hydrology":
+							$("#CPnotesList").append('<li class="flooding">Flooding</li><li class="reserviorLakeFlux">Reservoir/Lake flux</li><li class="airphotoOnly">Airphoto only</li>');								
+							break;
+						case "Debris":
+							$("#CPnotesList").append('<li class="airphotoOnly">Airphoto only</li>');								
+							break;
+						case "Growth":
+							$("#CPnotesList").append('<li class="airphotoOnly">Airphoto only</li>');								
+							break;
+						case "Stable":
+							$("#CPnotesList").append('<li class="airphotoOnly">Airphoto only</li>');								
+							break;
+						case "Conversion":
+							$("#CPnotesList").append('<li class="wetlandDrainage">Wetland drainage</li><li class="airphotoOnly">Airphoto only</li>');
+							break;
+						case "Other":
+							$("#CPnotesList").append('<li class="airphotoOnly">Airphoto only</li>');
+							break;						
+					}
+				}
 			
 			
 			//this function fill in the lineInfo object for the segments - not the vertices
@@ -926,55 +1056,94 @@
 				}
 			}
 			
-			//fill in the text for the change process and the fill in the lineInfo.segments array when a selection is made from the changeProcessList
-			$("#changeProcessList li").click(function(){
-				$("td.changeProcessInput.active").text($(this).text());
-				fillInLineInfo();
-			});
-			//make the landUseList div list go hide after it has been clicked
+
+			//DISPLAY THE CONDITIONAL NOTES ONCE A CHANGE PROCESS HAS BEEN SELECTED
 			$(document).ready(function(){
 				$("#changeProcessList li").click(function(){ //click anywhere to get rid of the .dropThis dropdowns
 						var selection = $(this).text();
 						$("#changeProcessList").hide();
-						$("#notesList").empty()
-						switch(selection){
-							case "Fire":
-								$("#notesList").append('<li>Natural</li><li>Prescribed</li><li>Site-prep fire</li><li>Airphoto only</li>');
-								break;
-							case "Harvest":
-								$("#notesList").append('<li>Clearcut</li><li>Thinning</li><li>Site-prep fire</li><li>Airphoto only</li>');
-							break;
-							case "Decline":
-								$("#notesList").append('<li>Airphoto only</li>');
-							break;
-							case "Wind":
-								$("#notesList").append('<li>Airphoto only</li>');
-							break;
-							case "Hydrology":
-								$("#notesList").append('<li>Flooding</li><li>Reservoir/Lake</li><li>Airphoto only</li>');
-							break;
-							case "Debris":
-								$("#notesList").append('<li>Airphoto only</li>');
-							break;
-							case "Growth":
-								$("#notesList").append('<li>Airphoto only</li>');
-							break;
-							case "Stable":
-								$("#notesList").append('<li>Airphoto only</li>');
-							break;
-							case "Conversion":
-								$("#notesList").append('<li>Wetland drainage</li><li>Airphoto only</li>');
-							break;
-							case "Other":
-								$("#notesList").append('<li>Airphoto only</li>');
-							break;						
-						}
+						$("#changeProcessSelection, td.changeProcessInput.active").text(selection);
 						
+						appendCPnotes(selection);
+
+						$("#CPnotesList li").prepend('<span class="glyphicon glyphicon-unchecked"></span> ');			
 				});
 			});
-
 			
+			
+			//#CPnotesList li SELECTION AND CHECKBOXES
+			$(document).ready(function(){
+				$(document).on("click","#CPnotesList li", function(){
+					var selected = $(this);
+					if(selected.hasClass("selected")){
+						selected.removeClass("selected");
+						$("span", this).replaceWith('<span class="glyphicon glyphicon-unchecked"></span> ');
+					} else {
+						selected.addClass("selected");
+						$("span", this).replaceWith('<span class="glyphicon glyphicon-ok"></span> ');
+					}
+				});
+			});
+			
+			
+			//HIDE THE CHANGE PROCESS INPUT DROPDOWN WHEN THE DONE BUTTON IS CLICKED
+			$("#changeProcessDoneBtn").click(function(){
+				$("#changeProcessDiv").hide();
+				
+				//remove the highlighted circle class - could find the highlighted class and only change that one (current implementation) or just reset all selected circles (commented out)
+				$("circle.highlight").attr("class","selected");			
+				$("tr.segment.active").removeClass("active"); //remove the land use row from the active class			
+				$("circle").css("cursor","pointer");
+				$("canvas").css("cursor","pointer");
+				
+				//fill in the lineInfo object
+				var thisOne = $(".changeProcessInput").index($(".changeProcessInput.active"));
+				var selection = $("td.changeProcessInput.active").text();
+				
 
+				lineInfo.segments[thisOne].changeProcess = selection;			
+				switch(selection){
+					case "Fire":
+						fillInNotes("#CPnotesList .selected",lineInfo,thisOne,"natural");
+						fillInNotes("#CPnotesList .selected",lineInfo,thisOne,"prescribed");
+						fillInNotes("#CPnotesList .selected",lineInfo,thisOne,"sitePrepFire");
+						break;
+					case "Harvest":
+						fillInNotes("#CPnotesList .selected",lineInfo,thisOne,"clearcut");
+						fillInNotes("#CPnotesList .selected",lineInfo,thisOne,"thinning");
+						fillInNotes("#CPnotesList .selected",lineInfo,thisOne,"sitePrepFire");						
+						break;
+					case "Decline":								
+						break;
+					case "Wind":								
+						break;
+					case "Hydrology":
+						fillInNotes("#CPnotesList .selected",lineInfo,thisOne,"flooding");
+						fillInNotes("#CPnotesList .selected",lineInfo,thisOne,"reserviorLakeFlux");											
+						break;
+					case "Debris":								
+						break;
+					case "Growth":							
+						break;
+					case "Stable":							
+						break;
+					case "Conversion":
+						fillInNotes("#CPnotesList .selected",lineInfo,thisOne,"wetlandDrainage");						
+						break;
+					case "Other":
+						break;						
+				}
+				fillInNotes("#CPnotesList .selected",lineInfo,thisOne,"airphotoOnly");
+			});
+			
+			//function to fill in note check box status in the lineInfo object when the done button is pressed
+			function fillInNotes(selector, lineInfo, thisOne, noteClass){
+				if($(selector).hasClass(noteClass)){
+					lineInfo.segments[thisOne].notes[noteClass] = true;
+				} else {
+					lineInfo.segments[thisOne].notes[noteClass] = null;
+				}
+			}
 			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			
@@ -987,15 +1156,17 @@
 				$(document).on("click",".landUseInput",function(e){ //listen for a click on a changeProcessInput <li>					
 					$(".landUseInput.active").removeClass("active"); //clear any .changeProcessInput "active" classes so that this will be the only one
 					var thisInput = $(this);
-					thisInput.addClass("active"); //set this .changeProcessInput <td> as the "active" class so that when a selection is made from the #changeProcessList dropdown it knows which <td> to place it in
-					dropInputLists(thisInput, "landUseDiv");
+					$("tr.vertex.active").removeClass("active"); //make sure there are no active rows for changeProcessInput
+					$("circle.highlight").attr("class","selected"); //make sure there are no highlighed circles - MIGHT NOT NEED THIS???
 					
+					thisInput.addClass("active"); //set this .landUseInput <td> as the "active" class so that when a selection is made from the #changeProcessList dropdown it knows which <td> to place it in
+					dropInputLists(thisInput, "landUseDiv");					
 					thisInput.closest("tr").addClass("active");
 					
 					//point highlighting
 					var thisOne = $("tr.vertex .landUseInput").index(thisInput);
-					var thisIndex = lineInfo.vertices[thisOne].index;
-					$("circle:eq("+thisIndex+")").attr("class","highlight");
+					var selection = lineInfo.vertices[thisOne].changeProcess
+					$("#changeProcessSelection").text(selection);
 					
 					//fill in the land use dropdown div with the info for this particular row
 					lineInfo.vertices[thisOne].landUse
@@ -1007,6 +1178,8 @@
 					$("#argChkBx").prop("checked", lineInfo.vertices[thisOne].otherUses.ARG);
 					$("#nvaChkBx").prop("checked", lineInfo.vertices[thisOne].otherUses.NVA);
 					
+					var thisIndex = lineInfo.vertices[thisOne].index;
+					$("circle:eq("+thisIndex+")").attr("class","highlight");
 					$("circle").css("cursor","not-allowed");
 					$("canvas").css("cursor","not-allowed");
 

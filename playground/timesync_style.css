@@ -236,7 +236,7 @@ tr.active{
 }
 .formDropSelection{
 	border:1px solid #afafaf;
-	margin:3px;
+	margin:0px 3px 3px 3px; /*0px,3px,3px,3px*/
 	cursor:pointer;
 	padding-left:3px;
 	height:20px;
@@ -264,6 +264,7 @@ tr.active{
 	font-size: 11px;
 	height:67px;
 }
+
 
 
 
