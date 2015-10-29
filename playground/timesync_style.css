@@ -40,8 +40,8 @@ circle{
 }
 
 circle.selected{
-	stroke:#ED2939; /*'#FF0000;*/
-	stroke-width:1;
+	stroke:#ED2939; /*#ED2939; '#FF0000;*/
+	stroke-width:2;
 }
 
 circle.highlight{
@@ -81,11 +81,16 @@ svg{
 	margin:3px;
 	vertical-align:top;
 	cursor: pointer;
-	border: 2px solid white; /*#dbdbdb*/
+	border: 3px solid white; /*#dbdbdb*/
 }
 #chip-gallery .selected{
-	border: 2px solid black;
+	border: 3px solid #ED2939; /*black;*/
 }
+
+#chip-gallery .highlight{
+	border: 3px solid #32CD32;
+}
+
 /*#################################################################################################*/
 
 
@@ -236,7 +241,7 @@ tr.active{
 	margin:3px 3px 3px 3px; /*0px,3px,3px,3px*/
 	cursor:pointer;
 	padding-left:3px;
-	height:20px;
+	height:17px; /*20px;*/
 	
 }
 /*#changeProcessList {
@@ -269,8 +274,12 @@ tr.active{
 	height:115px;
 }
 
-
-
+.glyphicon.glyphicon-search{
+	font-size:11px;
+}
+.highlightIt{
+	cursor:pointer;
+}
 
 
 

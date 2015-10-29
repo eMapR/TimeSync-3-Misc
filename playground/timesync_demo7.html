@@ -184,20 +184,23 @@
 				<div class="sectionDiv">
 					<p class="header">Trajectory Forms</p>
 					<ul class="test">
-						<li id="segmentsFormTab" class="selected" style="border-top-left-radius:4px;">Segments
-						<li id="verticesFormTab" class="unselected" style="margin-left:-1px; border-top-right-radius:4px;">Vertices
+						<li id="segmentsFormTab" class="selected" style="border-top-left-radius:4px; text-align:center;">Segments
+						<li id="verticesFormTab" class="unselected" style="margin-left:-1px; border-top-right-radius:4px; text-align:center;">Vertices
 					</ul>
 					
 					<div id="segmentsFormDiv">
 						<table id="segmentsFormTbl">
-							<col width="45">
-							<col width="45">
+							<col width="19">
+							<col width="38">
+							<col width="38">
 							<tr class="trHeader">
+								<th></th>
 								<th>Start</th>
 								<th>End</th>		
 								<th>Change Process</th>
 							</tr>
 	<!-- 						<tr class="segment">
+								<td class="highlightIt"><span class="glyphicon glyphicon-search"></span></td>
 								<td>&nbsp;</td>
 								<td>&nbsp;</td>		
 								<td class="changeProcessInput formDrop"></td>
@@ -207,7 +210,7 @@
 									
 					<div id="changeProcessDiv" class="dropThis">
 						<p class="subHeader">Change process:</p>
-						<div id="changeProcessSelection" class="formDropSelection"></div> <!-- <div id="theSelection"></div> -->
+						<div id="changeProcessSelection" class="formDropSelection" align="center"><span class="glyphicon glyphicon-triangle-bottom"></span></div> <!-- <div id="theSelection"></div> -->
 						<ul id="changeProcessList">
 							<li>Fire</li>
 							<li>Harvest</li>
@@ -230,14 +233,17 @@
 					
 					<div id="verticesFormDiv">						
 						<table id="verticesFormTbl">
-							<col width="45">
+							<col width="19">
+							<col width="38">
 							<col width="140">
 							<tr class="trHeader">
+								<th></th>
 								<th>Year</th>
 								<th>Land Use</th>
 								<th>Land Cover</th>
 							</tr>
 	<!-- 						<tr class="vertex">
+								<td class="highlightIt"><span class="glyphicon glyphicon-search"></span></td>
 								<td></td>
 								<td class="landUseInput formDrop"></td>	
 								<td class="landCoverInput formDrop"></td>								
@@ -247,7 +253,7 @@
 						
 					<div id="landUseDiv" class="dropThis">
 						<!-- <p class="subHeader">Land Use:</p> -->
-						<div id="landUseSelection" class="formDropSelection"></div> <!-- <div id="theSelection"></div> -->
+						<div id="landUseSelection" class="formDropSelection" align="center"><span class="glyphicon glyphicon-triangle-bottom"></span></div> <!-- <div id="theSelection"></div> -->
 						<ul id="landUseList">
 							<li>Forest</li>
 							<li>Developed</li>
@@ -264,7 +270,7 @@
 
 					<div id="landCoverDiv" class="dropThis">
 						<!-- <p class="subHeader">Land Cover:</p> -->
-						<div id="landCoverSelection" class="formDropSelection"></div> <!-- <div id="theSelection"></div> -->
+						<div id="landCoverSelection" class="formDropSelection" align="center"><span class="glyphicon glyphicon-triangle-bottom"></span></div> <!-- <div id="theSelection"></div> -->
 						<ul id="landCoverList">
 							<li>Trees</li>
 							<li>Shrubs</li>
@@ -276,6 +282,13 @@
 						</ul>
 						<p class="subHeader">Notes:</p>
 						<ul id="LCnotesList">
+							<li class="trees"><span class="glyphicon glyphicon-unchecked"></span> Trees</li>
+							<li class="shrubs"><span class="glyphicon glyphicon-unchecked"></span> Shrubs</li>
+							<li class="grassForbHerb"><span class="glyphicon glyphicon-unchecked"></span> Grass/forb/herb</li>
+							<li class="impervious"><span class="glyphicon glyphicon-unchecked"></span> Impervious</li>
+							<li class="naturalBarren"><span class="glyphicon glyphicon-unchecked"></span> Natural/barren</li>
+							<li class="SnowIce"><span class="glyphicon glyphicon-unchecked"></span> Snow/ice</li>
+							<li class="water"><span class="glyphicon glyphicon-unchecked"></span> Water</li>
 						</ul>
 						<div id="landCoverDoneBtn" class="doneBtn">Done</div>
 					</div>	
@@ -308,77 +321,7 @@
 		
 		
 		<script>
-			
-//			var lineInfo = {
-//					vertices:[
-//						{year:0,index:0,landUse:"",dominant:"",
-//							otherUses:{
-//								FOR:"",
-//								NFV:"",
-//								NVN:"",
-//								ARG:"",
-//								NVA:""
-//							}
-//						},
-//					],
-//					segments:[
-//						{startYear:1984,endYear:2014,startIndex:0,endIndex:0,changeProcess:"stable",ephemeral:"false"}
-//					]
-//				};
-
-			var lineInfo = {
-					vertices:[{
-						year:0,
-						index:0,
-						landUse:{
-							dominant:"",
-							notes:{
-								wetland:null,
-								mining:null,
-								rowCrop:null,
-								orchardTreeFarm:null,
-								vineyardsOtherWoody:null
-							}
-						},
-						landCover:{
-							dominant:"",
-							other:{
-								trees:null,
-								shrubs:null,
-								grassForbHerb:null,
-								impervious:null,
-								naturalBarren:null,
-								SnowIce:null,
-								water:null
-							}
-						}						
-					}],
-					segments:[{
-						startYear:1984,
-						endYear:2014,
-						startIndex:0,
-						endIndex:0,
-						changeProcess:"",
-						notes:{
-							natural:null,
-							prescribed:null,
-							sitePrepFire:null,
-							airphotoOnly:null,
-							clearcut:null,
-							thinning:null,
-							flooding:null,
-							reserviorLakeFlux:null,
-							wetlandDrainage:null
-						}
-					}]
-				};
 	
-		
-		
-		
-		    var lineInfo = {vertices:[],segments:[]}
-		
-		
 			//////////DEFINE GLOBAL VARIABLES/////////////////////////////////////////////////////////						
 			var n_stdev = 2,
 				data = {}, // = getJson("./test3.json"), //get the data
@@ -830,90 +773,89 @@
 ////////////////////////////BELOW ARE LINE INFO FORM SCRIPTS////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////BELOW ARE LINE INFO FORM SCRIPTS/////////////////////////////////BELOW ARE LINE INFO FORM SCRIPTS////			
-	
-			//function to sync the segments form to the selected vertices
-			function updateSegmentForm(){
-				$(".segment").remove();
-				$(".vertex").remove();
-				lineInfo = {vertices:[],segments:[]}
-				var yearStart = 0,
-					yearEnd = 0,
-					len = selectedCircles.length,
-					startIndex = 0,
-					endIndex = 0,
-					i = 0;
-				
-				//make empty segment entries
-				for(i; i < len-1; i++){
-					startIndex = selectedCircles[i];
-					endIndex = selectedCircles[i+1];
-					yearStart = years[startIndex];
-					yearEnd =   years[endIndex];
-					$("#segmentsFormTbl").append('<tr class="segment"><td>'+yearStart+'</td><td>'+yearEnd+'</td><td class="changeProcessInput formDrop"></td></tr>');
-					lineInfo.segments.push({
-						startYear:yearStart,endYear:yearEnd,startIndex:startIndex,endIndex:endIndex,changeProcess:"",
-						notes:{
-							natural:null,
-							prescribed:null,
-							sitePrepFire:null,
-							airphotoOnly:null,
-							clearcut:null,
-							thinning:null,
-							flooding:null,
-							reserviorLakeFlux:null,
-							wetlandDrainage:null
-						}
-					});
-				}
-				
-				//make empty vertex entries
-				for(i=0; i < len; i++){
-					startIndex = selectedCircles[i];
-					yearStart = years[startIndex];
-					$("#verticesFormTbl").append('<tr class="vertex"><td>'+yearStart+'</td><td class="landUseInput formDrop"></td><td class="landCoverInput formDrop"></td></tr>');
-					lineInfo.vertices.push({
-						year:yearStart,index:startIndex,
-						landUse:{
-							dominant:"",
-							notes:{
-								wetland:null,
-								mining:null,
-								rowCrop:null,
-								orchardTreeFarm:null,
-								vineyardsOtherWoody:null
-							}
-						
-						},
-						landCover:{
-							dominant:"",
-							other:{
-								trees:null,
-								shrubs:null,
-								grassForbHerb:null,
-								impervious:null,
-								naturalBarren:null,
-								SnowIce:null,
-								water:null
-							}
-						}
-					});
-				}
-			}	
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+//GLOBAL VARIABLES//////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+
+//template lineInfo object which holds all the segment and vertice info
+//			var lineInfo = {
+//					vertices:[{
+//						year:0,
+//						index:0,
+//						landUse:{
+//							dominant:"",
+//							notes:{
+//								wetland:null,
+//								mining:null,
+//								rowCrop:null,
+//								orchardTreeFarm:null,
+//								vineyardsOtherWoody:null
+//							}
+//						},
+//						landCover:{
+//							dominant:"",
+//							other:{
+//								trees:null,
+//								shrubs:null,
+//								grassForbHerb:null,
+//								impervious:null,
+//								naturalBarren:null,
+//								SnowIce:null,
+//								water:null
+//							}
+//						},
+//						changeProcess:{
+//							changeProcess:"",
+//							notes:{
+//								natural:null,
+//								prescribed:null,
+//								sitePrepFire:null,
+//								airphotoOnly:null,
+//								clearcut:null,
+//								thinning:null,
+//								flooding:null,
+//								reserviorLakeFlux:null,
+//								wetlandDrainage:null
+//							}
+//						}
+//					}],
+//					segments:[{
+//						startYear:1984,
+//						endYear:2014,
+//						startIndex:0,
+//						endIndex:0,
+//					}]
+//				};
 			
-		
+		    var lineInfo = {vertices:[],segments:[]}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+//EVENT LISTENERS///////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+					
 			//controls the trajectory form section tabs and tables 
-			$("#segmentsFormTab").click(function(){
+			$("#segmentsFormTab").click(function(){	
 				var status = $("#segmentsFormTab").attr("class");
 				if(status == "unselected"){
+					circleHighlightOff();
+					closeDropAndRecord();
 					$("#segmentsFormTab").attr("class","selected");
 					$("#verticesFormTab").attr("class","unselected");
 					$("#segmentsFormDiv").show();
 					$("#verticesFormDiv").hide();
 				}
 			});
-			$("#verticesFormTab").click(function(){
+			$("#verticesFormTab").click(function(){				
 				var status = $("#verticesFormTab").attr("class");
 				if(status == "unselected"){
+					circleHighlightOff();
+					closeDropAndRecord();
 					$("#verticesFormTab").attr("class","selected");
 					$("#segmentsFormTab").attr("class","unselected");
 					$("#verticesFormDiv").show();
@@ -926,29 +868,32 @@
 			//change process
 			$(document).ready(function(){
 				$(document).on("click",".changeProcessInput",function(e){ //listen for a click on a changeProcessInput <li>					
-					$(".changeProcessInput.active").removeClass("active"); //clear any .changeProcessInput "active" classes so that this will be the only one
+					//$(".changeProcessInput.active").removeClass("active"); //clear any .changeProcessInput "active" classes so that this will be the only one
+					closeDropAndRecord();
 					var thisInput = $(this); //store the reference to element as a variable, so we don't have to keep making jquery reference - gets used a lot
-					$("tr.segment.active").removeClass("active"); //make sure there are no active rows for changeProcessInput
-					$("circle.highlight").attr("class","selected"); //make sure there are no highlighed circles - MIGHT NOT NEED THIS???
+					//$("tr.segment.active").removeClass("active"); //make sure there are no active rows for changeProcessInput
+					//$("circle.highlight").attr("class","selected"); //make sure there are no highlighed circles - MIGHT NOT NEED THIS???
+					
 					
 					thisInput.addClass("active"); //set this .changeProcessInput <td> as the "active" class so that when a selection is made from the #changeProcessList dropdown it knows which <td> to place it in
 					dropInputLists(thisInput, "changeProcessDiv", -1, -1, 1);
 					thisInput.closest("tr").addClass("active");					
 					
 					//fill in info from table for this segment
-					var thisOne = $("tr.segment .changeProcessInput").index(thisInput); //find what change process row was selected
-					var selection = lineInfo.segments[thisOne].changeProcess
-					//$("#changeProcessSelection").text(selection);
+					var thisOne = $("tr.segment .changeProcessInput").index(thisInput)+1, //find what change process row was selected
+						selection = lineInfo.vertices[thisOne].changeProcess.changeProcess
 					
 					//fill in the forms with info from the table - will be blank at first but will reflect the input information if the change process input is clicked on again					
 					appendCPnotes(selection);					
-					changeNoteIcon("#CPnotesList", thisOne);
+					changeNoteIcon("#CPnotesList", thisOne, "changeProcess");
 					
 					//point highlighting
-					var startIndex = lineInfo.segments[thisOne].startIndex; //pull out the start index for the selected row
-					var endIndex = lineInfo.segments[thisOne].endIndex; //pull out the end index for the selected row
+					var startIndex = lineInfo.segments[thisOne-1].startIndex; //pull out the start index for the selected row
+					var endIndex = lineInfo.segments[thisOne-1].endIndex; //pull out the end index for the selected row
 					$("circle:eq("+startIndex+")").attr("class","highlight"); //highlight the start circle for the selected row (segment)
-					$("circle:eq("+endIndex+")").attr("class","highlight"); //highlight the end circle for the selected row (segment)					
+					$("circle:eq("+endIndex+")").attr("class","highlight"); //highlight the end circle for the selected row (segment)
+					$("canvas:eq("+startIndex+")").attr("class","highlight"); //highlight the start canvas for the selected row (segment)
+					$("canvas:eq("+endIndex+")").attr("class","highlight"); //highlight the end canvas for the selected row (segment)
 					$("circle").css("cursor","not-allowed");
 					$("canvas").css("cursor","not-allowed");
 
@@ -959,10 +904,11 @@
 			//land use
 			$(document).ready(function(){
 				$(document).on("click",".landUseInput",function(e){ //listen for a click on a changeProcessInput <li>					
-					$(".landUseInput.active").removeClass("active"); //clear any .changeProcessInput "active" classes so that this will be the only one
+					//$(".landUseInput.active").removeClass("active"); //clear any .changeProcessInput "active" classes so that this will be the only one
+					closeDropAndRecord();
 					var thisInput = $(this);
-					$("tr.vertex.active").removeClass("active"); //make sure there are no active rows for changeProcessInput
-					$("circle.highlight").attr("class","selected"); //make sure there are no highlighed circles - MIGHT NOT NEED THIS???
+					//$("tr.vertex.active").removeClass("active"); //make sure there are no active rows for changeProcessInput
+					//$("circle.highlight").attr("class","selected"); //make sure there are no highlighed circles - MIGHT NOT NEED THIS???
 					
 					thisInput.addClass("active"); //set this .landUseInput <td> as the "active" class so that when a selection is made from the #changeProcessList dropdown it knows which <td> to place it in
 					dropInputLists(thisInput, "landUseDiv", -1, -1, 1); //show the dropdown				
@@ -975,11 +921,12 @@
 					
 					//fill in the forms with info from the table - will be blank at first but will reflect the input information if the change process input is clicked on again					
 					appendLUnotes(selection);					
-					changeNoteIcon("#LUnotesList", thisOne);
+					changeNoteIcon("#LUnotesList", thisOne, "landUse");
 					
 					//point highlighting
 					var thisIndex = lineInfo.vertices[thisOne].index;
 					$("circle:eq("+thisIndex+")").attr("class","highlight");
+					$("canvas:eq("+thisIndex+")").attr("class","highlight");
 					$("circle").css("cursor","not-allowed");
 					$("canvas").css("cursor","not-allowed");
 
@@ -990,27 +937,39 @@
 			//land cover
 			$(document).ready(function(){
 				$(document).on("click",".landCoverInput",function(e){ //listen for a click on a changeProcessInput <li>					
-					$(".landCoverInput.active").removeClass("active"); //clear any .changeProcessInput "active" classes so that this will be the only one
+					//$(".landCoverInput.active").removeClass("active"); //clear any .changeProcessInput "active" classes so that this will be the only one
+					closeDropAndRecord();
 					var thisInput = $(this);
-					$("tr.vertex.active").removeClass("active"); //make sure there are no active rows for changeProcessInput
-					$("circle.highlight").attr("class","selected"); //make sure there are no highlighed circles - MIGHT NOT NEED THIS???
+					//$("tr.vertex.active").removeClass("active"); //make sure there are no active rows for changeProcessInput
+					//$("circle.highlight").attr("class","selected"); //make sure there are no highlighed circles - MIGHT NOT NEED THIS???
 					
 					thisInput.addClass("active"); //set this .landCoverInput <td> as the "active" class so that when a selection is made from the #changeProcessList dropdown it knows which <td> to place it in
 					dropInputLists(thisInput, "landCoverDiv", -1, -1, 1); //show the dropdown				
 					thisInput.closest("tr").addClass("active");
 					
 					//point highlighting
-					var thisOne = $("tr.vertex .landCoverInput").index(thisInput);
-					var selection = lineInfo.vertices[thisOne].landCover.dominant;
-					//$("#landCoverSelection").text(selection);
-					
-					//fill in the forms with info from the table - will be blank at first but will reflect the input information if the change process input is clicked on again					
-					appendLCnotes(selection);					
-					changeNoteIcon("#LCnotesList", thisOne);
-					
+					var thisOne = $("tr.vertex .landCoverInput").index(thisInput),
+						selection = lineInfo.vertices[thisOne].landCover.dominant;
+									
+					//change the note icon depending on whether the note is selected or not
+					theseLi = $("#LCnotesList li")
+					theseLi.each(function(i){
+						var thisLi = $(this),
+							note = thisLi.attr("class"),
+							span = thisLi.children("span");
+							noteNull = lineInfo.vertices[thisOne].landCover.other[note];		
+						if(noteNull == null){
+							span.replaceWith('<span class="glyphicon glyphicon-unchecked"></span> ')
+						} else{
+							span.replaceWith('<span class="glyphicon glyphicon-ok"></span> ');
+							thisLi.addClass("selected");
+						}
+					});
+				
 					//point highlighting
 					var thisIndex = lineInfo.vertices[thisOne].index;
 					$("circle:eq("+thisIndex+")").attr("class","highlight");
+					$("canvas:eq("+thisIndex+")").attr("class","highlight");
 					$("circle").css("cursor","not-allowed");
 					$("canvas").css("cursor","not-allowed");
 
@@ -1019,8 +978,157 @@
             });				
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+//DROP THE SELECTION LISTS ON CLICK///////////////////////////////////////////////////////////////////
+			//change process
+			$("#changeProcessSelection").click(function(e){			
+				$("#changeProcessList").show();
+				e.stopPropagation();
+			});
+			
+			//land use
+			$("#landUseSelection").click(function(e){			
+				$("#landUseList").show();
+				e.stopPropagation();
+			});
+			
+			//land cover
+			$("#landCoverSelection").click(function(e){			
+				$("#landCoverList").show();
+				e.stopPropagation();
+			});
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+			
+						
+//DONE BUTTON EVENT HANDLERS////////////////////////////////////////////////////////////////////////////
+			//when done buttons are clicked close their dropdown and record  the info in the inputs to the lineInfo object
+			$(".doneBtn").click(function(){
+				closeDropAndRecord();
+			});
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
 			
 			
+//DISPLAY THE CONDITIONAL NOTES ONCE A CHANGE PROCESS HAS BEEN SELECTED/////////////////
+			//change process
+			$(document).ready(function(){
+				$("#changeProcessList li").click(function(){ //click anywhere to get rid of the .dropThis dropdowns
+						var selection = $(this).text();
+						$("#changeProcessList").hide();
+						$("td.changeProcessInput.active").text(selection); //,#changeProcessSelection, 				
+						appendCPnotes(selection);
+						$("#CPnotesList li").prepend('<span class="glyphicon glyphicon-unchecked"></span> ');			
+				});
+			});
+			
+			//land use
+			$(document).ready(function(){
+				$("#landUseList li").click(function(){
+						var selection = $(this).text();
+						$("#landUseList").hide();
+						$("td.landUseInput.active").text(selection); //,#landUseSelection, 					
+						appendLUnotes(selection);
+						$("#LUnotesList li").prepend('<span class="glyphicon glyphicon-unchecked"></span> ');			
+				});
+			});
+			
+			//land cover
+			$(document).ready(function(){
+				$("#landCoverList li").click(function(){
+						var selection = $(this).text();
+						$("#landCoverList").hide();
+						$("td.landCoverInput.active").text(selection); //,#landCoverSelection,				
+				});
+			});
+/////////////////////////////////////////////////////////////////////////////////////////
+			
+			
+//MAKE THE NOTE CHECKBOXES TOGGLE ON AND OFF AND SET THE "SELECTED" CLASS////////////////
+			//#CPnotesList li SELECTION AND CHECKBOXES
+			$(document).ready(function(){
+				$(document).on("click","#CPnotesList li", function(){
+					var selected = $(this);
+					if(selected.hasClass("selected")){
+						selected.removeClass("selected");
+						$("span", this).replaceWith('<span class="glyphicon glyphicon-unchecked"></span> ');
+					} else {
+						selected.addClass("selected");
+						$("span", this).replaceWith('<span class="glyphicon glyphicon-ok"></span> ');
+					}
+				});
+			});
+			
+			//#LUnotesList li SELECTION AND CHECKBOXES
+			$(document).ready(function(){
+				$(document).on("click","#LUnotesList li", function(){
+					var selected = $(this);
+					if(selected.hasClass("selected")){
+						selected.removeClass("selected");
+						$("span", this).replaceWith('<span class="glyphicon glyphicon-unchecked"></span> ');
+					} else {
+						selected.addClass("selected");
+						$("span", this).replaceWith('<span class="glyphicon glyphicon-ok"></span> ');
+					}
+				});
+			});
+			
+			//#LCnotesList li SELECTION AND CHECKBOXES
+			$(document).ready(function(){
+				$(document).on("click","#LCnotesList li", function(){
+					var selected = $(this);
+					if(selected.hasClass("selected")){
+						selected.removeClass("selected");
+						$("span", this).replaceWith('<span class="glyphicon glyphicon-unchecked"></span> ');
+					} else {
+						selected.addClass("selected");
+						$("span", this).replaceWith('<span class="glyphicon glyphicon-ok"></span> ');
+					}
+				});
+			});
+//////////////////////////////////////////////////////////////////////////////////////////
+
+			//highlight selected circles, canvases, and input row when the magnifying glass is clicked
+			$(document).ready(function(){
+				$(document).on("click","td.highlightIt", function(){
+					var thisTr = $(this).closest("tr");
+					if(thisTr.hasClass("active")){
+						circleHighlightOff();
+						closeDropAndRecord();						
+					} else {
+						circleHighlightOff();
+						closeDropAndRecord();
+						if(thisTr.hasClass("segment")){
+							thisTr.addClass("active");
+							thisOne = $("tr.segment").index(thisTr);
+							
+//TODO						//THESE LINES TO TURN ON CIRCLE AND CANVAS HIGHLIGHTING ARE REPEATED - MAKE INTO A FUNCTION
+							var startIndex = lineInfo.segments[thisOne].startIndex;
+							var endIndex = lineInfo.segments[thisOne].endIndex;
+							$("circle:eq("+startIndex+")").attr("class","highlight");
+							$("circle:eq("+endIndex+")").attr("class","highlight");
+							$("canvas:eq("+startIndex+")").attr("class","highlight");
+							$("canvas:eq("+endIndex+")").attr("class","highlight");
+							$("circle").css("cursor","not-allowed");
+							$("canvas").css("cursor","not-allowed");
+						} else {
+							thisTr.addClass("active");
+							thisOne = $("tr.vertex").index(thisTr);
+							var thisIndex = lineInfo.vertices[thisOne].index;
+							$("circle:eq("+thisIndex+")").attr("class","highlight");
+							$("canvas:eq("+thisIndex+")").attr("class","highlight");
+							$("circle").css("cursor","not-allowed");
+							$("canvas").css("cursor","not-allowed");
+						}
+					}
+				});
+			});
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+//UNIQUE FUNCTIONS//////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 //APPEND NOTES TO THE NOTES DIV///////////////////////////////////////////////////////////////////	
 			//change process
 			function appendCPnotes(selection){					
@@ -1075,233 +1183,200 @@
 				}
 			}
 			
-			//land cover - this one is static would not need to append each time
-			function appendLCnotes(selection){					
-				$("#LCnotesList").empty();				
-				$("#LCnotesList").append(
-					'<li class="trees">Trees</li><li class="shrubs">Shrubs</li>'+
-					'<li class="grassForbHerb">Grass/forb/herb</li>'+
-					'<li class="impervious">Impervious</li>'+
-					'<li class="naturalBarren">Natural/barren</li>'+
-					'<li class="SnowIce">Snow/ice</li><li class="water">Water</li>'
-				);
-			}
-////////////////////////////////////////////////////////////////////////////////////////////////////////			
-
-
-
-//DROP THE SELECTION LISTS ON CLICK///////////////////////////////////////////////////////////////////
-			//change process
-			$("#changeProcessSelection").click(function(e){			
-				$("#changeProcessList").show();
-				e.stopPropagation();
-			});
 			
-			//land use
-			$("#landUseSelection").click(function(e){			
-				$("#landUseList").show();
-				e.stopPropagation();
-			});
-			
-			//land cover
-			$("#landCoverSelection").click(function(e){			
-				$("#landCoverList").show();
-				e.stopPropagation();
-			});
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-			
-						
-//DONE BUTTON EVENT HANDLERS////////////////////////////////////////////////////////////////////////////
-			//change process
-			$("#changeProcessDoneBtn").click(function(){
+//DONE BUTTON FUNCTION TO CLOSE DROPDOWN MENUS AND RECORD INFO FROM THE FORM INPUTS TO THE LINEINFO OBJECT						
+			function changeProcessDoneBtn(){
 				$("#changeProcessDiv").hide();
+				$("#changeProcessList").hide();
 				
 				//remove the highlighted circle class - could find the highlighted class and only change that one (current implementation) or just reset all selected circles (commented out)
-				circleHighlightOff("segment");
-				//$("circle.highlight").attr("class","selected");			
-				//$("tr.segment.active").removeClass("active"); //remove the land use row from the active class			
-				//$("circle").css("cursor","pointer");
-				//$("canvas").css("cursor","pointer");
+				circleHighlightOff();
 				
 				//fill in the lineInfo object
-				var thisOne = $(".changeProcessInput").index($(".changeProcessInput.active"));
+				var thisOne = $(".changeProcessInput").index($(".changeProcessInput.active"))+1;
 				var selection = $("td.changeProcessInput.active").text();
 				
-				lineInfo.segments[thisOne].changeProcess = selection;			
+				
+				lineInfo.vertices[thisOne].changeProcess.changeProcess = selection;		
 				switch(selection){
 					case "Fire":
-						fillInNotes("#CPnotesList .selected",lineInfo,thisOne,"natural");
-						fillInNotes("#CPnotesList .selected",lineInfo,thisOne,"prescribed");
-						fillInNotes("#CPnotesList .selected",lineInfo,thisOne,"sitePrepFire");
-						break;
+						fillInNotes("#CPnotesList .selected",thisOne,"natural","changeProcess");
+						fillInNotes("#CPnotesList .selected",thisOne,"prescribed","changeProcess");
+						fillInNotes("#CPnotesList .selected",thisOne,"sitePrepFire","changeProcess");
+					break;
 					case "Harvest":
-						fillInNotes("#CPnotesList .selected",lineInfo,thisOne,"clearcut");
-						fillInNotes("#CPnotesList .selected",lineInfo,thisOne,"thinning");
-						fillInNotes("#CPnotesList .selected",lineInfo,thisOne,"sitePrepFire");						
-						break;
+						fillInNotes("#CPnotesList .selected",thisOne,"clearcut","changeProcess");
+						fillInNotes("#CPnotesList .selected",thisOne,"thinning","changeProcess");
+						fillInNotes("#CPnotesList .selected",thisOne,"sitePrepFire","changeProcess");						
+					break;
 					case "Decline":								
-						break;
+					break;
 					case "Wind":								
-						break;
+					break;
 					case "Hydrology":
-						fillInNotes("#CPnotesList .selected",lineInfo,thisOne,"flooding");
-						fillInNotes("#CPnotesList .selected",lineInfo,thisOne,"reserviorLakeFlux");											
-						break;
+						fillInNotes("#CPnotesList .selected",thisOne,"flooding","changeProcess");
+						fillInNotes("#CPnotesList .selected",thisOne,"reserviorLakeFlux","changeProcess");											
+					break;
 					case "Debris":								
-						break;
+					break;
 					case "Growth":							
-						break;
+					break;
 					case "Stable":							
-						break;
+					break;
 					case "Conversion":
-						fillInNotes("#CPnotesList .selected",lineInfo,thisOne,"wetlandDrainage");						
-						break;
+						fillInNotes("#CPnotesList .selected",thisOne,"wetlandDrainage","changeProcess");						
+					break;
 					case "Other":
-						break;						
+					break;						
 				}
-				fillInNotes("#CPnotesList .selected",lineInfo,thisOne,"airphotoOnly");
-			});
+				fillInNotes("#CPnotesList .selected",thisOne,"airphotoOnly","changeProcess");
+			}
 			
 			//land use
-			$(document).ready(function(){
-				$("#landUseDoneBtn").click(function(){
-					console.log("im done!");
-					$("#landUseDiv").hide(); //hide the dropdown
-					
-					//remove the highlighted circle class - could find the highlighted class and only change that one (current implementation) or just reset all selected circles (commented out)				
-					circleHighlightOff("vertex");
+			function landUseDoneBtn(){				
+				$("#landUseDiv").hide(); //hide the dropdown
+				$("#landUseList").hide();
 				
-					//fill in the lineInfo object
-					var thisOne = $(".landUseInput").index($(".landUseInput.active"));
-					var selection = $("td.landUseInput.active").text();
+				//remove the highlighted circle class - could find the highlighted class and only change that one (current implementation) or just reset all selected circles (commented out)				
+				circleHighlightOff();
+				
+				//fill in the lineInfo object
+				var thisOne = $(".landUseInput").index($(".landUseInput.active"));
+				var selection = $("td.landUseInput.active").text();
+				
+				lineInfo.vertices[thisOne].landUse.dominant = selection;			
+				switch(selection){
+					case "Forest":
+						fillInNotes("#LUnotesList .selected",thisOne,"wetland","landUse");
+					break;
+					case "Developed":
+						fillInNotes("#LUnotesList .selected",thisOne,"mining","landUse");
 					
-					lineInfo.vertices[thisOne].landUse.dominant = selection;			
-					switch(selection){
-						case "Forest":
-							fillInNotes("#LUnotesList .selected",lineInfo,thisOne,"wetland");
-							break;
-						case "Developed":
-							fillInNotes("#LUnotesList .selected",lineInfo,thisOne,"mining");
+					break;
+					case "Agriculture":								
+						fillInNotes("#LUnotesList .selected",thisOne,"rowCrop","landUse");
+						fillInNotes("#LUnotesList .selected",thisOne,"orchardTreeFarm","landUse");
+						fillInNotes("#LUnotesList .selected",thisOne,"vineyardsOtherWoody","landUse");
+					break;					
+				}		
+			}
+	
+			//land cover
+			function landCoverDoneBtn(){			
+				$("#landCoverDiv").hide(); //hide the dropdown
+				$("#landCoverList").hide();
+				
+				//remove the highlighted circle class - could find the highlighted class and only change that one (current implementation) or just reset all selected circles (commented out)				
+				circleHighlightOff();
+			
+				//fill in the lineInfo object
+				var thisOne = $(".landCoverInput").index($(".landCoverInput.active"));
+				var selection = $("td.landCoverInput.active").text();
+				
+				lineInfo.vertices[thisOne].landCover.dominant = selection;			
+				
+				fillInNotes("#LCnotesList .selected",thisOne,"trees","landCover");
+				fillInNotes("#LCnotesList .selected",thisOne,"shrubs","landCover");
+				fillInNotes("#LCnotesList .selected",thisOne,"grassForbHerb","landCover");
+				fillInNotes("#LCnotesList .selected",thisOne,"impervious","landCover");
+				fillInNotes("#LCnotesList .selected",thisOne,"naturalBarren","landCover");
+				fillInNotes("#LCnotesList .selected",thisOne,"SnowIce","landCover");
+				fillInNotes("#LCnotesList .selected",thisOne,"water","landCover");
+				$("#LCnotesList .selected").removeClass("selected");		
+			}				
 						
-							break;
-						case "Agriculture":								
-							fillInNotes("#LUnotesList .selected",lineInfo,thisOne,"rowCrop");
-							fillInNotes("#LUnotesList .selected",lineInfo,thisOne,"orchardTreeFarm");
-							fillInNotes("#LUnotesList .selected",lineInfo,thisOne,"vineyardsOtherWoody");
-							break;					
-					}
-				});
-			});	
+////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-			//land cover
-			$(document).ready(function(){
-				$("#landCoverDoneBtn").click(function(){
-					$("#landCoverDiv").hide(); //hide the dropdown
-					
-					//remove the highlighted circle class - could find the highlighted class and only change that one (current implementation) or just reset all selected circles (commented out)				
-					circleHighlightOff("vertex");
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+//SHARED FUNCTIONS//////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+			//function to sync the segments form to the selected vertices
+			function updateSegmentForm(){
+				$(".segment").remove();
+				$(".vertex").remove();
+				lineInfo = {vertices:[],segments:[]}
+				var yearStart = 0,
+					yearEnd = 0,
+					len = selectedCircles.length,
+					startIndex = 0,
+					endIndex = 0,
+					i = 0;
 				
-					//fill in the lineInfo object
-					var thisOne = $(".landCoverInput").index($(".landCoverInput.active"));
-					var selection = $("td.landCoverInput.active").text();
-					
-					lineInfo.vertices[thisOne].landCover.dominant = selection;			
-					
-					fillInNotes("#LCnotesList .selected",lineInfo,thisOne,"trees");
-					fillInNotes("#LCnotesList .selected",lineInfo,thisOne,"shrubs");
-					fillInNotes("#LCnotesList .selected",lineInfo,thisOne,"grassForbHerb");
-					fillInNotes("#LCnotesList .selected",lineInfo,thisOne,"impervious");
-					fillInNotes("#LCnotesList .selected",lineInfo,thisOne,"naturalBarren");
-					fillInNotes("#LCnotesList .selected",lineInfo,thisOne,"SnowIce");
-					fillInNotes("#LCnotesList .selected",lineInfo,thisOne,"water");
-					
-				});
-			});				
-//////////////////////////////////////////////////////////////////////////////////////////////////////////
+				//make empty segment entries
+				for(i; i < len-1; i++){
+					startIndex = selectedCircles[i];
+					endIndex = selectedCircles[i+1];
+					yearStart = years[startIndex];
+					yearEnd =   years[endIndex];
+					$("#segmentsFormTbl").append('<tr class="segment"><td class="highlightIt"><span class="glyphicon glyphicon-search"></span></td><td>'+yearStart+'</td><td>'+yearEnd+'</td><td class="changeProcessInput formDrop"></td></tr>');
+					lineInfo.segments.push({
+						startYear:yearStart,endYear:yearEnd,startIndex:startIndex,endIndex:endIndex,changeProcess:"",
+						notes:{
+							natural:null,
+							prescribed:null,
+							sitePrepFire:null,
+							airphotoOnly:null,
+							clearcut:null,
+							thinning:null,
+							flooding:null,
+							reserviorLakeFlux:null,
+							wetlandDrainage:null
+						}
+					});
+				}
+				
+				//make empty vertex entries
+				for(i=0; i < len; i++){
+					startIndex = selectedCircles[i];
+					yearStart = years[startIndex];
+					$("#verticesFormTbl").append('<tr class="vertex"><td class="highlightIt"><span class="glyphicon glyphicon-search"></span></td><td>'+yearStart+'</td><td class="landUseInput formDrop"></td><td class="landCoverInput formDrop"></td></tr>');
+					lineInfo.vertices.push({
+						year:yearStart,index:startIndex,
+						landUse:{
+							dominant:"",
+							notes:{
+								wetland:null,
+								mining:null,
+								rowCrop:null,
+								orchardTreeFarm:null,
+								vineyardsOtherWoody:null
+							}
+						
+						},
+						landCover:{
+							dominant:"",
+							other:{
+								trees:null,
+								shrubs:null,
+								grassForbHerb:null,
+								impervious:null,
+								naturalBarren:null,
+								SnowIce:null,
+								water:null
+							}
+						},
+						changeProcess:{
+							changeProcess:"",
+							notes:{
+								natural:null,
+								prescribed:null,
+								sitePrepFire:null,
+								airphotoOnly:null,
+								clearcut:null,
+								thinning:null,
+								flooding:null,
+								reserviorLakeFlux:null,
+								wetlandDrainage:null
+							}
+						}
+					});
+				}
+			}	
 			
 			
-//DISPLAY THE CONDITIONAL NOTES ONCE A CHANGE PROCESS HAS BEEN SELECTED/////////////////
-			//change process
-			$(document).ready(function(){
-				$("#changeProcessList li").click(function(){ //click anywhere to get rid of the .dropThis dropdowns
-						var selection = $(this).text();
-						$("#changeProcessList").hide();
-						$("td.changeProcessInput.active").text(selection);	//#changeProcessSelection, 				
-						appendCPnotes(selection);
-						$("#CPnotesList li").prepend('<span class="glyphicon glyphicon-unchecked"></span> ');			
-				});
-			});
-			
-			//land use
-			$(document).ready(function(){
-				$("#landUseList li").click(function(){
-						var selection = $(this).text();
-						$("#landUseList").hide();
-						$("td.landUseInput.active").text(selection);	//#landUseSelection, 					
-						appendLUnotes(selection);
-						$("#LUnotesList li").prepend('<span class="glyphicon glyphicon-unchecked"></span> ');			
-				});
-			});
-			
-			//land cover
-			$(document).ready(function(){
-				$("#landCoverList li").click(function(){
-						var selection = $(this).text();
-						$("#landCoverList").hide();
-						$("td.landCoverInput.active").text(selection);		 //#landCoverSelection, 				
-						appendLCnotes(selection);
-						$("#LCnotesList li").prepend('<span class="glyphicon glyphicon-unchecked"></span> ');			
-				});
-			});
-/////////////////////////////////////////////////////////////////////////////////////////
-			
-			
-//MAKE THE NOTE CHECKBOXES TOGGLE ON AND OFF AND SET THE "SELECTED" CLASS////////////////
-			//#CPnotesList li SELECTION AND CHECKBOXES
-			$(document).ready(function(){
-				$(document).on("click","#CPnotesList li", function(){
-					var selected = $(this);
-					if(selected.hasClass("selected")){
-						selected.removeClass("selected");
-						$("span", this).replaceWith('<span class="glyphicon glyphicon-unchecked"></span> ');
-					} else {
-						selected.addClass("selected");
-						$("span", this).replaceWith('<span class="glyphicon glyphicon-ok"></span> ');
-					}
-				});
-			});
-			
-			//#LUnotesList li SELECTION AND CHECKBOXES
-			$(document).ready(function(){
-				$(document).on("click","#LUnotesList li", function(){
-					var selected = $(this);
-					if(selected.hasClass("selected")){
-						selected.removeClass("selected");
-						$("span", this).replaceWith('<span class="glyphicon glyphicon-unchecked"></span> ');
-					} else {
-						selected.addClass("selected");
-						$("span", this).replaceWith('<span class="glyphicon glyphicon-ok"></span> ');
-					}
-				});
-			});
-			
-			//#LCnotesList li SELECTION AND CHECKBOXES
-			$(document).ready(function(){
-				$(document).on("click","#LCnotesList li", function(){
-					var selected = $(this);
-					if(selected.hasClass("selected")){
-						selected.removeClass("selected");
-						$("span", this).replaceWith('<span class="glyphicon glyphicon-unchecked"></span> ');
-					} else {
-						selected.addClass("selected");
-						$("span", this).replaceWith('<span class="glyphicon glyphicon-ok"></span> ');
-					}
-				});
-			});
-//////////////////////////////////////////////////////////////////////////////////////////
-
-			
-//SHARED FUNCTIONS/////////////////////////////////////////////////////////////////////////			
 			//function to show a dropdown for the land use and change process inputs
 			function dropInputLists(thisInput, thisList, xAdj, yAdj, widthAdj){
 				var rowPos = thisInput.position(),
@@ -1309,40 +1384,68 @@
 					bottomLeft = rowPos.left,
 					bottomWidth = thisInput[0].getBoundingClientRect().width,
 					bottomHeight = thisInput[0].getBoundingClientRect().height
-					//bottomWidth = thisInput.css("width"),
-					//bottomHeight = thisInput.css("height")
-					console.log()
 					
 				//drop its dropdown based on the position of the clicked element
 				$("#"+thisList).css({
 					position: "absolute",
 					top: (bottomTop+parseFloat(bottomHeight)+yAdj),
 					left: bottomLeft+xAdj,
-					width: (parseFloat(bottomWidth)+widthAdj+"px")//+1, //THIS COULD BE HARDWIRED WHEN WE FIGURE OUT WHAT SIZE EVERYTHING SHOULD BE
-					//marginLeft: "-1px"
+					width: (parseFloat(bottomWidth)+widthAdj+"px")
 				}).show();
 			}
 			
 			//fill in note check box status in the lineInfo object when the done button is pressed
-			function fillInNotes(selector, lineInfo, thisOne, noteClass){
-				if($(selector).hasClass(noteClass)){
-					lineInfo.segments[thisOne].notes[noteClass] = true;
-				} else {
-					lineInfo.segments[thisOne].notes[noteClass] = null;
+			function fillInNotes(selector, thisOne, noteClass, inputType){
+				noteClassSelected = $(selector).hasClass(noteClass);
+				switch(inputType){
+					case "landUse":
+						if(noteClassSelected){
+							lineInfo.vertices[thisOne].landUse.notes[noteClass] = true;
+						} else {
+							lineInfo.vertices[thisOne].landUse.notes[noteClass] = null;
+						}	
+					break;
+					case "landCover":
+						if(noteClassSelected){
+							lineInfo.vertices[thisOne].landCover.other[noteClass] = true;
+						} else {
+							lineInfo.vertices[thisOne].landCover.other[noteClass] = null;
+						}						
+					break;
+					case "changeProcess":
+						if(noteClassSelected){
+							lineInfo.vertices[thisOne].changeProcess.notes[noteClass] = true;
+						} else {
+							lineInfo.vertices[thisOne].changeProcess.notes[noteClass] = null;
+						}
+					break;
 				}
 			}
 			
 			//function to change the note icon depending on whether the note is selected or not
-			function changeNoteIcon(notesList, thisOne){
+			function changeNoteIcon(notesList, thisOne, inputType){
 				theseLi = $(notesList+" li")
 				theseLi.each(function(i){
 					var thisLi = $(this)
-					var note = thisLi.attr("class");
-					noteNull = lineInfo.segments[thisOne].notes[note];
+					var noteClass = thisLi.attr("class");
+					
+					switch(inputType){
+						case "landUse":
+							noteNull = lineInfo.vertices[thisOne].landUse.notes[noteClass];
+						break;
+						case "landCover":
+							noteNull = lineInfo.vertices[thisOne].landCover.other[noteClass];
+						break;
+						case "changeProcess":
+							noteNull = lineInfo.vertices[thisOne].changeProcess.notes[noteClass];
+						break;
+					}
+					
+					//noteNull = lineInfo.segments[thisOne].notes[noteClass];
 					if(noteNull == null){
-						theseLi.eq(i).prepend('<span class="glyphicon glyphicon-unchecked"></span> ')
+						thisLi.prepend('<span class="glyphicon glyphicon-unchecked"></span> ') //theseLi.eq(i)
 					} else{
-						theseLi.eq(i).prepend('<span class="glyphicon glyphicon-ok"></span> ');
+						thisLi.prepend('<span class="glyphicon glyphicon-ok"></span> '); //theseLi.eq(i)
 						thisLi.addClass("selected");
 					}
 				});
@@ -1351,43 +1454,32 @@
 			//turn circle highlighting off
 			function circleHighlightOff(linePart){
 				//linePart eq vertex | segment
-				$("circle.highlight").attr("class","selected");			
-				$("tr."+linePart+".active").removeClass("active"); //remove the land use row from the active class			
+				$("circle.highlight").attr("class","selected");
+				$("canvas.highlight").attr("class","selected");				
+				//$("tr."+linePart+".active").removeClass("active"); //remove the land use row from the active class			
+				$("tr.active").removeClass("active"); //remove the land use row from the active class			
 				$("circle").css("cursor","pointer");
 				$("canvas").css("cursor","pointer");
+			}
+			
+			//figure out which dropdown to close and what info to record
+			function closeDropAndRecord(){
+				var tdActive = $("td.active");
+				if(tdActive.hasClass("changeProcessInput")){
+					console.log("im in changeProcessInput!");
+					changeProcessDoneBtn();	
+				} else if(tdActive.hasClass("landUseInput")){
+					console.log("im in landUseInput!");
+					landUseDoneBtn();
+				} else if(tdActive.hasClass("landCoverInput")){
+					console.log("im in landCoverInput!");
+					landCoverDoneBtn();	
+				}
+				tdActive.removeClass("active");
 			}
 /////////////////////////////////////////////////////////////////////////////////////////
 			
 			
-			
-			
-			
-			
-			
-
-			
-
-			
-			
-			
-			
-			
-			
-			
-			//fill in the text for the dominant land use
-			//$("#landUseList li").click(function(){
-			//	$("#dominantUse").text($(this).text());
-			//	$("td.landUseInput.active").text($(this).text());
-			//});
-			
-			
-			//MAKE THE SELECTION LIST HIDE
-			//make the landUseList div list go hide after it has been clicked
-			//$(document).ready(function(){
-			//	$("#landUseList").click(function(){ //click anywhere to get rid of the .dropThis dropdowns
-			//			$("#landUseList").hide();
-			//	});
-			//});
 			
 			
 			
