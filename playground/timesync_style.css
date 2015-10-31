@@ -2,19 +2,29 @@ html {
 	overflow-y: scroll;
 }			
 
-/*  DONT THIS IS NEEDED
-body {
-	-webkit-touch-callout: none;
-	-webkit-user-select: none;
-	-khtml-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	user-select: none;
-}
-*/
 body {
 	font-size:11px;
 }
+
+/*############## CHIP INPUTS ###############################################################*/
+#chipInputs{
+	margin-top:2px;
+}
+
+#chipSizeDiv, #plotSizeDiv{
+	margin-right:15px;
+}
+#chipInputs input{
+	width:60px;
+}
+
+input[type=range]{
+	display:inline-block;
+	width:200px;
+ 
+}
+
+/*###########################################################################################*/
 
 /*############## TRAJECTORY PLOT ###############################################################*/
 .axis path,
@@ -122,21 +132,7 @@ svg{
 	
 }
 
-#chipInputs{
-	margin-top:5px;
-}
 
-#chipSizeDiv{
-	margin-right:15px;
-}
-
-.chipInputsEdit{
-	border:1px solid #afafaf; 
-	width:30px; 
-	height:16px;
-	padding-left:3px;
-	cursor:pointer;
-}
 
 #containerDiv{
 	display:table;
@@ -186,14 +182,12 @@ svg{
 	margin-right:-1px;
 }
 .test li{
-	text-align: left;
+	/*text-align: left;*/
 	width: 75px;
 	display: inline-block;
-	font-size: 12px;
+	/*font-size:12px;*/
 	font-weight: bold;
-	padding-left: 3px;
-	padding-right: 3px;
-	padding-bottom: 3px;
+	padding: 0px 3px 3px 3px;
 	border: 1px solid #afafaf;
 	cursor: pointer;
 }
@@ -347,31 +341,15 @@ tr.active{
 	margin-left:3px;
 }
 
-.tableDisplayCell{
-	display: table-cell;
-	vertical-align:top;
-}
-
-
-
-
-#commentsChkBxDiv p{
-	margin-left:-3px;
-}
-
-#uncertaintyDiv{
-	margin-top:10px;
-}
-
 
 #commentInput{
-	height:250px;
-	width:98%;
+	/*height:250px;*/
+	height:270px;
+	width:100%;
 }
 
 #commentInputDiv{
-	padding-left:15px;
-	
+	margin:0px 3px 3px 3px;
 }
 
 /*############## TRAJECTORY PLOT BUTTONS ####################################################*/

@@ -26,42 +26,35 @@
 				<p id="title" style="display:inline-block;">TimeSync - v3.0</p>
 				<div id="chipInputs" style="display:inline-block;">
 					<div id="chipSizeDiv" style="display:inline-block;">
-						<p style="display:inline-block;">Chip Size:</p>
-						<div style="display:inline-block;">
-							<div id="chipSize" class="chipInputsEdit">195</div>
-							<div id="chipSizeList" class="dropThis">
-								<ul>
-									<li>95</li>
-									<li>195</li>
-									<li>255</li>
-								</ul>
-							</div>
-						</div>
+						<p style="display:inline-block;">Chip Size</p>
+						<!-- <div style="display:inline-block;"> -->
+							<input id="chipSize" autocomplete="off" type="number" name="chipSize" min="135" max="255" step="20" value="195">
+						<!-- </div> -->
+					</div>
+					<div id="plotSizeDiv" style="display:inline-block;">
+						<p style="display:inline-block;">Plot Size</p>
+						<!-- <div style="display:inline-block;"> -->
+							<input id="plotSize" autocomplete="off" type="number" name="plotSize" min="1" max="5" step="2" value="1">
+						<!-- </div> -->
 					</div>
 					<div style="display:inline-block;">
-						<p style="display:inline-block;">Plot Size:</p>
-						<div style="display:inline-block;">
-							<div id="plotSize" class="chipInputsEdit">1</div>
-							<div id="plotSizeList" class="dropThis">
-								<ul>
-									<li>1</li>
-									<li>9</li>
-									<li>25</li>
-								</ul>
-							</div>
-						</div>
+						<p style="display:inline-block;">Zoom </p>
+						<!-- <div style="display:inline-block;"> -->
+						<span class="glyphicon glyphicon-minus"></span>
+						<input id="zoomSize" autocomplete="off" style="width:100px; margin-bottom:-4px;" type="range" name="zoomSize" min="0" max="40" value="20">
+						<span class="glyphicon glyphicon-plus"></span>
+						<!-- </div> -->
 					</div>
+					
 				</div>
 				
-				
-				
-				<!-- <input id="plotSize" autocomplete="off" type="text" name="FirstName" value="1"></p> -->
+			
 			</div>
 			<div id="containerDiv">
 				<div id="plotSelectionDiv" class="sectionDiv">
 					<p class="header">Plots</p>
 					<ul> <!-- the <li>'s will be filled in on-the-fly -->
-						<li class="plotList selected">123
+						<li class="plotList selected">12312
 						<li class="plotList unselected">456
 						<li class="plotList unselected">789
 						<li class="plotList unselected">456
@@ -297,7 +290,7 @@
 				
 				<div id="commentsSection" class="sectionDiv">
 					<p class="header">Comments</p>
-					<div id="commentInputDiv" class="tableDisplayCell">
+					<div id="commentInputDiv">
 						<textarea id="commentInput" autocomplete="off"></textarea>
 					</div>
 				</div>
@@ -750,14 +743,16 @@
 			$("#btnLine").click(function(){
 				if ($("#lineDisplayThumb").attr("class") == "glyphicon glyphicon-thumbs-up"){
 					$("#lineDisplayThumb").removeClass("glyphicon glyphicon-thumbs-up")
-						.addClass("glyphicon glyphicon-thumbs-down");
-					$("circle.selected").css("stroke-width","0");
-					$("#plotLine").css("stroke-width","0");
+						.addClass("glyphicon glyphicon-thumbs-down");					
+					$("circle.selected").css("stroke-opacity","0");
+					$("circle.highlight").css("stroke-opacity","0");
+					$("#plotLine").css("stroke-opacity","0");
 				} else{
 					$("#lineDisplayThumb").removeClass("glyphicon glyphicon-thumbs-down")
 						.addClass("glyphicon glyphicon-thumbs-up");
-					$("circle.selected").css("stroke-width","1");
-					$("#plotLine").css("stroke-width","2");
+					$("circle.selected").css("stroke-opacity","1");
+					$("circle.highlight").css("stroke-opacity","1");
+					$("#plotLine").css("stroke-opacity","1");
 				}
 			});
 
@@ -843,7 +838,7 @@
 			$("#segmentsFormTab").click(function(){	
 				var status = $("#segmentsFormTab").attr("class");
 				if(status == "unselected"){
-					circleHighlightOff();
+					highlightOff();
 					closeDropAndRecord();
 					$("#segmentsFormTab").attr("class","selected");
 					$("#verticesFormTab").attr("class","unselected");
@@ -854,7 +849,7 @@
 			$("#verticesFormTab").click(function(){				
 				var status = $("#verticesFormTab").attr("class");
 				if(status == "unselected"){
-					circleHighlightOff();
+					highlightOff();
 					closeDropAndRecord();
 					$("#verticesFormTab").attr("class","selected");
 					$("#segmentsFormTab").attr("class","unselected");
@@ -867,14 +862,11 @@
 //INPUT DROP DOWNS AND HIGHLIGHTING CIRCLES PERTAINING TO THE SELECTED ROW//////////////////////
 			//change process
 			$(document).ready(function(){
-				$(document).on("click",".changeProcessInput",function(e){ //listen for a click on a changeProcessInput <li>					
-					//$(".changeProcessInput.active").removeClass("active"); //clear any .changeProcessInput "active" classes so that this will be the only one
+				$(document).on("click",".changeProcessInput",function(e){				
+					highlightOff();
 					closeDropAndRecord();
 					var thisInput = $(this); //store the reference to element as a variable, so we don't have to keep making jquery reference - gets used a lot
-					//$("tr.segment.active").removeClass("active"); //make sure there are no active rows for changeProcessInput
-					//$("circle.highlight").attr("class","selected"); //make sure there are no highlighed circles - MIGHT NOT NEED THIS???
-					
-					
+				
 					thisInput.addClass("active"); //set this .changeProcessInput <td> as the "active" class so that when a selection is made from the #changeProcessList dropdown it knows which <td> to place it in
 					dropInputLists(thisInput, "changeProcessDiv", -1, -1, 1);
 					thisInput.closest("tr").addClass("active");					
@@ -888,27 +880,17 @@
 					changeNoteIcon("#CPnotesList", thisOne, "changeProcess");
 					
 					//point highlighting
-					var startIndex = lineInfo.segments[thisOne-1].startIndex; //pull out the start index for the selected row
-					var endIndex = lineInfo.segments[thisOne-1].endIndex; //pull out the end index for the selected row
-					$("circle:eq("+startIndex+")").attr("class","highlight"); //highlight the start circle for the selected row (segment)
-					$("circle:eq("+endIndex+")").attr("class","highlight"); //highlight the end circle for the selected row (segment)
-					$("canvas:eq("+startIndex+")").attr("class","highlight"); //highlight the start canvas for the selected row (segment)
-					$("canvas:eq("+endIndex+")").attr("class","highlight"); //highlight the end canvas for the selected row (segment)
-					$("circle").css("cursor","not-allowed");
-					$("canvas").css("cursor","not-allowed");
-
-					e.stopPropagation();
+					highlightOn("segment", thisOne); //turn on highlighting for relevant segment vertices
+					e.stopPropagation(); //stop other actions from happening - what are the other actions??? - check
                 });
             });			
 			
 			//land use
 			$(document).ready(function(){
-				$(document).on("click",".landUseInput",function(e){ //listen for a click on a changeProcessInput <li>					
-					//$(".landUseInput.active").removeClass("active"); //clear any .changeProcessInput "active" classes so that this will be the only one
+				$(document).on("click",".landUseInput",function(e){				
+					highlightOff();
 					closeDropAndRecord();
 					var thisInput = $(this);
-					//$("tr.vertex.active").removeClass("active"); //make sure there are no active rows for changeProcessInput
-					//$("circle.highlight").attr("class","selected"); //make sure there are no highlighed circles - MIGHT NOT NEED THIS???
 					
 					thisInput.addClass("active"); //set this .landUseInput <td> as the "active" class so that when a selection is made from the #changeProcessList dropdown it knows which <td> to place it in
 					dropInputLists(thisInput, "landUseDiv", -1, -1, 1); //show the dropdown				
@@ -924,24 +906,17 @@
 					changeNoteIcon("#LUnotesList", thisOne, "landUse");
 					
 					//point highlighting
-					var thisIndex = lineInfo.vertices[thisOne].index;
-					$("circle:eq("+thisIndex+")").attr("class","highlight");
-					$("canvas:eq("+thisIndex+")").attr("class","highlight");
-					$("circle").css("cursor","not-allowed");
-					$("canvas").css("cursor","not-allowed");
-
-					e.stopPropagation();
+					highlightOn("vertex", thisOne); //turn on highlighting for relevant vertex
+					e.stopPropagation(); //stop other actions from happening - what are the other actions??? - check
                 });
             });
 
 			//land cover
 			$(document).ready(function(){
-				$(document).on("click",".landCoverInput",function(e){ //listen for a click on a changeProcessInput <li>					
-					//$(".landCoverInput.active").removeClass("active"); //clear any .changeProcessInput "active" classes so that this will be the only one
+				$(document).on("click",".landCoverInput",function(e){				
+					highlightOff();
 					closeDropAndRecord();
 					var thisInput = $(this);
-					//$("tr.vertex.active").removeClass("active"); //make sure there are no active rows for changeProcessInput
-					//$("circle.highlight").attr("class","selected"); //make sure there are no highlighed circles - MIGHT NOT NEED THIS???
 					
 					thisInput.addClass("active"); //set this .landCoverInput <td> as the "active" class so that when a selection is made from the #changeProcessList dropdown it knows which <td> to place it in
 					dropInputLists(thisInput, "landCoverDiv", -1, -1, 1); //show the dropdown				
@@ -966,14 +941,8 @@
 						}
 					});
 				
-					//point highlighting
-					var thisIndex = lineInfo.vertices[thisOne].index;
-					$("circle:eq("+thisIndex+")").attr("class","highlight");
-					$("canvas:eq("+thisIndex+")").attr("class","highlight");
-					$("circle").css("cursor","not-allowed");
-					$("canvas").css("cursor","not-allowed");
-
-					e.stopPropagation();
+					highlightOn("vertex", thisOne); //turn on highlighting for relevant vertex
+					e.stopPropagation(); //stop other actions from happening - what are the other actions??? - check
                 });
             });				
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1093,32 +1062,18 @@
 				$(document).on("click","td.highlightIt", function(){
 					var thisTr = $(this).closest("tr");
 					if(thisTr.hasClass("active")){
-						circleHighlightOff();
+						highlightOff();
 						closeDropAndRecord();						
 					} else {
-						circleHighlightOff();
+						highlightOff();
 						closeDropAndRecord();
+						thisTr.addClass("active");
 						if(thisTr.hasClass("segment")){
-							thisTr.addClass("active");
 							thisOne = $("tr.segment").index(thisTr);
-							
-//TODO						//THESE LINES TO TURN ON CIRCLE AND CANVAS HIGHLIGHTING ARE REPEATED - MAKE INTO A FUNCTION
-							var startIndex = lineInfo.segments[thisOne].startIndex;
-							var endIndex = lineInfo.segments[thisOne].endIndex;
-							$("circle:eq("+startIndex+")").attr("class","highlight");
-							$("circle:eq("+endIndex+")").attr("class","highlight");
-							$("canvas:eq("+startIndex+")").attr("class","highlight");
-							$("canvas:eq("+endIndex+")").attr("class","highlight");
-							$("circle").css("cursor","not-allowed");
-							$("canvas").css("cursor","not-allowed");
+							highlightOn("segment", thisOne+1);
 						} else {
-							thisTr.addClass("active");
 							thisOne = $("tr.vertex").index(thisTr);
-							var thisIndex = lineInfo.vertices[thisOne].index;
-							$("circle:eq("+thisIndex+")").attr("class","highlight");
-							$("canvas:eq("+thisIndex+")").attr("class","highlight");
-							$("circle").css("cursor","not-allowed");
-							$("canvas").css("cursor","not-allowed");
+							highlightOn("vertex", thisOne);
 						}
 					}
 				});
@@ -1190,7 +1145,7 @@
 				$("#changeProcessList").hide();
 				
 				//remove the highlighted circle class - could find the highlighted class and only change that one (current implementation) or just reset all selected circles (commented out)
-				circleHighlightOff();
+				highlightOff();
 				
 				//fill in the lineInfo object
 				var thisOne = $(".changeProcessInput").index($(".changeProcessInput.active"))+1;
@@ -1238,7 +1193,7 @@
 				$("#landUseList").hide();
 				
 				//remove the highlighted circle class - could find the highlighted class and only change that one (current implementation) or just reset all selected circles (commented out)				
-				circleHighlightOff();
+				highlightOff();
 				
 				//fill in the lineInfo object
 				var thisOne = $(".landUseInput").index($(".landUseInput.active"));
@@ -1267,7 +1222,7 @@
 				$("#landCoverList").hide();
 				
 				//remove the highlighted circle class - could find the highlighted class and only change that one (current implementation) or just reset all selected circles (commented out)				
-				circleHighlightOff();
+				highlightOff();
 			
 				//fill in the lineInfo object
 				var thisOne = $(".landCoverInput").index($(".landCoverInput.active"));
@@ -1451,28 +1406,44 @@
 				});
 			}
 			
-			//turn circle highlighting off
-			function circleHighlightOff(linePart){
-				//linePart eq vertex | segment
+			//turn highlighting off
+			function highlightOff(){
 				$("circle.highlight").attr("class","selected");
-				$("canvas.highlight").attr("class","selected");				
-				//$("tr."+linePart+".active").removeClass("active"); //remove the land use row from the active class			
-				$("tr.active").removeClass("active"); //remove the land use row from the active class			
+				$("canvas.highlight").attr("class","selected");							
+				$("tr.active").removeClass("active");			
 				$("circle").css("cursor","pointer");
 				$("canvas").css("cursor","pointer");
+			}
+			
+			//turn highlighting on
+			function highlightOn(linePart, thisOne){
+				switch(linePart){
+					case "vertex":
+						var thisIndex = lineInfo.vertices[thisOne].index;
+						$("circle:eq("+thisIndex+")").attr("class","highlight");
+						$("canvas:eq("+thisIndex+")").attr("class","highlight");
+					break;
+					case "segment":
+						var startIndex = lineInfo.segments[thisOne-1].startIndex; //pull out the start index for the selected row
+						var endIndex = lineInfo.segments[thisOne-1].endIndex; //pull out the end index for the selected row
+						$("circle:eq("+startIndex+")").attr("class","highlight"); //highlight the start circle for the selected row (segment)
+						$("circle:eq("+endIndex+")").attr("class","highlight"); //highlight the end circle for the selected row (segment)
+						$("canvas:eq("+startIndex+")").attr("class","highlight"); //highlight the start canvas for the selected row (segment)
+						$("canvas:eq("+endIndex+")").attr("class","highlight"); //highlight the end canvas for the selected row (segment)
+					break;
+				}
+				$("circle").css("cursor","not-allowed");
+				$("canvas").css("cursor","not-allowed");
 			}
 			
 			//figure out which dropdown to close and what info to record
 			function closeDropAndRecord(){
 				var tdActive = $("td.active");
 				if(tdActive.hasClass("changeProcessInput")){
-					console.log("im in changeProcessInput!");
 					changeProcessDoneBtn();	
 				} else if(tdActive.hasClass("landUseInput")){
-					console.log("im in landUseInput!");
 					landUseDoneBtn();
 				} else if(tdActive.hasClass("landCoverInput")){
-					console.log("im in landCoverInput!");
 					landCoverDoneBtn();	
 				}
 				tdActive.removeClass("active");
@@ -1561,43 +1532,42 @@
 				lwAdj = [chipInfo.box],
 				zoomIn = 0;
 			
-			
-			$("#plotSize").click(function(e){
-				var boxSize = $("#plotSize").text()
-				var thisInput = $("#plotSize"); 
-				dropInputLists(thisInput, "plotSizeList", 0, -1, 0);
-				e.stopPropagation();
-			});
-			$("#plotSizeList li").click(function(){
-				plotSize = $(this).text();
-				$("#plotSize").text(plotSize)
-				chipInfo.box = Math.sqrt(plotSize);
+			///////////PLOT SIZE CHANGE///////////////////////////////////////////////////////////////////////////////			
+			$("#plotSize").change(function(){
+				var plotSizeObject = $("#plotSize"),
+					plotSize = parseInt(plotSizeObject.prop("value"));
+				if((plotSize % 2) == 0){plotSize += 1}
+				plotSize = Math.min(plotSize,5);
+				plotSize = Math.max(plotSize,1);
+				plotSizeObject.prop("value",plotSize);	
+				//chipInfo.box = Math.sqrt(plotSize);
+				chipInfo.box = plotSize;
 				$("#plotSizeList").hide();
 				switch(chipInfo.box){
 					case 1:
 						stopZoom = 40;
-						break;
+					break;
 					case 3:
 						stopZoom = 32;
-						break;
+					break;
 					case 5:
 						stopZoom = 27;
-						break;
+					break;
 				}
 				updateChipInfo();
-				drawAllChips();
+				drawAllChips();	
 			});
-			
+						
 			///////////CHIP SIZE CHANGE///////////////////////////////////////////////////////////////////////////////
-			$("#chipSize").click(function(e){
-				var boxSize = $("#chipSize").text()
-				var thisInput = $("#chipSize"); 
-				dropInputLists(thisInput, "chipSizeList", 0, -1, 0);
-				e.stopPropagation();
-			});
-			$("#chipSizeList li").click(function(){
-				chipSize = parseInt($(this).text());
-				$("#chipSize").text(chipSize)
+			$("#chipSize").change(function(){
+				var chipSizeObject = $("#chipSize"),
+					chipSize = parseInt(chipSizeObject.prop("value"));
+				if((chipSize % 2) == 0){chipSize += 1}
+				chipSize = Math.min(chipSize,255);
+				chipSize = Math.max(chipSize,135);
+				chipSizeObject.prop("value",chipSize);
+				
+				//redraw the canvases and img chips
 				chipInfo.chipSize = chipSize;
 				chipInfo.halfChipSize = chipSize/2;
 				chipInfo.offset = (255 - chipSize)/2;
@@ -1605,12 +1575,42 @@
 				chipInfo.dateYpos = chipSize+12;
 				chipInfo.dateXpos = chipSize*0.39;
 				
-				$("#chipSizeList").hide();
+				//$("#chipSizeList").hide();
 				$("canvas").remove();
 				appendChips();
 				updateChipInfo();
-				drawAllChips();
+				drawAllChips();	
 			});
+			
+			$("#zoomSize").change(function(){
+				var zoomSizeObject = $("#zoomSize"),
+					zoomSize = parseInt(zoomSizeObject.val());
+					console.log("zoomSize: ",zoomSize);
+					console.log("stopZoom: ",stopZoom);
+					if (zoomSize > stopZoom){zoomSize = stopZoom}
+					if (zoomSize < minZoom){zoomSize = minZoom}
+					chipInfo.zoomLevel = zoomSize;
+	
+					drawAllChips(); //redraw the chips with the new zoom
+					
+					//prepare zoom message
+					zoomInfo = {
+						"action":"zoom",
+						"zoomLevel":chipInfo.zoomLevel
+					}
+
+					//send the zoom array to the external window
+					if ((chipstripwindow != null) && chipstripwindow.closed == false){ 
+						//prepare zoom message
+						zoomInfo = {
+							"action":"zoom",
+							"zoomLevel":chipInfo.zoomLevel
+						}
+						//send the zoom message
+						chipstripwindow.postMessage(JSON.stringify(zoomInfo),"*");
+					}				
+			});
+			
 			
 			///////////DEFINE THE FUNCTION TO ADD THE CANVAS AND IMAGE FOR EACH CHIP ON-THE-FLY////////////
 			function appendChips(){
@@ -1646,29 +1646,9 @@
 					
 					//define/store some other info needed for zooming
 					chipInfo.chips.chipsInStrip.push(thisManyChips);
-					chipInfo.chips.useThisChip.push(useThisChip);
-					
-					//chipInfo.chips.sxOrig.push(chipInfo.offset);	//0 chipInfo.offset set/push the original source x offset to the sxOrig array
-					//chipInfo.chips.syOrig.push((255*useThisChip)+chipInfo.offset); // +chipInfo.offset   set/push the original source y offset to the syOrig array
-					//chipInfo.chips.sWidthOrig.push(chipInfo.chipSize); //255  set/push the original source x width to the sWidthOrig array
-					//chipInfo.chips.sxZoom.push(chipInfo.chips.sxOrig[i]);
-					//chipInfo.chips.syZoom.push(chipInfo.chips.syOrig[i]);
-					//chipInfo.chips.sWidthZoom.push(chipInfo.chips.sWidthOrig[i]);					
-				}
-				
+					chipInfo.chips.useThisChip.push(useThisChip);			
+				}				
 				updateChipInfo()
-
-					
-				//fill in zoom adjustment arrays sAdj and lwAdj
-				//var starter = chipInfo.halfChipSize,
-				//	lwstarter = chipInfo.box;
-		
-				//for(var i=1; i<maxZoom+1; i++){
-				//	starter *= 0.9 
-				//	sAdj.push(chipInfo.halfChipSize-starter); 
-				//	lwstarter /= 0.9
-				//	lwAdj.push(lwstarter)
-				//}
 			}
 			
 			
