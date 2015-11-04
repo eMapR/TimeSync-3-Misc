@@ -7,22 +7,35 @@ body {
 }
 
 /*############## CHIP INPUTS ###############################################################*/
-#chipInputs{
+#chipOptionHolder{
 	margin-top:2px;
+	display:inline-block;
 }
 
-#chipSizeDiv, #plotSizeDiv{
+.chipOptions{
+	display:inline-block;
 	margin-right:15px;
 }
-#chipInputs input{
+
+#chipSize, #plotSize{
 	width:60px;
 }
 
-input[type=range]{
+#zoomSize{
 	display:inline-block;
-	width:200px;
- 
+	width:75px; 
+	margin-bottom:-4px; 
 }
+
+.colorOptions{
+	width:80px;
+}
+
+.colorOptions input{
+	height:17px;
+	width:30px
+}
+
 
 /*###########################################################################################*/
 
@@ -45,7 +58,7 @@ input[type=range]{
 	border-radius: 4px;
 }
 
-circle{
+circle.data{
 	cursor: pointer;
 }
 
@@ -59,10 +72,10 @@ circle.highlight{
 	stroke-width:5;
 }
 
-circle:hover{
-	stroke:#ED2939; /*'#FF0000;*/
+/*circle.data:hover{
+	stroke:#ED2939;
 	stroke-width:1;
-}
+}*/
 
 svg{
 	margin:-1px;
@@ -353,6 +366,9 @@ tr.active{
 }
 
 /*############## TRAJECTORY PLOT BUTTONS ####################################################*/
+
+button:focus {outline:none !important;}
+
 li:hover{
 	background-color:#f1f1f1;
 }
@@ -371,31 +387,17 @@ li:hover{
 	margin-top: 0;
 	min-width:0px;
 }
-
-
-.btn-default:focus{
-	background-color:white;
-}
-
-.dropdown button{
-	width:100px;
-	border: 1px solid #afafaf;
-}			
-
-.specPlotBtn{
-	border: 1px solid #afafaf;
-}
-
+			
 .dropdown:hover .dropdown-menu {
 	display: block;
 }
 
 .specPlotBtn{
+	border: 1px solid #afafaf;
 	font-size:11px;
 	text-align: left;
-	padding-left:5px;
-	padding-top:0px;
-	padding-bottom:1px;
+	padding:0px 0px 1px 5px;
+	width:100px;
 }
 
 .buttonText{margin-right:2px;}
