@@ -7,7 +7,6 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge"> <!--needed so that D3 will work in IE!-->
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
 		<link rel="stylesheet" href="timesync_style.css">
-		<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
@@ -179,12 +178,17 @@
 						</div>
 						<div class="btn-group" role="group">
 							<button id="btnLine" class="btn btn-default specPlotBtn" type="button">
-								<Strong>Show Line</strong>:<br><span id="lineDisplayThumb" class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span>
+								<Strong>Show Line</strong><br><span id="lineDisplayThumb" class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span>
 							</button>
 						</div>
 						<div class="btn-group" role="group">
 							<button id="btnPoints" class="btn btn-default specPlotBtn" type="button">
-								<Strong>Show Points</strong>:<br><span id="allPointsDisplayThumb" class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span>
+								<Strong>Show Points</strong><br><span id="allPointsDisplayThumb" class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span>
+							</button>
+						</div>
+						<div class="btn-group" role="group">
+							<button id="btnExpand" class="btn btn-default specPlotBtn" type="button">
+								<Strong>Expand Plot</strong><br><span id="allPointsDisplayThumb" class="glyphicon glyphicon-new-window" aria-hidden="true"></span>	
 							</button>
 						</div>
 					</div>
@@ -234,8 +238,7 @@
 							<li>Other</li>
 						</ul>
 						<p class="subHeader">Notes:</p>
-						<ul id="CPnotesList">
-						</ul>
+						<ul id="CPnotesList" class="notesList"  ></ul>
 						<div id="changeProcessDoneBtn" class="doneBtn">Done</div>
 					</div>
 					
@@ -262,7 +265,6 @@
 					</div>
 						
 					<div id="landUseDiv" class="dropThis">
-						<!-- <p class="subHeader">Land Use:</p> -->
 						<div id="landUseSelection" class="formDropSelection" align="center"><span class="glyphicon glyphicon-triangle-bottom"></span></div> <!-- <div id="theSelection"></div> -->
 						<ul id="landUseList">
 							<li>Forest</li>
@@ -273,13 +275,11 @@
 							<li>Other</li>
 						</ul>
 						<p class="subHeader">Notes:</p>
-						<ul id="LUnotesList">
-						</ul>
+						<ul id="LUnotesList" class="notesList"></ul>
 						<div id="landUseDoneBtn" class="doneBtn">Done</div>
 					</div>
 
 					<div id="landCoverDiv" class="dropThis">
-						<!-- <p class="subHeader">Land Cover:</p> -->
 						<div id="landCoverSelection" class="formDropSelection" align="center"><span class="glyphicon glyphicon-triangle-bottom"></span></div> <!-- <div id="theSelection"></div> -->
 						<ul id="landCoverList">
 							<li>Trees</li>
@@ -290,16 +290,8 @@
 							<li>Snow/ice</li>
 							<li>Water</li>
 						</ul>
-						<p class="subHeader">Notes:</p>
-						<ul id="LCnotesList">
-							<li class="trees"><span class="glyphicon glyphicon-unchecked"></span> Trees</li>
-							<li class="shrubs"><span class="glyphicon glyphicon-unchecked"></span> Shrubs</li>
-							<li class="grassForbHerb"><span class="glyphicon glyphicon-unchecked"></span> Grass/forb/herb</li>
-							<li class="impervious"><span class="glyphicon glyphicon-unchecked"></span> Impervious</li>
-							<li class="naturalBarren"><span class="glyphicon glyphicon-unchecked"></span> Natural/barren</li>
-							<li class="SnowIce"><span class="glyphicon glyphicon-unchecked"></span> Snow/ice</li>
-							<li class="water"><span class="glyphicon glyphicon-unchecked"></span> Water</li>
-						</ul>
+						<p class="subHeader">Other:</p>
+						<ul id="LCnotesList" class="notesList"></ul>
 						<div id="landCoverDoneBtn" class="doneBtn">Done</div>
 					</div>	
 					
@@ -352,6 +344,7 @@
 								
 				$.getJSON(jsonAllDataURL).done(function(jsonobject){					
 					allData = calcIndices(jsonobject);					
+					calcD3date();
 					plotInt();	
 				});
 			});
@@ -402,7 +395,6 @@
 				var selectedCirclesTemp = $("circle.selected"),
 					lineData = [],
 					i = 0;
-					console.log(selectedCirclesTemp);
 				selectedCircles = [];
 				for(i; i < selectedCirclesTemp.length; i++){
 					var thisone = $("circle.data").index(selectedCirclesTemp[i]);
@@ -502,7 +494,26 @@
 				}
 				return data
 			}
-					
+			
+
+			//define function to determine if leap year
+			function leapYear(year){
+				return ((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0);
+			}
+			
+			function calcD3date(){
+				for(var i=0;i<allData.Values.length;i++){
+					var thisYear = allData.Values[i].Year;
+					if(leapYear(thisYear)){
+						var n_days = 367
+					} else{
+						var n_days = 366
+					}
+					var D3date = thisYear + (allData.Values[i].doy/n_days);
+					allData.Values[i]["D3xValue"] = D3date
+				}
+			}
+			
 			//define function to initialize the spectral trajectory
 			function plotInt(){
 				//get the range of the x values
@@ -575,11 +586,12 @@
 					.interpolate("linear");
 				
 				//create the circles that will go into the svg
+				console.log(rgbColor);
 				var circles = svg.selectAll(".data")
 					.data(data.Values)
 					.enter()
 					.append("circle")
-					.style("fill",function(d,i){return rgbColor[i]})
+					.style("fill",function(d,i){return rgbColor[i];})
 					.attr("cx", function(d){return xscale(d.Year);})
 					.attr("cy", function(d){return yscale(d[specIndex]);})
 					.attr("r", 9)
@@ -591,7 +603,7 @@
 					.append("circle")
 					.style("fill-opacity",0.25) //0.25
 					.attr("visibility","hidden")
-					.attr("cx", function(d){return xscale(d.Year);})
+					.attr("cx", function(d){return xscale(d.Year);}) //d.D3xValue
 					.attr("cy", function(d){return yscale(d[specIndex]);})
 					.attr("r", 3)
 					.attr("class","allData");
@@ -807,7 +819,6 @@
 			
 			function setHighlightColor(){
 				var color = $("#highlightColor").prop("value");
-				console.log(color);
 				$("circle.highlight").css("stroke",color);
 				$("canvas.highlight").css("border-color",color);
 				$("tr.active").css("background-color",color);
@@ -912,109 +923,49 @@
 			
 
 //INPUT DROP DOWNS AND HIGHLIGHTING CIRCLES PERTAINING TO THE SELECTED ROW//////////////////////
-			//change process
 			$(document).ready(function(){
-				$(document).on("click",".changeProcessInput",function(e){				
+				$(document).on("click",".changeProcessInput, .landUseInput, .landCoverInput", function(e){				
 					highlightOff();
-					closeDropAndRecord();
-					var thisInput = $(this); //store the reference to element as a variable, so we don't have to keep making jquery reference - gets used a lot
-				
-					thisInput.addClass("active"); //set this .changeProcessInput <td> as the "active" class so that when a selection is made from the #changeProcessList dropdown it knows which <td> to place it in
-					dropInputLists(thisInput, "changeProcessDiv", -1, -1, 1);
-					thisInput.closest("tr").addClass("active");					
-					
-					//fill in info from table for this segment
-					var thisOne = $("tr.segment .changeProcessInput").index(thisInput)+1, //find what change process row was selected
-						selection = vertInfo[thisOne].changeProcess.changeProcess
-					
-					//fill in the forms with info from the table - will be blank at first but will reflect the input information if the change process input is clicked on again					
-					appendCPnotes(selection);					
-					changeNoteIcon("#CPnotesList", thisOne, "changeProcess");
-					
-					//point highlighting
-					highlightOn("segment", thisOne); //turn on highlighting for relevant segment vertices
-					e.stopPropagation(); //stop other actions from happening - what are the other actions??? - check
-                });
-            });			
-			
-			//land use
-			$(document).ready(function(){
-				$(document).on("click",".landUseInput",function(e){				
-					highlightOff();
-					closeDropAndRecord();
+					closeDropAndRecord();								
 					var thisInput = $(this);
-					
-					thisInput.addClass("active"); //set this .landUseInput <td> as the "active" class so that when a selection is made from the #changeProcessList dropdown it knows which <td> to place it in
-					dropInputLists(thisInput, "landUseDiv", -1, -1, 1); //show the dropdown				
-					thisInput.closest("tr").addClass("active");
-					
-					//point highlighting
-					var thisOne = $("tr.vertex .landUseInput").index(thisInput);
-					var selection = vertInfo[thisOne].landUse.dominant;
-					//$("#landUseSelection").text(selection);
-					
-					//fill in the forms with info from the table - will be blank at first but will reflect the input information if the change process input is clicked on again					
-					appendLUnotes(selection);					
-					changeNoteIcon("#LUnotesList", thisOne, "landUse");
-					
-					//point highlighting
-					highlightOn("vertex", thisOne); //turn on highlighting for relevant vertex
-					e.stopPropagation(); //stop other actions from happening - what are the other actions??? - check
-                });
-            });
-
-			//land cover
-			$(document).ready(function(){
-				$(document).on("click",".landCoverInput",function(e){				
-					highlightOff();
-					closeDropAndRecord();
-					var thisInput = $(this);
-					
+					thisClass = thisInput.attr("class");
 					thisInput.addClass("active"); //set this .landCoverInput <td> as the "active" class so that when a selection is made from the #changeProcessList dropdown it knows which <td> to place it in
-					dropInputLists(thisInput, "landCoverDiv", -1, -1, 1); //show the dropdown				
-					thisInput.closest("tr").addClass("active");
-					
-					//point highlighting
-					var thisOne = $("tr.vertex .landCoverInput").index(thisInput),
-						selection = vertInfo[thisOne].landCover.dominant;
-									
-					//change the note icon depending on whether the note is selected or not
-					theseLi = $("#LCnotesList li")
-					theseLi.each(function(i){
-						var thisLi = $(this),
-							note = thisLi.attr("class"),
-							span = thisLi.children("span");
-							noteNull = vertInfo[thisOne].landCover.other[note];		
-						if(noteNull == null){
-							span.replaceWith('<span class="glyphicon glyphicon-unchecked"></span> ')
-						} else{
-							span.replaceWith('<span class="glyphicon glyphicon-ok"></span> ');
-							thisLi.addClass("selected");
-						}
-					});
-				
-					highlightOn("vertex", thisOne); //turn on highlighting for relevant vertex
+					thisInput.closest("tr").addClass("active");					
+					switch(thisClass){
+						case "changeProcessInput formDrop":
+							dropInputLists(thisInput, "changeProcessDiv", -1, -1, 1);
+							var thisOne = $("tr.segment .changeProcessInput").index(thisInput)+1,
+							selection = vertInfo[thisOne].changeProcess.changeProcess							
+							appendCPnotes(selection);					
+							changeNoteIcon("#CPnotesList", thisOne, "changeProcess");							
+							highlightOn("segment", thisOne);
+						break;
+						case "landUseInput formDrop":
+							dropInputLists(thisInput, "landUseDiv", -1, -1, 1);
+							var thisOne = $("tr.vertex .landUseInput").index(thisInput),
+							selection = vertInfo[thisOne].landUse.dominant;
+							appendLUnotes(selection);					
+							changeNoteIcon("#LUnotesList", thisOne, "landUse");
+							highlightOn("vertex", thisOne);
+						break;					
+						case "landCoverInput formDrop":
+							dropInputLists(thisInput, "landCoverDiv", -1, -1, 1);
+							var thisOne = $("tr.vertex .landCoverInput").index(thisInput),
+							selection = vertInfo[thisOne].landCover.dominant				
+							appendLCnotes(selection);					
+							changeNoteIcon("#LCnotesList", thisOne, "landCover");											
+							highlightOn("vertex", thisOne);
+						break;										
+					}
 					e.stopPropagation(); //stop other actions from happening - what are the other actions??? - check
                 });
-            });				
+            });		
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-//DROP THE SELECTION LISTS ON CLICK///////////////////////////////////////////////////////////////////
-			//change process
-			$("#changeProcessSelection").click(function(e){			
-				$("#changeProcessList").show();
-				e.stopPropagation();
-			});
-			
-			//land use
-			$("#landUseSelection").click(function(e){			
-				$("#landUseList").show();
-				e.stopPropagation();
-			});
-			
-			//land cover
-			$("#landCoverSelection").click(function(e){			
-				$("#landCoverList").show();
+//DROP THE SELECTION LISTS ON CLICK///////////////////////////////////////////////////////////////////			
+			$("#changeProcessSelection, #landUseSelection, #landCoverSelection").click(function(e){			
+				var thisList = $(this).next("ul").attr("id")				
+				$("#"+thisList).show();
 				e.stopPropagation();
 			});
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1025,50 +976,37 @@
 			$(".doneBtn").click(function(){
 				closeDropAndRecord();
 			});
-
-
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 			
 			
 //DISPLAY THE CONDITIONAL NOTES ONCE A CHANGE PROCESS HAS BEEN SELECTED/////////////////
-			//change process
 			$(document).ready(function(){
-				$("#changeProcessList li").click(function(){ //click anywhere to get rid of the .dropThis dropdowns
-						var selection = $(this).text();
-						$("#changeProcessList").hide();
-						$("td.changeProcessInput.active").text(selection); //,#changeProcessSelection, 				
-						appendCPnotes(selection);
-						$("#CPnotesList li").prepend('<span class="glyphicon glyphicon-unchecked"></span> ');			
-				});
-			});
-			
-			//land use
-			$(document).ready(function(){
-				$("#landUseList li").click(function(){
-						var selection = $(this).text();
-						$("#landUseList").hide();
-						$("td.landUseInput.active").text(selection); //,#landUseSelection, 					
-						appendLUnotes(selection);
-						$("#LUnotesList li").prepend('<span class="glyphicon glyphicon-unchecked"></span> ');			
-				});
-			});
-			
-			//land cover
-			$(document).ready(function(){
-				$("#landCoverList li").click(function(){
-						var selection = $(this).text();
-						$("#landCoverList").hide();
-						$("td.landCoverInput.active").text(selection); //,#landCoverSelection,				
+				$("#changeProcessList li, #landUseList li, #landCoverList li").click(function(){						
+					var selection = $(this).text();	//get the text from the list selection that was clicked					
+					$("td.active").text(selection);	 //place the text in the active td
+					var ulId = $(this).parent().attr("id") //what is the parent list to this li
+					$("#"+ulId).hide(); //hide the list since a selection has been made
+					var thisNoteList = $("#"+ulId).siblings("ul").attr("id") //what note list is associated					
+					switch(ulId){
+						case "changeProcessList":				
+							appendCPnotes(selection);
+						break;
+						case "landUseList":				
+							appendLUnotes(selection);
+						break;
+						case "landCoverList":				
+							appendLCnotes(selection);
+						break;						
+					}
+					$("#"+thisNoteList+" li").prepend('<span class="glyphicon glyphicon-unchecked"></span> ');
 				});
 			});
 /////////////////////////////////////////////////////////////////////////////////////////
 			
 			
 //MAKE THE NOTE CHECKBOXES TOGGLE ON AND OFF AND SET THE "SELECTED" CLASS////////////////
-			//#CPnotesList li SELECTION AND CHECKBOXES
 			$(document).ready(function(){
-				$(document).on("click","#CPnotesList li", function(){
+				$(document).on("click","#CPnotesList li, #LUnotesList li, #LCnotesList li", function(){
 					var selected = $(this);
 					if(selected.hasClass("selected")){
 						selected.removeClass("selected");
@@ -1078,35 +1016,7 @@
 						$("span", this).replaceWith('<span class="glyphicon glyphicon-ok"></span> ');
 					}
 				});
-			});
-			
-			//#LUnotesList li SELECTION AND CHECKBOXES
-			$(document).ready(function(){
-				$(document).on("click","#LUnotesList li", function(){
-					var selected = $(this);
-					if(selected.hasClass("selected")){
-						selected.removeClass("selected");
-						$("span", this).replaceWith('<span class="glyphicon glyphicon-unchecked"></span> ');
-					} else {
-						selected.addClass("selected");
-						$("span", this).replaceWith('<span class="glyphicon glyphicon-ok"></span> ');
-					}
-				});
-			});
-			
-			//#LCnotesList li SELECTION AND CHECKBOXES
-			$(document).ready(function(){
-				$(document).on("click","#LCnotesList li", function(){
-					var selected = $(this);
-					if(selected.hasClass("selected")){
-						selected.removeClass("selected");
-						$("span", this).replaceWith('<span class="glyphicon glyphicon-unchecked"></span> ');
-					} else {
-						selected.addClass("selected");
-						$("span", this).replaceWith('<span class="glyphicon glyphicon-ok"></span> ');
-					}
-				});
-			});
+			});			
 //////////////////////////////////////////////////////////////////////////////////////////
 
 			//highlight selected circles, canvases, and input row when the magnifying glass is clicked
@@ -1187,6 +1097,29 @@
 					case "Agriculture":
 						$("#LUnotesList").append('<li class="rowCrop">Row crop</li><li class="orchardTreeFarm">Orchard/Tree farm</li><li class="vineyardsOtherWoody">Vineyard/Other woody</li>');								
 						break;						
+				}
+			}
+			
+			//land use
+			function appendLCnotes(selection){					
+				$("#LCnotesList").empty();
+				if(selection != ""){
+					$("#LCnotesList").append(
+						'<li class="trees">Trees</li>'+
+						'<li class="shrubs">Shrubs</li>'+
+						'<li class="grassForbHerb">Grass/forb/herb</li>'+
+						'<li class="impervious">Impervious</li>'+
+						'<li class="naturalBarren">Natural/barren</li>'+
+						'<li class="SnowIce">Snow/ice</li>'+
+						'<li class="water">Water</li>'
+					);
+					$("#LCnotesList li").each(function(){
+						var thisClass = $(this).text().trim();
+						if(thisClass == selection){
+							$(this).hide();
+							return false
+						}					
+					});
 				}
 			}
 			
@@ -1289,7 +1222,7 @@
 				fillInNotes("#LCnotesList .selected",thisOne,"naturalBarren","landCover");
 				fillInNotes("#LCnotesList .selected",thisOne,"SnowIce","landCover");
 				fillInNotes("#LCnotesList .selected",thisOne,"water","landCover");
-				$("#LCnotesList .selected").removeClass("selected");		
+				$("#LCnotesList .selected").removeClass("selected");
 			}				
 						
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1626,8 +1559,6 @@
 			$("#zoomSize").change(function(){
 				var zoomSizeObject = $("#zoomSize"),
 					zoomSize = parseInt(zoomSizeObject.val());
-					console.log("zoomSize: ",zoomSize);
-					console.log("stopZoom: ",stopZoom);
 					if (zoomSize > stopZoom){zoomSize = stopZoom}
 					if (zoomSize < minZoom){zoomSize = minZoom}
 					chipInfo.zoomLevel = zoomSize;
@@ -1857,8 +1788,8 @@
 			
 			///////////////////OPEN THE REMOTE CHIP STRIP WINDOW AND SEND MESSAGES/////////////////////
 			var chipstripwindow = null ;//keep track of whether the chipstrip window is open or not so it is not opened in multiple new window on each chip click
-			$("body").on("click", "canvas", function(e){ //need to use body because the canvases have probably not loaded yet
-				if (e.ctrlKey) { 					
+			$("body").on("dblclick", "canvas", function(e){ //need to use body because the canvases have probably not loaded yet
+				//if (e.ctrlKey) { 					
 					var thisImg = (parseInt($(this).attr("id").replace( /^\D+/g, ''))); //extract the chip index
 					var pass_data = {
 						"action":"add_chips", //hard assign
@@ -1874,8 +1805,32 @@
 					} else {                                                         //else if the window is already loaded, just send the message - no need to wait
 						chipstripwindow.postMessage(JSON.stringify(pass_data),"*");
 					}
+				//}
+			});
+			
+			
+			///////////////////OPEN THE REMOTE CHIP STRIP WINDOW AND SEND MESSAGES/////////////////////
+			var trajectoryWindow = null ;//keep track of whether the chipstrip window is open or not so it is not opened in multiple new window on each chip click
+			var innerWidth = window.innerWidth
+			$("body").on("click", "#btnExpand", function(e){ //need to use body because the canvases have probably not loaded yet
+				var pass_data = {
+					"action":"add_trajectory", //hard assign
+					"data":data,
+					"allData":allData,
+					"specIndex":specIndex,
+					"rgbColor":rgbColor,
+					"domain":domain,
+					"len":len
+				};
+				
+				if ((trajectoryWindow == null) || (trajectoryWindow.closed)){      //if the window is not loaded then load it and send the message after it is fully loaded
+					trajectoryWindow = window.open("./expanded_trajectory_plot.html","_blank","width="+innerWidth+"px, height=550px", "toolbar=0","titlebar=0","menubar=0","scrollbars=yes"); //open the remote chip strip window
+					$(trajectoryWindow).load(function(){trajectoryWindow.postMessage(JSON.stringify(pass_data),"*");}); //wait until the remote window finishes loading before sending the message
+				} else {                                                         //else if the window is already loaded, just send the message - no need to wait
+					trajectoryWindow.postMessage(JSON.stringify(pass_data),"*");
 				}
 			});
+			
 			
 			
 			//////////////////////////GET MESSAGES FROM REMOTE////////////////////////////////////////////

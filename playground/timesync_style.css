@@ -237,7 +237,6 @@ svg{
 	width:100%;
 }
 
-
 tr.active{
 	background-color:#32CD32;
 }
@@ -251,13 +250,6 @@ tr.active{
 	height:17px; /*20px;*/
 	
 }
-/*#changeProcessList {
-	border:1px solid #afafaf;
-	border-radius:0px 0px 4px 4px;
-	margin:-4px 3px 3px 3px;
-	display:none;
-}*/
-
 #changeProcessList, #landUseList, #landCoverList {
 	display:none;
 	list-style-type: none;
@@ -278,7 +270,7 @@ tr.active{
 	height:67px;
 }
 #LCnotesList{
-	height:115px;
+	height:100px;
 }
 
 .glyphicon.glyphicon-search{
@@ -289,34 +281,7 @@ tr.active{
 }
 
 
-
-/*#LUnotesList{
-	border:1px solid #afafaf;
-	border-radius:0px 0px 4px 4px;
-	margin:-4px 3px 3px 3px;
-	list-style-type: none;
- 	padding-left:0px;
-	font-size: 11px;
-	height:67px;
-}
-#LCnotesList{
-	border:1px solid #afafaf;
-	border-radius:0px 0px 4px 4px;
-	margin:-4px 3px 3px 3px;
-	list-style-type: none;
- 	padding-left:0px;
-	font-size: 11px;
-	height:67px;
-}*/
-
-
-
 /*############## VERTICES FORM ####################################################*/
-/*#landUseList li{
-	padding-left:3px;
-	cursor:pointer;	
-}*/
-
 
 .doneBtn{
 	border:1px solid #afafaf;
@@ -331,7 +296,6 @@ tr.active{
 .doneBtn:hover{
 	background-color:#f1f1f1;
 }
-
 
 .formDrop{
 	cursor:pointer;
@@ -381,7 +345,6 @@ li:hover{
 	padding-left:5px;
 	cursor:pointer;
 	width:99px; /*substract 1 from .dropdown button width because of border*/
-	
 }
 .dropdown-menu.plot {
 	margin-top: 0;
@@ -398,6 +361,7 @@ li:hover{
 	text-align: left;
 	padding:0px 0px 1px 5px;
 	width:100px;
+	height:35px
 }
 
 .buttonText{margin-right:2px;}

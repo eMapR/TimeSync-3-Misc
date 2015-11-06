@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lan="en">
+	<head>
+		<title>Expanded time series</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge"> <!--needed so that D3 will work in IE!-->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+		<link rel="stylesheet" href="timesync_style.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
+		<!--<script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>!-->
+		<script type="text/javascript" src="jquery.mousewheel.min.js"></script>
+		<script type="text/javascript" src="specIndexStretch.js"></script>
+		<style>
+			#holder{
+				margin-top:20px;
+			}
+			svg{
+				cursor: move;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="holder">
+			<svg id="svg" height="500"></svg>
+		</div>
+		<script>
+			var innerWidth = window.innerWidth
+			document.getElementById("svg").style.width = innerWidth + "px";
+
+						//define function to initialize the spectral trajectory
+			function plotInt(){
+				//get the range of the x values
+				var yearmin = d3.min(data.Values, function(d) {return d.Year;}),
+					yearmax = d3.max(data.Values, function(d) {return d.Year;});
+				
+				//adjust the ranges so there is some buffer
+				var xmin = yearmin-1, //
+					xmax = yearmax+1;
+				
+				//define the width of the svg plot area
+				var w = innerWidth, 
+					h = 500; 
+				
+				//define the plot margins
+				var pt = 10, //plot top
+					pr = 20, //plot right
+					pl = 70, //plot left
+					pb = 37; //plot bottom
+				
+				//define the x scale
+				xscale = d3.scale.linear() //NEEDS TO BE A GLOBAL VARIABLE - IS USED HERE AND IN THE UPDATE FUNCTION
+					.domain([xmin, xmax])
+					.range([pl, w - pr]);
+				
+				//define the y scale
+				yscale = d3.scale.linear() //NEEDS TO BE A GLOBAL VARIABLE - IS USED HERE AND IN THE UPDATE FUNCTION
+					.domain([domain[specIndex].min, domain[specIndex].max])
+					.range([h - pb, pt]);
+						
+				//define the x axis
+				var xaxis = d3.svg.axis()
+					.scale(xscale)
+					.orient("bottom")
+					.tickFormat(d3.format("d"));
+				
+				//define the x axis
+				yaxis = d3.svg.axis() //NEEDS TO BE A GLOBAL VARIABLE - IS USED HERE AND IN THE UPDATE FUNCTION
+					.scale(yscale)
+					.orient("left");
+				
+				//define the zooming function - what gets scaled on zoom
+				function zoomed() {
+					svg.select(".y.axis").call(yaxis);
+					svg.select(".x.axis").call(xaxis);
+					
+					svg.selectAll(".allData")
+						.attr("cy", function(d){return yscale(d[specIndex]);})
+						.attr("cx", function(d){return xscale(d.D3xValue);});
+					
+					svg.selectAll(".data")
+						.attr("cy", function(d){return yscale(d[specIndex]);})
+						.attr("cx", function(d){return xscale(d.Year);});
+					
+					svg.selectAll("#plotLine").attr("d", lineFunction(lineData));
+					
+					svg.selectAll(".vline")
+						.attr("x1", function(d){return xscale(d.Year)})
+						.attr("x2", function(d){return xscale(d.Year)})
+				}
+				
+				//define the zoom behavior
+				var zoom = d3.behavior.zoom()
+					.y(yscale)
+					.x(xscale)
+					.scaleExtent([1, 5])
+					.on("zoom", zoomed);
+									
+				svg = d3.select(svg); //retrieve the svg reference
+				
+				svg.call(zoom).on("dblclick.zoom", null); //call the zoom once - needed for the updating to work
+						
+				//make the default line data
+				var lineData = [ //needs to be local variable
+					{"x":yearmin ,"y":data.Values[0][specIndex]},
+					{"x":yearmax ,"y":data.Values[len-1][specIndex]}
+				];
+
+
+				//make the line function to convert the xy object to svg path syntax 
+				lineFunction = d3.svg.line() //global because it gets used when selecting new points
+					.x(function(d){return xscale(d.x);})
+					.y(function(d){return yscale(d.y);})
+					.interpolate("linear");
+				
+				//create the circles that will go into the svg
+				console.log(rgbColor);
+				
+				var vline = svg.selectAll(".vline")
+					.data(data.Values)
+					.enter()
+					.append("line")
+					.attr("x1", function(d){return xscale(d.Year)})
+					.attr("x2", function(d){return xscale(d.Year)})
+					.attr("y1", function(d){return -20000})
+					.attr("y2", function(d){return 20000})
+					.style("stroke", "#eee")
+					.attr("class","vline")
+				
+				
+				var circles = svg.selectAll(".data")
+					.data(data.Values)
+					.enter()
+					.append("circle")
+					//.style("fill",function(d,i){return d3.rgb(rgbColor[i].r,rgbColor[i].g,rgbColor[i].b)})
+					.style("fill", function(d,i){return dataRGBcolor[i]})
+					.attr("cx", function(d){return xscale(d.Year);})
+					.attr("cy", function(d){return yscale(d[specIndex]);})
+					.attr("r", 9)
+					.attr("class","data unselected");
+				
+				var allCircles = svg.selectAll(".allData")
+					.data(allData.Values)
+					.enter()
+					.append("circle")
+					.style("fill", function(d,i){return allDataRGBcolor[i]})
+					.attr("cx", function(d){return xscale(d.D3xValue);})
+					.attr("cy", function(d){return yscale(d[specIndex]);})
+					.attr("r", 5)
+					.attr("class","allData");
+							
+				//add the default line
+				var lineGraph = svg.append("path") //local because it will get overwritten
+					.attr("d", lineFunction(lineData))
+					.attr("id","plotLine");
+				
+				//draw the x axis
+				svg.append("g")
+					.attr("class", "x axis")
+					.attr("transform", "translate(0," + (h - pb) + ")")
+					.call(xaxis);
+					
+				//draw the y axis
+				svg.append("g")
+					.attr("class", "y axis")
+					.attr("transform", "translate(" + pl + ",0)")
+					.call(yaxis);
+					
+				//add label for the x axis
+				svg.append("text")      
+					.attr("transform", "rotate(-90)")
+					.attr("x", (h-pb)/-2)
+					.attr("y", 20)
+					.style("text-anchor", "middle")
+					.text("TC Wetness")
+					.attr("id","specPlotIndex");
+				
+				//define clip path so that circles don't go outside the axes
+				svg.append("defs")
+					.append("clipPath")
+					  .attr("id", "clip")
+					.append("rect")
+					  .attr("x", 50)
+					  .attr("y", 10)
+					  .attr("width", w-pr)
+					  .attr("height", h-pb-pt);
+				
+				//add the path to the circles to activate the clipping
+				circles.attr("clip-path", "url(#clip)");
+				allCircles.attr("clip-path", "url(#clip)");
+				lineGraph.attr("clip-path", "url(#clip)");
+				vline.attr("clip-path", "url(#clip)");
+				
+				//default the first and last circles to class "selected"
+				var dataCircles = $("circle.data");
+				dataCircles.eq(0).attr("class","data selected");
+				dataCircles.eq(len-1).attr("class","data selected");
+			}
+			
+			
+			//define function to return stretch color array by index
+			function setcolor(data, specIndex, stretch, n_stdev, len) {
+				var minv = stretch[specIndex].mean - (stretch[specIndex].stdev * n_stdev),
+					maxv = stretch[specIndex].mean + (stretch[specIndex].stdev * n_stdev),
+					color = [],
+					i = 0;
+				for (i; i < len; i++) {
+					if (data.Values[i][specIndex] < minv) data.Values[i][specIndex] = minv;
+					if (data.Values[i][specIndex] > maxv) data.Values[i][specIndex] = maxv;
+					color[i] = ((data.Values[i][specIndex] - minv) / (maxv - minv)) * 256;
+				}
+				return color;
+			}
+			
+			function scaledRGB(data, RspecIndex, GspecIndex, BspecIndex, stretch, n_stdev, len){
+				var colorR = setcolor(data, RspecIndex, stretch, n_stdev, len),
+					colorG = setcolor(data, GspecIndex, stretch, n_stdev, len),
+					colorB = setcolor(data, BspecIndex, stretch, n_stdev, len),
+					color = [],
+					i = 0;
+				for(i;i<len;i++) {color[i] = d3.rgb(colorR[i],colorG[i],colorB[i]);}
+				return color;
+			}
+			
+			
+			
+			///////////////////OPEN THE REMOTE CHIP STRIP WINDOW AND SEND MESSAGES/////////////////////
+			var chipstripwindow = null ;//keep track of whether the chipstrip window is open or not so it is not opened in multiple new window on each chip click
+			$("body").on("click", "canvas", function(e){ //need to use body because the canvases have probably not loaded yet
+				if (e.ctrlKey) { 
+					var pass_data = {
+						"action":"add_chips", //hard assign
+						"n_chips":"40", //get this from the img metadata
+						"src":"chips/chips_2012.png", //get this from the id of the .chipholder clicked
+						"canvasID":$(this).attr("id"),
+						"zoomLevel":zoomLevel
+					};
+					if ((chipstripwindow == null) || (chipstripwindow.closed)){      //if the window is not loaded then load it and send the message after it is fully loaded
+						chipstripwindow = window.open("./chip_strip_4.html","_blank","width=1080px, height=840px", "toolbar=0","titlebar=0","menubar=0","scrollbars=yes"); //open the remote chip strip window
+						$(chipstripwindow).load(function(){chipstripwindow.postMessage(JSON.stringify(pass_data),"*");}); //wait until the remote window finishes loading before sending the message
+					} else {                                                         //else if the window is already loaded, just send the message - no need to wait
+						chipstripwindow.postMessage(JSON.stringify(pass_data),"*");
+					}
+				}
+			});
+			///////////////////////////////////////////////////////////////////////////////////////////
+			
+			
+			//////////////////////////GET MESSAGES FROM REMOTE///////////////////////////////// 
+			//receive messages from the origin window
+			$(window).on("message onmessage",function(e){
+				var pass_data = JSON.parse(e.originalEvent.data);
+				if(pass_data.action == "add_trajectory"){
+					data = pass_data.data;
+					allData = pass_data.allData;
+					specIndex = pass_data.specIndex;
+					rgbColor = pass_data.rgbColor;
+					domain = pass_data.domain;
+					len = pass_data.len;
+					dataRGBcolor =  scaledRGB(data, "TCB", "TCG", "TCW", stretch, 2, data.Values.length);
+					allDataRGBcolor = scaledRGB(allData, "TCB", "TCG", "TCW", stretch, 2, allData.Values.length); //get the scaled rgb color
+					
+					plotInt();
+				}
+			});	
+			//////////////////////////////////////////////////////////////////////////////////
+			
+			
+			
+			
+			
+
+		</script>
+	</body>
+</html>
