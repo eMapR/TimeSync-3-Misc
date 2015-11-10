@@ -1,4 +1,4 @@
-html {
+body {
 	overflow-y: scroll;
 }			
 
@@ -36,6 +36,33 @@ body {
 	width:30px
 }
 
+
+/*###########################################################################################*/
+
+
+/*############## TS GUIDE ###############################################################*/
+#tsGuideBody{
+	font-size:12px;
+	height:750px;
+}
+#tsGuideBody li:hover{
+	background-color: transparent;
+}
+#btnTsGuide:focus{
+	background-color: transparent;
+}
+#btnTsGuide:hover{
+	background-color: #F1F1F1;;
+}
+#btnTsGuide{
+	margin:2px 3px 0px 0px;
+	text-align: left;
+	padding:0px 0px 0px 5px;
+	font-size:11px;
+	height:21.7167px;
+	width:57px;
+	float:right;
+}
 
 /*###########################################################################################*/
 
@@ -99,19 +126,44 @@ svg{
 	width:auto;
 	overflow-y: auto;
 }
-#chip-gallery canvas{
+/*#chip-gallery canvas{
 	display:inline;
 	margin:3px;
 	vertical-align:top;
 	cursor: pointer;
-	border: 3px solid white; /*#dbdbdb*/
+	border: 3px solid white;
+}*/
+
+.chipHolder{
+	display:inline-block;
+	margin:3px;
+	border: 3px solid white;
+	box-shadow:rgba(0, 0, 0, 0.176) 0px 1px 2px 0px;
 }
+
+.chipImg{
+	cursor: pointer;
+}
+
+.chipDate{
+	text-align: center;
+}
+
 #chip-gallery .selected{
 	border: 3px solid #ED2939; /*black;*/
 }
 
-#chip-gallery .highlight{
+.chipHolder .highlight{
 	border: 3px solid #32CD32;
+}
+
+.expandChipYear{
+	visibility: hidden;
+	cursor: pointer;
+}
+
+.chipHolder:hover .expandChipYear{
+	visibility: visible;
 }
 
 /*#################################################################################################*/
@@ -119,6 +171,9 @@ svg{
 
 
 #img-gallery{
+	display:none;
+}
+.chipImgSrc{
 	display:none;
 }
 
