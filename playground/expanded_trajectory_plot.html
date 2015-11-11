@@ -20,12 +20,16 @@
 			svg{
 				cursor: move;
 			}
+			.vline{				
+				stroke: #e9e9e9;
+				shape-rendering: crispEdges;
+			}
 		</style>
 	</head>
 	<body>
 
 		<div id="holder">
-			<svg id="svg" height="500"></svg>
+			<svg id="svg" height="700"></svg>
 		</div>
 		<script>
 			var innerWidth = window.innerWidth
@@ -43,7 +47,7 @@
 				
 				//define the width of the svg plot area
 				var w = innerWidth, 
-					h = 500; 
+					h = 700; 
 				
 				//define the plot margins
 				var pt = 10, //plot top
@@ -73,17 +77,21 @@
 					.orient("left");
 				
 				//define the zooming function - what gets scaled on zoom
-				function zoomed() {
+				function zoomed(){
+				var origScale = d3.event.scale
 					svg.select(".y.axis").call(yaxis);
 					svg.select(".x.axis").call(xaxis);
-					
+					console.log(d3.event.scale)
+					if(d3.event.scale == 1){var r = 5} else {var r = Math.pow(d3.event.scale,1.1)+5}
 					svg.selectAll(".allData")
 						.attr("cy", function(d){return yscale(d[specIndex]);})
-						.attr("cx", function(d){return xscale(d.D3xValue);});
+						.attr("cx", function(d){return xscale(d.D3xValue);})
+						.attr("r", r);
 					
 					svg.selectAll(".data")
 						.attr("cy", function(d){return yscale(d[specIndex]);})
 						.attr("cx", function(d){return xscale(d.Year);});
+						
 					
 					svg.selectAll("#plotLine").attr("d", lineFunction(lineData));
 					
@@ -92,11 +100,22 @@
 						.attr("x2", function(d){return xscale(d.Year)})
 				}
 				
+				//function zoomed(){
+				//	var trans=d3.event.translate;
+				//	var scale=d3.event.scale;
+				//	var newScale = scale / 2;
+				//	//zoom.scale(newScale); 
+				//	console.log(newScale)
+				//	svg.selectAll(".data").attr("transform","translate(" + trans + ")" + " scale(" + newScale + ")");
+				//	svg.selectAll(".allData").attr("transform","translate(" + trans + ")" + " scale(" + newScale + ")");
+				//}
+				
 				//define the zoom behavior
 				var zoom = d3.behavior.zoom()
 					.y(yscale)
 					.x(xscale)
-					.scaleExtent([1, 5])
+					.scaleExtent([1, Infinity]) //5
+					.scale(1)
 					.on("zoom", zoomed);
 									
 				svg = d3.select(svg); //retrieve the svg reference
@@ -116,9 +135,7 @@
 					.y(function(d){return yscale(d.y);})
 					.interpolate("linear");
 				
-				//create the circles that will go into the svg
-				console.log(rgbColor);
-				
+				//create the circles that will go into the svg				
 				var vline = svg.selectAll(".vline")
 					.data(data.Values)
 					.enter()
@@ -127,7 +144,6 @@
 					.attr("x2", function(d){return xscale(d.Year)})
 					.attr("y1", function(d){return -20000})
 					.attr("y2", function(d){return 20000})
-					.style("stroke", "#eee")
 					.attr("class","vline")
 				
 				
@@ -183,9 +199,9 @@
 					.append("clipPath")
 					  .attr("id", "clip")
 					.append("rect")
-					  .attr("x", 50)
+					  .attr("x", 70)
 					  .attr("y", 10)
-					  .attr("width", w-pr)
+					  .attr("width", w-pr-pl)
 					  .attr("height", h-pb-pt);
 				
 				//add the path to the circles to activate the clipping

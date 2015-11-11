@@ -261,7 +261,6 @@
 					.interpolate("linear");
 				
 				//create the circles that will go into the svg
-				console.log(rgbColor);
 				var circles = svg.selectAll(".data")
 					.data(data.Values)
 					.enter()
@@ -489,6 +488,7 @@
 			});
 			
 			$("#plotColor").change(function(){
+				chipDisplayProps.plotColor = $("#plotColor").prop("value")
 				drawAllChips()
 			});
 			
@@ -1150,15 +1150,15 @@
 			for(var i=0;i<images.length;i++){years.push(1985+i)}
 			
 			var chipInfo = {
-					box: 1,
-					boxZoom: 1,
-					chipSize:195,
-					halfChipSize:97.5,
-					offset:30,
-					canvasHeight:195, //212,
-					dateYpos:207,
-					dateXpos:76.05,
-					zoomLevel:20, //0
+					//box: 1,
+					//boxZoom: 1,
+					//chipSize:195,
+					//halfChipSize:97.5,
+					//offset:30,
+					//canvasHeight:195, //212,
+					//dateYpos:207,
+					//dateXpos:76.05,
+					//zoomLevel:20, //0
 					chips:{
 						useThisChip:[],
 						canvasIDs:[],
@@ -1173,12 +1173,23 @@
 					}
 				};
 			
+			var chipDisplayProps = {
+					box: 1,
+					boxZoom: 1,
+					chipSize:195,
+					halfChipSize:97.5,
+					offset:30,
+					canvasHeight:195, //212,
+					zoomLevel:20,
+					plotColor:"#ED2939"					//0
+			};
+			
 			var n_chips = images.length,
 				minZoom = 0,
 				maxZoom = 40,
 				stopZoom = 40,
 				sAdj = [0],
-				lwAdj = [chipInfo.box],
+				lwAdj = [chipDisplayProps.box],
 				zoomIn = 0;
 			
 			///////////PLOT SIZE CHANGE///////////////////////////////////////////////////////////////////////////////			
@@ -1190,9 +1201,9 @@
 				plotSize = Math.max(plotSize,1);
 				plotSizeObject.prop("value",plotSize);	
 				//chipInfo.box = Math.sqrt(plotSize);
-				chipInfo.box = plotSize;
+				chipDisplayProps.box = plotSize;
 				$("#plotSizeList").hide();
-				switch(chipInfo.box){
+				switch(chipDisplayProps.box){
 					case 1:
 						stopZoom = 40;
 					break;
@@ -1217,19 +1228,23 @@
 				chipSizeObject.prop("value",chipSize);
 				
 				//redraw the canvases and img chips
-				chipInfo.chipSize = chipSize;
-				chipInfo.halfChipSize = chipSize/2;
-				chipInfo.offset = (255 - chipSize)/2;
-				chipInfo.canvasHeight = chipSize//+17;
-				//chipInfo.dateYpos = chipSize+12;
-				//chipInfo.dateXpos = chipSize*0.39;
-				
-				//$("#chipSizeList").hide();
-				//$("canvas").remove();
+				chipDisplayProps.chipSize = chipSize;
+				chipDisplayProps.halfChipSize = chipSize/2;
+				chipDisplayProps.offset = (255 - chipSize)/2;
+				chipDisplayProps.canvasHeight = chipSize//+17;
+
 				$(".chipHolder").remove();
-				appendChips();
+				appendChips("main");
 				updateChipInfo();
 				drawAllChips();	
+				
+				//send the zoom message
+				//these if's are exclusive - in the main window originURL is always null, in the remote window chipstripwindow is always null
+				if ((chipstripwindow != null) && chipstripwindow.closed == false){
+					var message = {"action":"chipSize","chipDisplayProps":chipDisplayProps} //prepare zoom message
+					chipstripwindow.postMessage(JSON.stringify(message),"*");	
+				}
+				
 			});
 			
 			$("#zoomSize").change(function(){
@@ -1237,22 +1252,22 @@
 					zoomSize = parseInt(zoomSizeObject.val());
 					if (zoomSize > stopZoom){zoomSize = stopZoom}
 					if (zoomSize < minZoom){zoomSize = minZoom}
-					chipInfo.zoomLevel = zoomSize;
+					chipDisplayProps.zoomLevel = zoomSize;
 	
 					drawAllChips(); //redraw the chips with the new zoom
 					
 					//prepare zoom message
-					zoomInfo = {
-						"action":"zoom",
-						"zoomLevel":chipInfo.zoomLevel
-					}
+					//zoomInfo = {
+					//	"action":"zoom",
+					//	"zoomLevel":chipDisplayProps.zoomLevel
+					//}
 
 					//send the zoom array to the external window
 					if ((chipstripwindow != null) && chipstripwindow.closed == false){ 
 						//prepare zoom message
 						zoomInfo = {
 							"action":"zoom",
-							"zoomLevel":chipInfo.zoomLevel
+							"zoomLevel":chipDisplayProps.zoomLevel
 						}
 						//send the zoom message
 						chipstripwindow.postMessage(JSON.stringify(zoomInfo),"*");
@@ -1261,21 +1276,28 @@
 			
 			
 			///////////DEFINE THE FUNCTION TO ADD THE CANVAS AND IMAGE FOR EACH CHIP ON-THE-FLY////////////
-			function appendChips(){
-				var appendThisCanvas = "",
-					appendThisImg = "";
-					
+			function appendChips(window){
+				//var appendThisCanvas = "",
+				//	appendThisImg = "";
 				for(var i=0; i<n_chips; i++){
-					chipInfo.chips.canvasIDs.push("chip"+i)
-					chipInfo.chips.imgIDs.push("img"+i)
+					chipInfo.chips.canvasIDs.push("chip"+i) ////xxxxxxxxxxxxxxxxx  THESE ARE A PROBLEM - DON;T WANT TO KEEP PUSHING 
+					chipInfo.chips.imgIDs.push("img"+i) // xxxxxxxxxxxxxxxxxxxxx THESE ARE A PROBLEM - DON;T WANT TO KEEP PUSHING 
 					//appendThisCanvas = '<canvas class="unselected" id="'+chipInfo.chips.canvasIDs[i]+'" width="'+chipInfo.chipSize+'" height="'+chipInfo.canvasHeight+'"></canvas>'; // style="border:1px solid #d3d3d3;"
-					appendThisCanvas = '<div id="'+chipInfo.chips.canvasIDs[i]+'" class="chipHolder">'+
-						'<canvas class="chipImg" width="'+chipInfo.chipSize+'" height="'+chipInfo.canvasHeight+'"></canvas>'+
+					if(window == "main"){
+					var appendThisCanvas = '<div id="'+chipInfo.chips.canvasIDs[i]+'" class="chipHolder">'+
+						'<canvas class="chipImg" width="'+chipDisplayProps.chipSize+'" height="'+chipDisplayProps.canvasHeight+'"></canvas>'+
 						'<div class="chipDate">date'+
 						'<span class="glyphicon glyphicon-new-window expandChipYear" aria-hidden="true" style="float:right; margin-right:5px"></span>'+
 						'</div>'+
 						'<img class="chipImgSrc" id="'+chipInfo.chips.imgIDs[i]+'"src="'+images[i]+'">'+
 						'</div>'
+					} else if(window == "remote"){
+						var appendThisCanvas = '<div id="'+chipInfo.chips.canvasIDs[i]+'" class="chipHolder">'+
+						'<canvas class="chipImg" width="'+chipDisplayProps.chipSize+'" height="'+chipDisplayProps.canvasHeight+'"></canvas>'+
+						'<div class="chipDate">date</div>'+
+						'<img class="chipImgSrc" id="'+chipInfo.chips.imgIDs[i]+'"src="'+images+'">'+
+						'</div>'
+					}
 					$("#chip-gallery").append(appendThisCanvas);
 					//appendThisImg = '<img class="chipImgSrc" id="'+chipInfo.chips.imgIDs[i]+'"src="'+images[i]+'">';
 					//$("#img-gallery").append(appendThisImg);
@@ -1285,13 +1307,18 @@
 
 			
 			////////////////DEFINE FUNCTION TO INITIALLY POPULATE CHIPINFO OBJECT/////////////////////////////////////
-			function makeChipInfo(){
+			function makeChipInfo(selection){
 				for(var i=0; i < n_chips; i++){					
-					//randomly select a chip from a strip to display - not needed once we have json file to tell us
-					var thisimg = document.getElementById(chipInfo.chips.imgIDs[i]),
-						thisManyChips = thisimg.naturalHeight/255,
+					var thisimg = document.getElementById(chipInfo.chips.imgIDs[i]);
+					var	thisManyChips = thisimg.naturalHeight/255; 
+					if(selection == "random"){
+						//randomly select a chip from a strip to display - not needed once we have json file to tell us
 						useThisChip = Math.floor((Math.random() * thisManyChips)); 
-					
+					} else if(selection == "ordered"){
+						useThisChip = i;						
+					} else if(selection == "json"){
+							
+					}
 					//define/store some other info needed for zooming
 					chipInfo.chips.chipsInStrip.push(thisManyChips);
 					chipInfo.chips.useThisChip.push(useThisChip);			
@@ -1304,20 +1331,20 @@
 			function updateChipInfo(){
 				for(var i=0; i < n_chips; i++){										
 					//define/store some other info needed for zooming
-					chipInfo.chips.sxOrig[i] = chipInfo.offset;	//0 chipInfo.offset set/push the original source x offset to the sxOrig array
-					chipInfo.chips.syOrig[i] = (255*chipInfo.chips.useThisChip[i])+chipInfo.offset; // +chipInfo.offset   set/push the original source y offset to the syOrig array
-					chipInfo.chips.sWidthOrig[i] = chipInfo.chipSize; //255  set/push the original source x width to the sWidthOrig array
+					chipInfo.chips.sxOrig[i] = chipDisplayProps.offset;	//0 chipInfo.offset set/push the original source x offset to the sxOrig array
+					chipInfo.chips.syOrig[i] = (255*chipInfo.chips.useThisChip[i])+chipDisplayProps.offset; // +chipInfo.offset   set/push the original source y offset to the syOrig array
+					chipInfo.chips.sWidthOrig[i] = chipDisplayProps.chipSize; //255  set/push the original source x width to the sWidthOrig array
 					chipInfo.chips.sxZoom[i] = chipInfo.chips.sxOrig[i];
 					chipInfo.chips.syZoom[i] = chipInfo.chips.syOrig[i];
 					chipInfo.chips.sWidthZoom[i] = chipInfo.chips.sWidthOrig[i];					
 				}
 				
-				var starter = chipInfo.halfChipSize,
-					lwstarter = chipInfo.box;
+				var starter = chipDisplayProps.halfChipSize,
+					lwstarter = chipDisplayProps.box;
 									
 				for(var i=1; i<maxZoom+1; i++){
 					starter *= 0.9 
-					sAdj[i] = (chipInfo.halfChipSize-starter);
+					sAdj[i] = (chipDisplayProps.halfChipSize-starter);
 					lwstarter /= 0.9;
 					lwAdj[i] = lwstarter;
 				}
@@ -1325,9 +1352,8 @@
 						
 			
 			////////////////DEFINE FUNCTION TO DRAW ALL THE IMAGE CHIPS TO THE CANVASES/////////////////////
-			var plotColor = $("#plotColor").prop("value") //global variable
+			//var plotColor = $("#plotColor").prop("value") //global variable
 			function drawAllChips(){
-				plotColor = $("#plotColor").prop("value")
 				updateZoom();
 				for(var i=0; i<n_chips; i++){drawOneChip(i)}
 			}
@@ -1336,7 +1362,7 @@
 			////////////DEFINE FUNCTION TO DRAW A NEW IMAGE SECTION TO A CANVAS////////////////////////////
 			function drawOneChip(thisChip){				
 				//var imgID = document.getElementById(chipInfo.chips.imgIDs[thisChip]),   //these might be faster - need to add an ID to the canvases - right now it is all tied to indexes of .chipHolder divs for the differnt components (canvas, img, date) 
-				//	canvasID = document.getElementById(chipInfo.chips.canvasIDs[thisChip]);
+				//	canvasID = document.getElementById(chipInfo.chips.canvasIDs[thisChip]),
 				var imgID = $(".chipImgSrc").eq(thisChip)[0],
 					canvasID = $(".chipImg").eq(thisChip)[0],
 					ctx = canvasID.getContext("2d");
@@ -1351,11 +1377,11 @@
 					chipInfo.chips.syZoom[thisChip],
 					chipInfo.chips.sWidthZoom[thisChip],
 					chipInfo.chips.sWidthZoom[thisChip],
-					0,0,chipInfo.chipSize,chipInfo.chipSize); //chipInfo.offset,chipInfo.offset
-				ctx.strokeStyle=plotColor; //"#FF0000"
+					0,0,chipDisplayProps.chipSize,chipDisplayProps.chipSize); //chipInfo.offset,chipInfo.offset
+				ctx.strokeStyle=chipDisplayProps.plotColor; //"#FF0000"
 				ctx.lineWidth=1;
 				ctx.lineCap = 'square';
-				ctx.strokeRect(chipInfo.halfChipSize-(chipInfo.boxZoom/2), chipInfo.halfChipSize-(chipInfo.boxZoom/2), chipInfo.boxZoom, chipInfo.boxZoom);
+				ctx.strokeRect(chipDisplayProps.halfChipSize-(chipDisplayProps.boxZoom/2), chipDisplayProps.halfChipSize-(chipDisplayProps.boxZoom/2), chipDisplayProps.boxZoom, chipDisplayProps.boxZoom);
 				//ctx.font = "11px";
 				//ctx.fillText("Image Date",chipInfo.dateXpos,chipInfo.dateYpos); //NEED TO GET THE "IMAGE DATE" PASSED IN AS A PARAMETER FROM THE JSON OBJECT OR SIMILAR
 			}
@@ -1375,11 +1401,11 @@
 			
 			function updateZoom(){
 				for(var i=0; i<n_chips; i++){
-					chipInfo.chips.sxZoom[i] = chipInfo.chips.sxOrig[i]+sAdj[chipInfo.zoomLevel];
-					chipInfo.chips.syZoom[i] = chipInfo.chips.syOrig[i]+sAdj[chipInfo.zoomLevel];
-					chipInfo.chips.sWidthZoom[i] = chipInfo.chips.sWidthOrig[i]-(sAdj[chipInfo.zoomLevel]*2);
+					chipInfo.chips.sxZoom[i] = chipInfo.chips.sxOrig[i]+sAdj[chipDisplayProps.zoomLevel];
+					chipInfo.chips.syZoom[i] = chipInfo.chips.syOrig[i]+sAdj[chipDisplayProps.zoomLevel];
+					chipInfo.chips.sWidthZoom[i] = chipInfo.chips.sWidthOrig[i]-(sAdj[chipDisplayProps.zoomLevel]*2);
 				}
-				chipInfo.boxZoom = lwAdj[chipInfo.zoomLevel];
+				chipDisplayProps.boxZoom = lwAdj[chipDisplayProps.zoomLevel];
 			}
   
 			
@@ -1389,67 +1415,54 @@
 						e.preventDefault(); //make sure that default browser behaviour is prevented
 						if(e.deltaX <= -1 || e.deltaY >= 1){zoomIn = 1} else {zoomIn = 0}
 						if(zoomIn > 0){
-							if (chipInfo.zoomLevel < maxZoom & chipInfo.zoomLevel < stopZoom){chipInfo.zoomLevel++;}
+							if (chipDisplayProps.zoomLevel < maxZoom & chipDisplayProps.zoomLevel < stopZoom){chipDisplayProps.zoomLevel++;}
 						} else {
-							if (chipInfo.zoomLevel > minZoom){chipInfo.zoomLevel--;}
+							if (chipDisplayProps.zoomLevel > minZoom){chipDisplayProps.zoomLevel--;}
 						}
-
-						//redraw the chips
-						//updateZoom(); //update the zoom arrays	
-						drawAllChips(); //redraw the chips with the new zoom
+						drawAllChips(); //redraw the chips with the new zoom						
+						zoomInfo = {"action":"zoom","zoomLevel":chipDisplayProps.zoomLevel} //prepare zoom message
 						
-						//prepare zoom message
-						zoomInfo = {
-							"action":"zoom",
-							"zoomLevel":chipInfo.zoomLevel
-						}
-
-						//send the zoom array to the external window
-						if ((chipstripwindow != null) && chipstripwindow.closed == false){ 
-							//prepare zoom message
-							zoomInfo = {
-								"action":"zoom",
-								"zoomLevel":chipInfo.zoomLevel
-							}
-							//send the zoom message
-							chipstripwindow.postMessage(JSON.stringify(zoomInfo),"*");
-						}		
+						//send the zoom message
+						//these if's are exclusive - in the main window originURL is always null, in the remote window chipstripwindow is always null
+						if ((chipstripwindow != null) && chipstripwindow.closed == false){
+							chipstripwindow.postMessage(JSON.stringify(zoomInfo),"*");	
+						} else if(originURL != null){originURL.postMessage(JSON.stringify(zoomInfo),"*");}	//send the zoom info to the main window
 					}
 				});
 			});
 			
 			
 			//make the chip gallery expand on click
-			$(document).ready(function(){
-				$("#chip-gallery").click(function(e){
-					if(!e.ctrlKey && !e.shiftKey){
-						var status = $(this).css("height");
-						if(status == "565px"){
-							$(this).css("height","auto");
-						} else {
-							$(this).css("height","565px");
-						}
-					}
-					
-				});
-			});
+			//$(document).ready(function(){
+			//	$("#chip-gallery").click(function(e){
+			//		if(!e.ctrlKey && !e.shiftKey){
+			//			var status = $(this).css("height");
+			//			if(status == "565px"){
+			//				$(this).css("height","auto");
+			//			} else {
+			//				$(this).css("height","565px");
+			//			}
+			//		}		
+			//	});
+			//});
 			
 			
 			///////////////////OPEN THE REMOTE CHIP STRIP WINDOW AND SEND MESSAGES/////////////////////
 			var chipstripwindow = null ;//keep track of whether the chipstrip window is open or not so it is not opened in multiple new window on each chip click
+			var originURL = null;
 			$("body").on("click", ".expandChipYear", function(e){ //need to use body because the canvases have probably not loaded yet
 				//if (e.ctrlKey) { 					
-					var thisImg = (parseInt($(this).attr("id").replace( /^\D+/g, ''))); //extract the chip index
+					//var thisImg = (parseInt($(this).attr("id").replace( /^\D+/g, ''))); //extract the chip index
+					var thisImg = $(".expandChipYear").index(this); //extract the chip index
 					var pass_data = {
 						"action":"add_chips", //hard assign
 						"n_chips":chipInfo.chips.chipsInStrip[thisImg], //"n_chips":"40", //get this from the img metadata
 						"src":images[thisImg], //"src":"chips/chips_2012.png", //get this from the id of the .chipholder clicked
 						"canvasID":$(this).attr("id"),
-						"zoomLevel":chipInfo.zoomLevel
+						"chipDisplayProps":chipDisplayProps
 					};
-					
 					if ((chipstripwindow == null) || (chipstripwindow.closed)){      //if the window is not loaded then load it and send the message after it is fully loaded
-						chipstripwindow = window.open("./chip_strip_5.html","_blank","width=1080px, height=840px", "toolbar=0","titlebar=0","menubar=0","scrollbars=yes"); //open the remote chip strip window
+						chipstripwindow = window.open("./chip_strip_6.html","_blank","width=1080px, height=840px", "toolbar=0","titlebar=0","menubar=0","scrollbars=yes"); //open the remote chip strip window
 						$(chipstripwindow).load(function(){chipstripwindow.postMessage(JSON.stringify(pass_data),"*");}); //wait until the remote window finishes loading before sending the message
 					} else {                                                         //else if the window is already loaded, just send the message - no need to wait
 						chipstripwindow.postMessage(JSON.stringify(pass_data),"*");
@@ -1490,7 +1503,7 @@
 					replaceChip(pass_data.originChipIndex, pass_data.newSyOffset); //replace a chip with one selected in the remote window
 					//$(document).ready(function(){drawAllChips()}); //wait until the image has loaded and then draw the chips
 				} else if (pass_data.action == "zoom"){
-					chipInfo.zoomLevel = pass_data.zoomLevel;
+					chipDisplayProps.zoomLevel = pass_data.zoomLevel;
 					//updateZoom();
 					drawAllChips();
 				}
@@ -1502,6 +1515,6 @@
 			/////////////////////////LOAD THE CHIPS////////////////////////////////////////////////////////
 			//function to run functions that need all the elements to be loaded - also need to do them in order was the window is loaded
 			function start(){
-				makeChipInfo();
+				makeChipInfo("random");
 				drawAllChips();
 			}

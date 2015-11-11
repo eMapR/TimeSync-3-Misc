@@ -122,7 +122,7 @@ svg{
 
 /*############## CHIP GALLERY ###############################################################*/
 #chip-gallery{
-	height:565px;
+	height:59.6vh; /*565px*/
 	width:auto;
 	overflow-y: auto;
 }
