@@ -13,12 +13,13 @@
 
 		</style>
 	</head>
-	<body> <!-- onload="drawAllChips();"--> 
+	<body>
 
-			<div id="chipGallerySection" style="margin:10px;">
-				<p class="header">Intra-Annual Chip Gallery</p>
-				<div id="chip-gallery" style=" height: 95vh"></div>
-			</div>
+		<div id="chipGallerySection" style="margin:10px;">
+			<p class="header">Intra-Annual Chip Gallery</p>
+			<div id="chip-gallery" style=" height: 95vh"></div>
+		</div>
+		<div id="img-gallery"></div>
 
 		
 		<script>
@@ -27,15 +28,17 @@
 			///////////////////SEND MESSAGES TO THE ORIGIN WINDOW///////////////////	
 			$(document).on("click","canvas",function(e){
 				if (e.ctrlKey) {
-					var canvasID = $(this).attr("id"); //get the id of the chip that was clicked on
-					var canvasIDindex = parseInt(canvasID.replace( /^\D+/g, '')); //extract the chip index
+					//var canvasID = $(this).attr("id"); //get the id of the chip that was clicked on
+					//var canvasIDindex = parseInt(canvasID.replace( /^\D+/g, '')); //extract the chip index
+					var canvasIDindex = $("canvas").index(this);
 					var newSyOffset = canvasIDindex*255; //calc the source x offset for that chip
-					var originChipIndex = parseInt(originChipID.replace( /^\D+/g, '')); //extract the origin chip index
+					//var originChipIndex = parseInt(originChipID.replace( /^\D+/g, '')); //extract the origin chip index
 					var passback = {
 						"action":"replace_chip",
 						"newSyOffset":newSyOffset, //tell the origin where to set the original offset for the chip
-						"originChipID":originChipID, //tell the origin which chip to set the original offset for (ID)
-						"originChipIndex":originChipIndex //tell the origin which chip to set the original offset for (index)
+						//"originChipID":originChipID, //tell the origin which chip to set the original offset for (ID)
+						"originChipIndex":originChipIndex, //tell the origin which chip to set the original offset for (index)
+						"useThisChip":canvasIDindex //tell the origin what chip to use instead
 					}
 					originURL.postMessage(JSON.stringify(passback), '*'); //the 'originURL' object is just the url of the origin window saved when a messages was received from it	
 				}
@@ -53,21 +56,21 @@
 				var dataFromOrigin = JSON.parse(e.originalEvent.data);
 				if(dataFromOrigin.action == "add_chips"){
 					originURL = e.originalEvent.source; //the 'e.originalEvent.source' is just the url of the origin window - save it for use later when we need to send messages to the origin window
-					originChipID = dataFromOrigin.canvasID;
+					originChipIndex = dataFromOrigin.chipIndex;
 					n_chips = dataFromOrigin.n_chips; //need global 
 					chipDisplayProps = dataFromOrigin.chipDisplayProps
 					images = dataFromOrigin.src; //need global
 					$(document).ready(function(){
 						$("#chip-gallery").empty();
+						$("#img-gallery").empty();
+						chipInfo = {chips:{useThisChip:[],canvasIDs:[],imgIDs:[],sxOrig:[],syOrig:[],sWidthOrig:[],sxZoom:[],syZoom:[],sWidthZoom:[],chipsInStrip:[]}};
 						appendChips("remote")
 						makeChipInfo("ordered");
 						drawAllChips();
-						console.log(chipInfo);
 					}); //wait until the image has loaded and then draw the chips
 				} else if (dataFromOrigin.action == "zoom"){
 					drawAllChips();
 				} else if (dataFromOrigin.action == "chipSize"){
-					console.log(chipInfo);
 					chipDisplayProps = dataFromOrigin.chipDisplayProps
 						$(".chipHolder").remove();
 						appendChips("remote");

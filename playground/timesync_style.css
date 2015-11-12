@@ -216,9 +216,7 @@ svg{
 
 #plotSelectionDiv{
 	min-width:55px;
-	width:55px;
-	height:%;
-	
+	width:55px;	
 }
 #plotSelectionDiv ul{
 	list-style-type: none;

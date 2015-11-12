@@ -1146,7 +1146,7 @@
 				"chips/test_chip_2013.png",
 				"chips/test_chip_2014.png"
 			];
-			years = [];
+			var years = [];
 			for(var i=0;i<images.length;i++){years.push(1985+i)}
 			
 			var chipInfo = {
@@ -1276,35 +1276,45 @@
 			
 			
 			///////////DEFINE THE FUNCTION TO ADD THE CANVAS AND IMAGE FOR EACH CHIP ON-THE-FLY////////////
-			function appendChips(window){
-				//var appendThisCanvas = "",
-				//	appendThisImg = "";
-				for(var i=0; i<n_chips; i++){
-					chipInfo.chips.canvasIDs.push("chip"+i) ////xxxxxxxxxxxxxxxxx  THESE ARE A PROBLEM - DON;T WANT TO KEEP PUSHING 
-					chipInfo.chips.imgIDs.push("img"+i) // xxxxxxxxxxxxxxxxxxxxx THESE ARE A PROBLEM - DON;T WANT TO KEEP PUSHING 
-					//appendThisCanvas = '<canvas class="unselected" id="'+chipInfo.chips.canvasIDs[i]+'" width="'+chipInfo.chipSize+'" height="'+chipInfo.canvasHeight+'"></canvas>'; // style="border:1px solid #d3d3d3;"
-					if(window == "main"){
-					var appendThisCanvas = '<div id="'+chipInfo.chips.canvasIDs[i]+'" class="chipHolder">'+
-						'<canvas class="chipImg" width="'+chipDisplayProps.chipSize+'" height="'+chipDisplayProps.canvasHeight+'"></canvas>'+
-						'<div class="chipDate">date'+
-						'<span class="glyphicon glyphicon-new-window expandChipYear" aria-hidden="true" style="float:right; margin-right:5px"></span>'+
-						'</div>'+
-						'<img class="chipImgSrc" id="'+chipInfo.chips.imgIDs[i]+'"src="'+images[i]+'">'+
-						'</div>'
-					} else if(window == "remote"){
-						var appendThisCanvas = '<div id="'+chipInfo.chips.canvasIDs[i]+'" class="chipHolder">'+
-						'<canvas class="chipImg" width="'+chipDisplayProps.chipSize+'" height="'+chipDisplayProps.canvasHeight+'"></canvas>'+
-						'<div class="chipDate">date</div>'+
-						'<img class="chipImgSrc" id="'+chipInfo.chips.imgIDs[i]+'"src="'+images+'">'+
-						'</div>'
-					}
-					$("#chip-gallery").append(appendThisCanvas);
-					//appendThisImg = '<img class="chipImgSrc" id="'+chipInfo.chips.imgIDs[i]+'"src="'+images[i]+'">';
-					//$("#img-gallery").append(appendThisImg);
-				}
-				$("#chip0, #chip"+(n_chips-1)).addClass("selected")
+			var imgSrcAppended = false //tracker - once the image src's have been appended don't do it again
+			function appendChips(window){ //this function is handling the appending of the main chips and the remote chips, though it might be better to separate them
+				switch(window){
+					case "main":
+						for(var i=0; i<n_chips; i++){
+							chipInfo.chips.canvasIDs[i] = ("chip"+i) 
+							chipInfo.chips.imgIDs[i] = ("img"+i)
+							var appendThisCanvas = '<div id="'+chipInfo.chips.canvasIDs[i]+'" class="chipHolder">'+
+									'<canvas class="chipImg" width="'+chipDisplayProps.chipSize+'" height="'+chipDisplayProps.canvasHeight+'"></canvas>'+
+									'<div class="chipDate">date'+
+										'<span class="glyphicon glyphicon-new-window expandChipYear" aria-hidden="true" style="float:right; margin-right:5px"></span>'+
+									'</div>'+
+								'</div>',
+								appendThisImg = '<img class="chipImgSrc" id="'+chipInfo.chips.imgIDs[i]+'"src="'+images[i]+'">';
+							$("#chip-gallery").append(appendThisCanvas);
+							if(imgSrcAppended == false){$("#img-gallery").append(appendThisImg);}
+						}
+						imgSrcAppended = true //tracker - once the image src's have been appended don't do it again
+					break;
+					case "remote":
+						for(var i=0; i<n_chips; i++){
+							chipInfo.chips.canvasIDs[i] = ("chip"+i) 
+							chipInfo.chips.imgIDs[i] = ("img"+i)
+							var appendThisCanvas = '<div id="'+chipInfo.chips.canvasIDs[i]+'" class="chipHolder">'+
+									'<canvas class="chipImg" width="'+chipDisplayProps.chipSize+'" height="'+chipDisplayProps.canvasHeight+'"></canvas>'+
+									'<div class="chipDate">date</div>'+
+								'</div>',
+								appendThisImg = '<img class="chipImgSrc" id="'+chipInfo.chips.imgIDs[i]+'"src="'+images+'">';
+							$("#chip-gallery").append(appendThisCanvas);
+							$("#img-gallery").append(appendThisImg);
+						}
+						appendThisImg = '<img class="chipImgSrc" id="'+chipInfo.chips.imgIDs[i]+'"src="'+images+'">';
+						$("#img-gallery").append(appendThisImg);
+					break;
+				}										
+				$("#chip0, #chip"+(n_chips-1)).addClass("selected")				
 			}
-
+			
+			
 			
 			////////////////DEFINE FUNCTION TO INITIALLY POPULATE CHIPINFO OBJECT/////////////////////////////////////
 			function makeChipInfo(selection){
@@ -1369,8 +1379,7 @@
 				ctx.clearRect(0, 0, canvasID.width, canvasID.height);
 				ctx.mozImageSmoothingEnabled = false;
 				ctx.msImageSmoothingEnabled = false;
-				ctx.imageSmoothingEnabled = false;
-								
+				ctx.imageSmoothingEnabled = false;		
 				ctx.drawImage(
 					imgID,
 					chipInfo.chips.sxZoom[thisChip],
@@ -1388,13 +1397,15 @@
 			
 							
 			////////////REPLACE A CHIP WITH ONE SELECTED IN THE REMOTE WINDOW//////////////////////////////
-			function replaceChip(replaceThisChip,newSyOffset){
-				//adjust the chip offset for the orig and zoom arrays
-				chipInfo.chips.syOrig[replaceThisChip] = newSyOffset //set the new original offset
-				chipInfo.chips.syZoom[replaceThisChip] = chipInfo.chips.syOrig[replaceThisChip]+sAdj[chipInfo.zoomLevel]; //set the new zoom offset
-				
-				//draw the new chip
-				drawOneChip(replaceThisChip)	
+			function replaceChip(pass_data){
+				//adjust the chip offset for the orig			
+				var thisChip = pass_data.originChipIndex
+				chipInfo.chips.useThisChip[thisChip] = pass_data.useThisChip
+				chipInfo.chips.syOrig[thisChip] = (255*chipInfo.chips.useThisChip[thisChip])+chipDisplayProps.offset; // +chipInfo.offset   set/push the original source y offset to the syOrig array
+				chipInfo.chips.syZoom[thisChip] = chipInfo.chips.syOrig[thisChip]+sAdj[chipDisplayProps.zoomLevel];
+				//draw the chip - need to call updateZoom first since not running drawAllChips
+				//updateZoom() //don't need to run since the syZoom was updated a line up
+				drawOneChip(thisChip)	
 			}
 			/////////////////////////////////////////////////////////////////////////////////////////////////
 			
@@ -1458,7 +1469,8 @@
 						"action":"add_chips", //hard assign
 						"n_chips":chipInfo.chips.chipsInStrip[thisImg], //"n_chips":"40", //get this from the img metadata
 						"src":images[thisImg], //"src":"chips/chips_2012.png", //get this from the id of the .chipholder clicked
-						"canvasID":$(this).attr("id"),
+						//"canvasID":$(this).attr("id"),
+						"chipIndex":$(".expandChipYear").index(this),
 						"chipDisplayProps":chipDisplayProps
 					};
 					if ((chipstripwindow == null) || (chipstripwindow.closed)){      //if the window is not loaded then load it and send the message after it is fully loaded
@@ -1500,11 +1512,10 @@
 			$(window).on("message onmessage",function(e){
 				var pass_data = JSON.parse(e.originalEvent.data);
 				if(pass_data.action == "replace_chip"){
-					replaceChip(pass_data.originChipIndex, pass_data.newSyOffset); //replace a chip with one selected in the remote window
-					//$(document).ready(function(){drawAllChips()}); //wait until the image has loaded and then draw the chips
+					//replaceChip(pass_data.originChipIndex, pass_data.newSyOffset, pass_data.useThisChip);
+					replaceChip(pass_data); //replace a chip with one selected in the remote window
 				} else if (pass_data.action == "zoom"){
 					chipDisplayProps.zoomLevel = pass_data.zoomLevel;
-					//updateZoom();
 					drawAllChips();
 				}
 				

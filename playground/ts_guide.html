@@ -1,0 +1,280 @@
+<div>
+	<h4>Introduction</h4>
+	<p>
+		This document describes the approach (or response design) for using the plot-based TimeSync time series 
+		visualization tool to collect reference information for the joint LCMS/LCMAP effort to comprehensively map 
+		land cover and land use change across the US using the Landsat data record from 1984-present. For any given plot, 
+		TimeSync is used to temporally demarcate Landsat spectral trajectories into observable change segments, following 
+		the logic of Cohen et al. (2010) and Kennedy et al. (2010). Segments are approximately linear spectral trends 
+		commonly associated with vegetation disturbance and regrowth processes, and may involve only land cover change 
+		or both land cover and land use change. Vertices define start and end dates of a given segment and have descriptors 
+		that characterize both the land use and land cover before and after a change event. 
+		A disturbance in a woody vegetation environment is commonly declared only in cases where the woody vegetation
+		is affected. Occasional snow cover or recurring inundation of wetland areas that does not significantly alter
+		the longer-term trajectory of shrubs and trees are not considered disturbances. Disturbances in non-forest 
+		environments are possible, such as grassland fires or mechanical removal of vegetation in shrub dominated systems.
+		Disturbances are also declared for land use changes (e.g., agricultural land transformed into a housing development), 
+		and are labeled as conversion. Regrowth is a change process that involves vegetation growth, commonly associated 
+		with post-disturbance vegetation succession but also with accumulation of vegetation in areas where growth was 
+		previously inhibited. Integrated data can yield additional information that is not readily apparent from the 
+		individual interpretation elements. In such cases, combining that change process with before and after land use, 
+		however, does resolve this.
+	</p>
+	<p>
+		The response design is not static, and this document will be updated as necessary. It is important to document 
+		challenges, inconsistencies, or other remarkable situations that arise during the interpretations. Regular meetings
+		among interpreters and other critical players will take place (beginning monthly) to discuss these challenging 
+		observations and resolve them. 
+	</p>
+
+	<h5>How the response design works?</h5>
+	<p>
+		The joint LCMS/LCMAP design requires selections from several categories: Land Use, Dominant (Area-based) Land 
+		Cover Element, Change Process, and Checkboxes (if relevant). Several rules must be adhered to:
+	</p>
+	<ol>
+		<li>
+			All calls are explicitly based on the 1-pixel plot area. However, it is important to view the 9-pixel 
+			neighborhood centered on the 1-pixel plot and the temporal context to make the calls. 
+		</li>
+		<li>
+			The dominant use and process must be chosen, based on areal coverage in the 1-pixel plot. If there are 
+			secondary use or process classes, those are ignored, but should be documented in the comments box. Forest is a 
+			special case, in that it must meet a minimum size threshold. 
+		</li>
+		<li>
+			Checkboxes must be used if they are relevant. Where there are multiple checkboxes, more than one can be 
+			chosen. In some cases, the checkboxes are mutually exclusive, in other cases they are not. This should be 
+			obvious from the context. 
+		</li>
+		<li>
+			The dominant cover element must be chosen. But if other cover elements exist (must be at least 10% of pixel), 
+			those are noted with checkboxes. 
+		</li>
+		<li>
+			There is an implied hierarchy in the Land use class structure. Forest is chosen before before Rangeland before 
+			Non-forest wetland; other classes are naturally mutually exclusive. 
+		</li>
+		<li>
+			Land use class Other is for snow/ice, water, salt flats and other unlisted use types. 
+		</li>
+		<li>
+			The change process class Other is an option for disturbance processes. However, this should be rarely used, 
+			and only when there is certainty about disturbance but uncertainty about cause.
+		</li>
+		<li>
+			There are two site-prep fire checkboxes. The one under fire is used when the site-prep fire results in a separate, 
+			distinguishable disturbance segment, whereas the one under harvest is used when only the site-prep fire is seen 
+			but we also want to capture the harvest event preceding it.
+		</li>
+	</ol>
+
+	<h4>Vertex Labels: Land Use</h4>
+	<ul>
+		<li>
+			<strong>Forest</strong>: planted or naturally vegetated land which contains (or is likely to contain) 10% or greater tree cover at some 
+			time during a near-term successional sequence. This may include deciduous, evergreen and/or mixed categories of natural 
+			forest, forest plantations, and woody wetlands. In accordance with FIA's definition of forest, trees (or the ground area
+			with potential for trees) must be a minimum of 1 acre in size (i.e. approximately >= 5 contiguous Landsat pixels) and 
+			at least 120 feet wide (i.e. approximately 1 Landsat pixel). Patches of 5 or more adjoining pixels can take any shape 
+			including linear. Forest roads (i.e. those that are not used for public transport from town to town), are considered 
+			forestland use. For situations where trees occur around a home site (or other man-made structure) or in an agricultural 
+			field, the land use call will revert to developed or agriculture respectively. Rivers and streams that are overtopped 
+			by trees are considered forest land use. Actively managed Xmas tree farms or tree nurseries, orchards and vineyards are
+			considered agriculture. 
+			<ul>
+				<li>
+					In the event a plot meets the minimum tree cover and patch size threshold for forest use but is also determined 
+					to be a <strong>Wetland</strong>, then a check box will be used to indicate this secondary use class.
+				</li>
+			</ul>
+		</li>
+
+		<li>
+			<strong>Developed</strong>: Areas of intensive use such that any portion of the pixel is covered with structures (e.g. high density 
+			residential, commercial, industrial, or transportation), or less intensive uses where the land cover matrix includes both 
+			vegetation and structures (e.g., low density residential, lawns, recreational facilities, cemeteries, transportation and 
+			utility corridors, etc.), including any land functionally altered by human activity. Note that narrower forest and 
+			agricultural roads are considered forest or agricultural land use respectively.
+			<ul>
+				<li>
+					In the event that strip mining, open-pit mining, quarries, or mountain top removal is observed a check box
+					will be used to indicate the presence of <strong>Mining</strong> activity. 
+				</li>
+			</ul>
+		</li>
+
+		<li>
+			<strong>Agriculture</strong>: Land in either a vegetated or unvegetated state used for the production of food, fiber 
+			and fuels. This includes but is not limited to cultivated and uncultivated croplands, hay lands, actively managed 
+			and/or grazed pasture lands, orchards, vineyards, confined livestock operations, and areas planted for production of
+			fruits, nuts or berries. Roads used primarily for agricultural use (i.e. not used for public transport from town to 
+			town) are considered as agriculture land use. 
+			<ul>
+				<li>
+					In an effort to better distinguish food production from managed pasture and hay lands specific evidence 
+					of <strong>Row crops</strong> and the presence of <strong>Orchard/Tree farms/Vineyards</strong> will be 
+					recorded with a series of check boxes.    
+				</li>
+			</ul>
+		</li>
+
+		<li>
+			<strong>Non-forest Wetland</strong>: Lands where water saturation (either permanently or seasonally) is a primary 
+			factor in determining soil characteristics, vegetation types, and animal communities. Examples include marshes, 
+			bogs, swamps, quagmires, muskegs, sloughs, fens, and bayous. 
+		</li>
+		<li>
+			<strong>Rangeland</strong>: Lands where the native vegetation is predominately grasses, grass-like plants, 
+			forbs or shrubs suitable for grazing or browsing of livestock or other animals. This category does not include
+			pasture directly associated with agriculture, but does include open rangeland in which vegetation is not being 
+			actively managed (although it may be grazed). Most rangeland in the U.S. is located west of an irregular north/south
+			line that cuts through the Dakotas, Nebraska, Kansas, Oklahoma and Texas. In the arid regions of the western U.S. 
+			care should be taken to ensure oak woodlands and pinyon-juniper dominated systems that meet the minimum tree cover 
+			and patch size thresholds are classified as forest land use.   
+		</li>
+		<li>
+			<strong>Other</strong>: Lands which are perennially covered with snow and ice, water, salt flats and other undeclared
+			classes. Glaciers and ice sheets or places where snow and ice obscure any other land cover call are included 
+			(assumed is the presence of permanent snow and ice; otherwise a different class is more appropriate). Water 
+			includes rivers, streams, canals, ponds, lakes, reservoirs, bays, or oceans. This assumes permanent water (which 
+			can be in some state of flux due to ephemeral changes brought on by climate or man); otherwise a different class 
+			is more appropriate. 
+		</li>
+	</ul>
+
+	<h4>Vertex Labels: Dominant Land Cover Element</h4>
+	<ul>
+		<li>
+			<strong>Tree</strong>: Land where the cover of live or standing dead trees is greater than or equal to 10% 
+			of the pixel area. 
+		</li>
+		<li>
+			<strong>Shrub</strong>: Vegetated land where shrub cover is greater than or equal to 10% and tree cover is
+			less than 10% of the pixel area. 
+		</li>
+		<li>
+			<strong>Grass/forb/herb</strong>: Land predominately covered with perennial grasses, forbs, or other forms
+			of herbaceous vegetation. The non-grass cover component (e.g. shrubs and trees) comprises less than 10% of
+			the pixel area. 
+		</li>
+		<li>
+			<strong>Impervious</strong>: Land covered with man-made materials that water cannot penetrate, such as 
+			paved roads, rooftops, and parking lots. 
+		</li>
+		<li>
+			<strong>Natural Barren</strong>: Land comprised of natural occurrences of bare soil associated with 
+			rotational croplands, and perennially barren areas such as deserts, playas, rock outcroppings (including
+			minerals and other geologic materials exposed by surface mining activities), sand dunes, salt flats, and
+			beaches where less than 10% of the pixel area is vegetated. 
+		</li>
+		<li>
+			<strong>Snow/Ice</strong>: Land where at least 10% of the pixel area is covered by permanent snow and ice.
+		</li>
+		<li>
+			<strong>Water</strong>: Land where at least 10% of the pixel area is covered by permanent water.
+		</li>
+	</ul>
+
+	<h4>Segment Labels: Change Processes</h4>
+		<ul>
+		<li>
+			<strong>Fire</strong>: Land (regardless of use) altered by fire, regardless of the cause of the ignition
+			(natural or anthropogenic), severity, or land use. 
+			<ul>
+				<li>
+					A check box will be used to capture the occurrence of post-harvest <strong>Site-prep fires</strong> which result
+					in a separate, distinguishable disturbance segment. For instances where burning is evident but 
+					the preceding harvest is not, the site-prep fire option under harvest should be used instead.  
+					Checkboxes also exist to distinguish between natural and prescribed burning. 
+				</li>
+			</ul>
+		</li>
+		
+		<li>
+			<strong>Harvest</strong>: Land where trees, shrubs or other vegetation have been mechanically severed or removed
+			by anthropogenic means. Examples include salvage logging after fire or insect outbreaks, scraping, chaining,
+			earth moving, mining, building of non-forest roads, dams, and building or construction of man-made structures.
+			Harvests can occur over a two-year (or more) period, but should only be assigned a single, multi-year segment.
+			For example, some systems are managed such that a few trees are removed over the course of several consecutive
+			years, and in this case it is best to declare a single, multi-year harvest segment.
+			<ul>
+				<li>
+					A series of check boxes will be used to record evidence of <strong>Clearcutting</strong> (defined as >=80% removal 
+					of trees/vegetation), <strong>Thinning</strong> (defined as <=20% removal of trees/vegetation), and <strong>Site-prep fires</strong>
+					(e.g. where vegetation and debris remaining after clearcutting is burned to ready the site for planting).
+					Note this site-prep fire option is used only in circumstances where burning is evident, but the 
+					preceding harvest is not directly seen due to image acquisition timing or cloud cover obstruction.
+					In the event a site-prep fire results in a separate, distinguishable change segment, the site-prep 
+					fire option under fire should be used instead. 
+				</li>
+			</ul>
+		</li>
+
+		<li>
+			<strong>Decline</strong>: Land altered by disturbance from non-anthropogenic or non-mechanical means. This type of
+			stress related disturbance often results in a subtle spectral trend in natural (primarily woody) vegetation
+			environments, most likely from insects, disease, drought, acid rain, etc. Clear evidence of tree mortality 
+			and/or loss of leaf area must be observed. 
+		</li>
+		<li>
+			<strong>Wind</strong>: Land (regardless of use) where vegetation is altered by wind related damage from hurricanes, 
+			tornados, and storms. 
+		</li>
+		<li>
+			<strong>Hydrology</strong>: Land where flooding has significantly altered woody cover or other land cover elements regardless
+			of land use (e.g. new mixtures of gravel and vegetation in and around streambeds after a flood). Flood 
+			disturbances with a clear effect on forest health or which induce a prolonged recovery period should 
+			also be included, whereas floods that only affect the understory and recover within a year or two would
+			be considered ephemeral.
+			<ul>
+				<li>
+					Check boxes are used to record specific evidence of <strong>Flooding</strong> and <strong>Reservoir/Lake water 
+					fluxuations</strong> (which include swampy areas or lake/reservoir edges which rise and fall due to
+					changes in climate or management.
+				</li>
+			</ul>
+		</li>
+
+		<li>
+			<strong>Debris</strong>: Land (regardless of use) altered by natural material movement associated 
+			with landslides, avalanches, volcanos, etc. 
+		</li>
+		<li>
+			<strong>Growth/Recovery</strong>: Land exhibiting an increase in vegetation cover due to growth and succession
+			over one or more years. Applicable to any areas that may express spectral change associated with vegetation 
+			regrowth. This includes vegetation growth from bare ground, as well as the over topping of intermediate and 
+			co-dominate trees and/or lower-lying grasses and shrubs.  
+		</li>
+		<li>
+			<strong>Stable</strong>: Where no significant change is evident in the spectral response and the trend is essentially
+			flat. Agricultural systems and wetlands are commonly highly variable spectrally through time, and are thus 
+			considered stable but ephemeral. 
+		</li>
+		<li>
+			<strong>Conversion</strong>: Land by which mechanical or other change mechanisms lead to a transformation of land from
+			one use category to another. Examples include but are not limited to deforestation (e.g. loss of forest to other
+			non-forest uses), afforestation (e.g. establishment of trees in a previously non-forested area), urbanization 
+			(e.g. agricultural land cleared for residential development), and agricultural expansion (e.g. grassland tilled 
+			for agricultural use). A check box will be used to record evidence of <strong>Wetland drainage</strong>, where removal of water 
+			from low-lying areas, often near coastal zones, results in a shift from wetland to some other land use (e.g. 
+			agricultural, recreation or housing).     
+		</li>
+		<li>
+			<strong>Other</strong>: Land (regardless of use) where the spectral trend or other supporting evidence suggests a disturbance
+			or change event has occurred but the definitive cause cannot be determined or the type of change fails to meet
+			any of the change process categories defined above. The comment field in TimeSync should be used to further 
+			describe the situation encountered.  
+		</li>
+	</ul>
+
+	<h4>References</h4>
+	<p>
+		Cohen, W.B., Z. Yang, and R.E. Kennedy. 2010. Detecting trends in forest disturbance and recovery using yearly
+		Landsat time series: 2. TimeSync - Tools for calibration and validation, Remote Sensing of Environment 114:2911-2924.
+	</p>
+	<p>
+		Kennedy, R.E., Z. Yang, and W.B. Cohen. 2010. Detecting trends in forest disturbance and recovery using yearly
+		Landsat time series: 1. LandTrendr - Temporal segmentation algorithms, Remote Sensing of Environment 114:2897-2910.
+	</p>
+</div>
