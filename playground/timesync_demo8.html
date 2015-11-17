@@ -185,7 +185,8 @@
 				<p class="header">Trajectory Forms</p>
 				<ul class="test">
 					<li id="segmentsFormTab" class="selected" style="border-top-left-radius:4px; text-align:center;">Segments
-					<li id="verticesFormTab" class="unselected" style="margin-left:-1px; border-top-right-radius:4px; text-align:center;">Vertices
+					<li id="verticesFormTab" class="unselected" style="margin-left:-1px; text-align:center;">Vertices
+					<li id="CommentsFormTab" class="unselected" style="margin-left:-1px; border-top-right-radius:4px; text-align:center;">Comments
 				</ul>
 				
 				<div id="segmentsFormDiv">
@@ -281,19 +282,47 @@
 					<div id="landCoverDoneBtn" class="doneBtn">Done</div>
 				</div>	
 				
+				
+				<div id="CommentsFormDiv">						
+					<div id="commentInputDiv">
+						<textarea id="commentInput" autocomplete="off"></textarea>
+					</div>
+				</div>
+				
+				
 			</div>
 			
-			<div id="commentsSection" class="sectionDiv">
+			<div id="timeLapse" class="sectionDiv">
+				<p class="header">Time-Lapse</p>
+
+				<div id="tlHolder" style="margin:0px 5px 0px 5px">
+					<canvas id="tlCanvas" width=235 height=235></canvas>
+					<div id="tlDate" style="text-align:center">&nbsp</div>
+				</div>
+ 				<div class="text-center">
+					<div class="btn-group btn-group-xs" role="group" aria-label="...">
+					  <button id="tlBackx2" type="button" class="btn btn-default tlBtn"><span class="glyphicon glyphicon-fast-backward"></span></button>
+					  <button id="tlBack" type="button" class="btn btn-default tlBtn"><span class="glyphicon glyphicon-step-backward"></span></button>
+					  <button id="tlPlay" type="button" class="btn btn-default tlBtn"><span class="glyphicon glyphicon-play"></span></button>
+					  <button id="tlPause" type="button" class="btn btn-default tlBtn"><span class="glyphicon glyphicon-pause"></span></button>
+					  <button id="tlForward" type="button" class="btn btn-default tlBtn"><span class="glyphicon glyphicon-step-forward"></span></button>
+					  <button id="tlForwardx2" type="button" class="btn btn-default tlBtn"><span class="glyphicon glyphicon-fast-forward"></span></button>
+					</div>
+				</div>
+			</div>
+			
+			
+<!-- 			<div id="commentsSection" class="sectionDiv">
 				<p class="header">Comments</p>
 				<div id="commentInputDiv">
 					<textarea id="commentInput" autocomplete="off"></textarea>
 				</div>
-			</div>
+			</div> -->
 
 		</div>
 		
 		<div id="chipGallerySection">
-			<p class="header">Image Chip Gallery</p>
+			<p class="header">Image Chip Gallery<span id="expandChipGallery" class="glyphicon glyphicon-new-window right-align" style="float:right; margin:3px; cursor:pointer"></span></p>
 			<div id="chip-gallery"></div>
 		</div>
 		<div id="img-gallery"></div>	
@@ -324,7 +353,7 @@
 		<script type="text/javascript" src="ts_v3_scripts.js"></script> 
 		<script>				
 			
-			appendChips("main");
+			appendChips("main",[0,n_chips-1]); //n_chips might not be loaded at this point - keep in mind
 			window.onload = start;
 			$("#tsGuideBody").load("ts_guide.html"); //append the html guide file			
 		

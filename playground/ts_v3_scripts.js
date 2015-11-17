@@ -45,8 +45,8 @@
 
 			//make the trajectory svg circles selectable
 			$(document).ready(function(){
-				$(document).on("click", "circle.data, .chipImg", function(e){ //need to use this style event binding for elements that don't exisit yet - these lines will run before the "circle" elements are created, alternatively could use the commented lines in the above jquery section
-					if(e.shiftKey){
+				$(document).on("dblclick", "circle.data, .chipImg", function(e){ //need to use this style event binding for elements that don't exisit yet - these lines will run before the "circle" elements are created, alternatively could use the commented lines in the above jquery section
+					//if(e.shiftKey){
 						if($("tr").hasClass("active") == false){
 							e.preventDefault(); //make sure that default browser behaviour is prevented
 							var nodeType = $(this).prop('nodeName')
@@ -59,7 +59,7 @@
 								changeSelectedClass(seriesIndex)
 							}					
 						}
-					}
+					//}
 				});
 			});
 			
@@ -231,22 +231,32 @@
 					.orient("left");
 				
 				//define the zooming function - what gets scaled on zoom
-				function zoomed() {
-					svg.select(".y.axis").call(yaxis);
-					svg.selectAll("circle").attr("cy", function(d){return yscale(d[specIndex]);});
-					svg.selectAll("#plotLine").attr("d", lineFunction(lineData));
-				}
+				//function zoomed() {
+				//	svg.select(".y.axis").call(yaxis);
+				//	svg.selectAll("circle").attr("cy", function(d){return yscale(d[specIndex]);});
+				//	svg.selectAll("#plotLine").attr("d", lineFunction(lineData));
+				//}
 				
 				//define the zoom behavior
-				var zoom = d3.behavior.zoom()
+				var xyzoom = d3.behavior.zoom()
 					.y(yscale)
-					.scaleExtent([1, 5])
-					.on("zoom", zoomed);
-									
+					.x(xscale)
+					//.scaleExtent([1, 5])
+					.on("zoom", draw); //zoomed
+				var xzoom = d3.behavior.zoom()
+				  .x(xscale)
+				  //.scaleExtent([1, 5])
+				  .on("zoom", draw);
+				var yzoom = d3.behavior.zoom()
+				  .y(yscale)
+				  //.scaleExtent([1, 5])
+				  .on("zoom", draw);				
+
+				
+				
 				svg = d3.select(svg); //retrieve the svg reference
 				
-				svg.call(zoom).on("dblclick.zoom", null); //call the zoom once - needed for the updating to work
-						
+				
 				//make the default line data
 				var lineData = [ //needs to be local variable
 					{"x":yearmin ,"y":data.Values[0][specIndex]},
@@ -259,7 +269,23 @@
 					.x(function(d){return xscale(d.x);})
 					.y(function(d){return yscale(d.y);})
 					.interpolate("linear");
-				
+
+				//append an xy box
+				var xybox = svg.append("rect")
+					.attr("class", "zoom xy box")
+					.attr("x", 70)
+					.attr("y", 10)
+					.attr("width", w - pl - pr)
+					.attr("height", h - pt - pb)
+					.style("visibility", "hidden")
+					//.style("stroke-width", 1)
+					//.style("stroke", "red")
+					//.style("fill", "none")
+					.attr("pointer-events", "all")
+					.call(xyzoom)
+					.on("dblclick.zoom", null)
+
+					
 				//create the circles that will go into the svg
 				var circles = svg.selectAll(".data")
 					.data(data.Values)
@@ -318,6 +344,91 @@
 					  .attr("width", w-pr-pl)
 					  .attr("height", h-pb-pt);
 				
+
+	
+				//append an x box
+				var xbox = svg.append("rect")
+					.attr("class", "zoom x box")
+					.attr("x", pl)
+					.attr("y", h-pb)
+					.attr("width", w - pl - pr)
+					.attr("height", pb)
+					.style("visibility", "hidden")
+					//.style("stroke-width", 1)
+					//.style("stroke", "red")
+					//.style("fill", "none")
+					.attr("pointer-events", "all")
+					.call(xzoom)
+					.on("dblclick.zoom", null) 
+								
+				//append a y box
+				var ybox = svg.append("rect")
+					.attr("class", "zoom y box")
+					.attr("y", pt)
+					.attr("width", pl)
+					.attr("height", h - pt - pb)
+					.style("visibility", "hidden")
+					//.style("stroke-width", 1)
+					//.style("stroke", "red")
+					//.style("fill", "none")
+					.attr("pointer-events", "all")
+					.call(yzoom)
+					.on("dblclick.zoom", null)
+				
+				//xbox.call(xzoom).on("dblclick.zoom", null) //turn off dblclick
+				//ybox.call(yzoom).on("dblclick.zoom", null) //turn off dblclick
+				//xybox.call(xyzoom).on("dblclick.zoom", null) //turn off dblclick
+				
+			//function xyZoomDraw(){
+			//	svg.select('.x.axis').call(xaxis);
+			//	svg.select('.y.axis').call(yaxis);
+			//	svg.selectAll("circle").attr("cx", function(d){return xscale(d.Year);});
+			//	svg.selectAll("circle").attr("cy", function(d){return yscale(d[specIndex]);});
+			//	svg.selectAll("#plotLine").attr("d", lineFunction(lineData));
+			//}
+			//function xZoomDraw(){
+			//	svg.select('.x.axis').call(xaxis);
+			//	svg.selectAll("circle").attr("cx", function(d){return xscale(d.Year);});
+			//	svg.selectAll("#plotLine").attr("d", lineFunction(lineData));
+
+			//}
+			//function yZoomDraw(){
+			//	svg.select('.y.axis').call(yaxis);
+			//	svg.selectAll("circle").attr("cy", function(d){return yscale(d[specIndex]);});
+			//	svg.selectAll("#plotLine").attr("d", lineFunction(lineData));
+			//}
+
+
+			function zoom_update() {
+				var xyzoom = d3.behavior.zoom()
+					.y(yscale)
+					.x(xscale)
+					.on("zoom", draw);
+				var xzoom = d3.behavior.zoom()
+					.x(xscale)
+					.on("zoom", draw);
+				var yzoom = d3.behavior.zoom()
+					.y(yscale)
+					.on("zoom", draw);
+				
+				xybox.call(xyzoom).on("dblclick.zoom", null); //svg.
+				xbox.call(xzoom).on("dblclick.zoom", null); //svg.
+				ybox.call(yzoom).on("dblclick.zoom", null);	//svg.	 		
+				//xbox.call(xzoom).on("dblclick.zoom", null) //turn off dblclick
+				//ybox.call(yzoom).on("dblclick.zoom", null) //turn off dblclick
+				//xybox.call(xyzoom).on("dblclick.zoom", null) //turn off dblclick				
+			}
+			
+			function draw() {
+				svg.select('.x.axis').call(xaxis);
+				svg.select('.y.axis').call(yaxis);
+				svg.selectAll("circle").attr("cx", function(d){return xscale(d.Year);});
+				svg.selectAll("circle").attr("cy", function(d){return yscale(d[specIndex]);});
+				svg.selectAll("#plotLine").attr("d", lineFunction(lineData));
+				zoom_update();
+			};			
+				
+				
 				//add the path to the circles to activate the clipping
 				circles.attr("clip-path", "url(#clip)");
 				allCircles.attr("clip-path", "url(#clip)");
@@ -338,9 +449,16 @@
 			}
 			
 			
+
+			
+			
+			
+			
 			//define function to update the D3 scatterplot when new selection are made
 			function update(data, specIndex, rgbColor, domain){
 				//update the y domain based on the new index
+				
+				//console.log("im in update!")
 				yscale.domain([domain[specIndex].min, domain[specIndex].max]); //yscale was defined in the plotInt function
 				
 				//define the zooming function - what gets scaled on zoom 
@@ -578,10 +696,10 @@
 				if(status == "unselected"){
 					highlightOff();
 					closeDropAndRecord();
-					$("#segmentsFormTab").attr("class","selected");
-					$("#verticesFormTab").attr("class","unselected");
+					$("#CommentsFormTab, #verticesFormTab").attr("class","unselected");
+					$("#CommentsFormDiv, #verticesFormDiv").hide();
+					$("#segmentsFormTab").attr("class","selected").show();
 					$("#segmentsFormDiv").show();
-					$("#verticesFormDiv").hide();
 				}
 			});
 			$("#verticesFormTab").click(function(){				
@@ -589,10 +707,22 @@
 				if(status == "unselected"){
 					highlightOff();
 					closeDropAndRecord();
-					$("#verticesFormTab").attr("class","selected");
-					$("#segmentsFormTab").attr("class","unselected");
+					$("#segmentsFormTab, #CommentsFormTab").attr("class","unselected");
+					$("#segmentsFormDiv, #CommentsFormDiv").hide();
+					$("#verticesFormTab").attr("class","selected").show();
 					$("#verticesFormDiv").show();
-					$("#segmentsFormDiv").hide();
+				}
+			});
+			$("#CommentsFormTab").click(function(){				
+				var status = $("#CommentsFormTab").attr("class");
+				console.log("im in comments, status: ", status)
+				if(status == "unselected"){
+					highlightOff();
+					closeDropAndRecord();
+					$("#segmentsFormTab, #verticesFormTab").attr("class","unselected");
+					$("#segmentsFormDiv, #verticesFormDiv").hide();
+					$("#CommentsFormTab").attr("class","selected").show();
+					$("#CommentsFormDiv").show();
 				}
 			});
 			
@@ -1255,12 +1385,6 @@
 					chipDisplayProps.zoomLevel = zoomSize;
 	
 					drawAllChips(); //redraw the chips with the new zoom
-					
-					//prepare zoom message
-					//zoomInfo = {
-					//	"action":"zoom",
-					//	"zoomLevel":chipDisplayProps.zoomLevel
-					//}
 
 					//send the zoom array to the external window
 					if ((chipstripwindow != null) && chipstripwindow.closed == false){ 
@@ -1275,9 +1399,22 @@
 			});
 			
 			
+			$("#expandChipGallery").click(function(){
+				
+			});
+			
+			
+			
 			///////////DEFINE THE FUNCTION TO ADD THE CANVAS AND IMAGE FOR EACH CHIP ON-THE-FLY////////////
+			$.fn.eqAnyOf = function (arrayOfIndexes) {
+				return this.filter(function(i) {
+					return $.inArray(i, arrayOfIndexes) > -1;
+				});
+			};
+			
+			
 			var imgSrcAppended = false //tracker - once the image src's have been appended don't do it again
-			function appendChips(window){ //this function is handling the appending of the main chips and the remote chips, though it might be better to separate them
+			function appendChips(window, selected){ //this function is handling the appending of the main chips and the remote chips, though it might be better to separate them
 				switch(window){
 					case "main":
 						for(var i=0; i<n_chips; i++){
@@ -1309,9 +1446,11 @@
 						}
 						appendThisImg = '<img class="chipImgSrc" id="'+chipInfo.chips.imgIDs[i]+'"src="'+images+'">';
 						$("#img-gallery").append(appendThisImg);
+						
 					break;
 				}										
-				$("#chip0, #chip"+(n_chips-1)).addClass("selected")				
+				$(".chipHolder").eqAnyOf(selected).addClass("selected");
+				//$("#chip0, #chip"+(n_chips-1)).addClass("selected")				
 			}
 			
 			
@@ -1361,6 +1500,90 @@
 			}
 						
 			
+			/////////////////////////////////////////////////////////////////////////////////////////////////////
+			/////////////////////////////////////////////////////////////////////////////////////////////////////
+			var tlImgID = "" //global
+			var timeLapseIndex = 0,
+				tlCanvasID = document.getElementById("tlCanvas"),			
+				playTL;
+
+			function tlPlay(){
+				tlImgID = $(".chipImgSrc").eq(timeLapseIndex)[0]
+				tlctx.drawImage(
+					tlImgID,
+					chipInfo.chips.sxZoom[timeLapseIndex],
+					chipInfo.chips.syZoom[timeLapseIndex],
+					chipInfo.chips.sWidthZoom[timeLapseIndex],
+					chipInfo.chips.sWidthZoom[timeLapseIndex],
+					0,0,235,235
+				);
+				tlctx.strokeStyle=chipDisplayProps.plotColor; //"#FF0000"
+				tlctx.lineWidth=1;
+				tlctx.lineCap = 'square';
+				tlctx.strokeRect(117.5-(chipDisplayProps.boxZoom/2), 117.5-(chipDisplayProps.boxZoom/2), chipDisplayProps.boxZoom, chipDisplayProps.boxZoom);
+				$("#tlDate").text(data.Values[timeLapseIndex].Year);
+				if(timeLapseIndex < len-1){timeLapseIndex += 1} else {timeLapseIndex = 0}
+				 			
+			}
+			
+			$(".tlBtn").click(function(){
+				var thisID = $(this).attr("id");
+				clearInterval(playTL);
+				if(thisID == "tlBackx2"){
+					timeLapseIndex += -2;
+					timeLapseIndex = (timeLapseIndex < 0) ? 0:timeLapseIndex
+					drawTLimage();
+					$("#tlDate").text(data.Values[timeLapseIndex].Year);
+				} else if(thisID == "tlBack" && timeLapseIndex > 0){
+					timeLapseIndex += -1;
+					drawTLimage();
+					$("#tlDate").text(data.Values[timeLapseIndex].Year);					
+				} else if(thisID == "tlPlay"){
+					playTL = setInterval(tlPlay, 300);
+				} else if(thisID == "tlPause"){
+				
+				} else if(thisID == "tlForward" && timeLapseIndex < len-1){
+					timeLapseIndex += 1;
+					drawTLimage();
+					$("#tlDate").text(data.Values[timeLapseIndex].Year);
+				} else if(thisID == "tlForwardx2"){
+					timeLapseIndex += 2;
+					timeLapseIndex = (timeLapseIndex > len-1) ? (len-1):timeLapseIndex
+				}
+				drawTLimage();
+				$("#tlDate").text(data.Values[timeLapseIndex].Year);
+			})
+			
+			function drawTLimage(){
+				tlImgID = $(".chipImgSrc").eq(timeLapseIndex)[0]
+				tlctx.drawImage(
+					tlImgID,
+					chipInfo.chips.sxZoom[timeLapseIndex],
+					chipInfo.chips.syZoom[timeLapseIndex],
+					chipInfo.chips.sWidthZoom[timeLapseIndex],
+					chipInfo.chips.sWidthZoom[timeLapseIndex],
+					0,0,235,235
+				);
+				tlctx.strokeStyle=chipDisplayProps.plotColor; //"#FF0000"
+				tlctx.lineWidth=1;
+				tlctx.lineCap = 'square';
+				tlctx.strokeRect(117.5-(chipDisplayProps.boxZoom/2), 117.5-(chipDisplayProps.boxZoom/2), chipDisplayProps.boxZoom, chipDisplayProps.boxZoom);
+			}
+			
+			/////////////////////////////////////////////////////////////////////////////////////////////////////
+			/////////////////////////////////////////////////////////////////////////////////////////////////////
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
 			////////////////DEFINE FUNCTION TO DRAW ALL THE IMAGE CHIPS TO THE CANVASES/////////////////////
 			//var plotColor = $("#plotColor").prop("value") //global variable
 			function drawAllChips(){
@@ -1376,7 +1599,7 @@
 				var imgID = $(".chipImgSrc").eq(thisChip)[0],
 					canvasID = $(".chipImg").eq(thisChip)[0],
 					ctx = canvasID.getContext("2d");
-				ctx.clearRect(0, 0, canvasID.width, canvasID.height);
+				//ctx.clearRect(0, 0, canvasID.width, canvasID.height);
 				ctx.mozImageSmoothingEnabled = false;
 				ctx.msImageSmoothingEnabled = false;
 				ctx.imageSmoothingEnabled = false;		
@@ -1386,7 +1609,8 @@
 					chipInfo.chips.syZoom[thisChip],
 					chipInfo.chips.sWidthZoom[thisChip],
 					chipInfo.chips.sWidthZoom[thisChip],
-					0,0,chipDisplayProps.chipSize,chipDisplayProps.chipSize); //chipInfo.offset,chipInfo.offset
+					0,0,chipDisplayProps.chipSize,chipDisplayProps.chipSize
+				); //chipInfo.offset,chipInfo.offset
 				ctx.strokeStyle=chipDisplayProps.plotColor; //"#FF0000"
 				ctx.lineWidth=1;
 				ctx.lineCap = 'square';
@@ -1464,14 +1688,15 @@
 			$("body").on("click", ".expandChipYear", function(e){ //need to use body because the canvases have probably not loaded yet
 				//if (e.ctrlKey) { 					
 					//var thisImg = (parseInt($(this).attr("id").replace( /^\D+/g, ''))); //extract the chip index
-					var thisImg = $(".expandChipYear").index(this); //extract the chip index
+					var thisImg = $(".expandChipYear").index(this) //extract the chip index
 					var pass_data = {
 						"action":"add_chips", //hard assign
 						"n_chips":chipInfo.chips.chipsInStrip[thisImg], //"n_chips":"40", //get this from the img metadata
 						"src":images[thisImg], //"src":"chips/chips_2012.png", //get this from the id of the .chipholder clicked
 						//"canvasID":$(this).attr("id"),
-						"chipIndex":$(".expandChipYear").index(this),
-						"chipDisplayProps":chipDisplayProps
+						"chipIndex":thisImg,
+						"chipDisplayProps":chipDisplayProps,
+						"useThisChip":chipInfo.chips.useThisChip[thisImg]
 					};
 					if ((chipstripwindow == null) || (chipstripwindow.closed)){      //if the window is not loaded then load it and send the message after it is fully loaded
 						chipstripwindow = window.open("./chip_strip_6.html","_blank","width=1080px, height=840px", "toolbar=0","titlebar=0","menubar=0","scrollbars=yes"); //open the remote chip strip window
@@ -1525,7 +1750,29 @@
 			
 			/////////////////////////LOAD THE CHIPS////////////////////////////////////////////////////////
 			//function to run functions that need all the elements to be loaded - also need to do them in order was the window is loaded
+			var tlctx //global
 			function start(){
 				makeChipInfo("random");
 				drawAllChips();
+				
+				//tlImgID = document.getElementById("img0");
+				tlImgID = $(".chipImgSrc").eq(timeLapseIndex)[0]
+				tlctx = tlCanvasID.getContext("2d")
+				tlctx.mozImageSmoothingEnabled = false;
+				tlctx.msImageSmoothingEnabled = false;
+				tlctx.imageSmoothingEnabled = false;
+				tlctx.drawImage(
+					tlImgID,
+					chipInfo.chips.sxZoom[timeLapseIndex],
+					chipInfo.chips.syZoom[timeLapseIndex],
+					chipInfo.chips.sWidthZoom[timeLapseIndex],
+					chipInfo.chips.sWidthZoom[timeLapseIndex],
+					0,0,235,235
+				);
+				tlctx.strokeStyle=chipDisplayProps.plotColor; //"#FF0000"
+				tlctx.lineWidth=1;
+				tlctx.lineCap = 'square';
+				tlctx.strokeRect(117.5-(chipDisplayProps.boxZoom/2), 117.5-(chipDisplayProps.boxZoom/2), chipDisplayProps.boxZoom, chipDisplayProps.boxZoom);
+				$("#tlDate").text(data.Values[timeLapseIndex].Year);
+				
 			}

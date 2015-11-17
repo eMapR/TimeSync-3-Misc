@@ -373,13 +373,12 @@ tr.active{
 
 
 #commentInput{
-	/*height:250px;*/
-	height:270px;
+	height:250px;
 	width:100%;
 }
 
 #commentInputDiv{
-	margin:0px 3px 3px 3px;
+	margin:3px 3px 3px 3px;
 }
 
 /*############## TRAJECTORY PLOT BUTTONS ####################################################*/
@@ -441,12 +440,18 @@ table, th, td {
 table td, table th{
 	padding-left:3px;
 }
-#segmentsFormTbl, #verticesFormTbl{
+#segmentsFormTbl, #verticesFormTbl, #CommentsFormDiv{
 	width:310px
 }
 
 #verticesFormDiv{
 	display:none;
+}
+
+#CommentsFormDiv{
+	display:none;
+	margin:-1px;
+	border-top: 1px solid #afafaf;
 }
 
 .trHeader{
