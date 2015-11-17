@@ -18,11 +18,314 @@
 				rgbColor = scaledRGB(data, "TCB", "TCG", "TCW", stretch, 2, len); //get the scaled rgb color
 								
 				$.getJSON(jsonAllDataURL).done(function(jsonobject){					
-					allData = calcIndices(jsonobject);					
+					allData = calcIndices(jsonobject);
+					allDataRGBcolor = scaledRGB(allData, "TCB", "TCG", "TCW", stretch, 2, allData.Values.length); //get the scaled rgb color					
+					console.log(allDataRGBcolor);
 					calcD3date();
 					plotInt();	
 				});
 			});
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////			
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////D3 POINT AND LINE SCRIPTS////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////	
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+			//define function to update the zoom behaviors
+			function zoomUpdate() {
+				xyzoom = d3.behavior.zoom()
+					.y(yscale)
+					.x(xscale)
+					.on("zoom", zoomDraw);
+				xzoom = d3.behavior.zoom()
+					.x(xscale)
+					.on("zoom", zoomDraw);
+				yzoom = d3.behavior.zoom()
+					.y(yscale)
+					.on("zoom", zoomDraw);
+				
+				xybox.call(xyzoom).on("dblclick.zoom", null); //svg.
+				xbox.call(xzoom).on("dblclick.zoom", null); //svg.
+				ybox.call(yzoom).on("dblclick.zoom", null);	//svg.	 					
+			}
+			
+			//define function to redraw the points and update the zoom behavior is invoked 
+			function zoomDraw() {
+				svg.select('.x.axis').call(xaxis);
+				svg.select('.y.axis').call(yaxis);
+				svg.selectAll("circle.data").attr("cx", function(d){return xscale(d.Year);});
+				svg.selectAll("circle").attr("cy", function(d){return yscale(d[specIndex]);});
+				svg.selectAll("circle.allData").attr("cx", function(d){return xscale(d.D3xValue);});		
+				svg.selectAll("#plotLine").attr("d", lineFunction(lineData));
+				zoomUpdate();
+			};
+			
+			//define function to initialize the spectral trajectory
+			function plotInt(){
+				//get the range of the x values
+				
+				var w = $("#plot").width()
+				$("#svg").attr("width",w)
+				
+				var yearmin = d3.min(data.Values, function(d) {return d.Year;}),
+					yearmax = d3.max(data.Values, function(d) {return d.Year;});
+				
+				//adjust the ranges so there is some buffer
+				var xmin = yearmin-1, //
+					xmax = yearmax+1;
+				
+				//define the width of the svg plot area
+				//var w = 740,// 
+				var	h = 250; 
+				
+				//define the plot margins
+				var pt = 10, //plot top
+					pr = 20, //plot right
+					pl = 70, //plot left
+					pb = 37; //plot bottom
+												
+				//define the x scale
+				xscale = d3.scale.linear() //NEEDS TO BE A GLOBAL VARIABLE - IS USED HERE AND IN THE UPDATE FUNCTION
+					.domain([xmin, xmax])
+					.range([pl, w - pr]);
+				
+				//define the y scale
+				yscale = d3.scale.linear() //NEEDS TO BE A GLOBAL VARIABLE - IS USED HERE AND IN THE UPDATE FUNCTION
+					.domain([domain[specIndex].min, domain[specIndex].max])
+					.range([h - pb, pt]);
+						
+				//define the x axis
+				xaxis = d3.svg.axis()
+					.scale(xscale)
+					.orient("bottom")
+					.tickFormat(d3.format("d"));
+				
+				//define the x axis
+				yaxis = d3.svg.axis() //NEEDS TO BE A GLOBAL VARIABLE - IS USED HERE AND IN THE UPDATE FUNCTION
+					.scale(yscale)
+					.orient("left");
+				
+				//define the zoom behavior
+				xyzoom = d3.behavior.zoom()
+					.y(yscale)
+					.x(xscale)
+					.on("zoom", zoomDraw); //zoomed
+				xzoom = d3.behavior.zoom()
+				  .x(xscale)
+				  .on("zoom", zoomDraw);
+				yzoom = d3.behavior.zoom()
+				  .y(yscale)
+				  .on("zoom", zoomDraw);				
+				
+				//retrieve the svg reference
+				svg = d3.select(svg); 
+								
+				//make the default line data
+				lineData = [ //needs to be local variable
+					{"x":yearmin ,"y":data.Values[0][specIndex]},
+					{"x":yearmax ,"y":data.Values[len-1][specIndex]}
+				];
+
+				//make the line function to convert the xy object to svg path syntax 
+				lineFunction = d3.svg.line() //global because it gets used when selecting new points
+					.x(function(d){return xscale(d.x);})
+					.y(function(d){return yscale(d.y);})
+					.interpolate("linear");
+
+				//append an xy box
+				xybox = svg.append("rect")
+					.attr("class", "zoom xy box")
+					.attr("id","xybox")
+					.attr("x", 70)
+					.attr("y", 10)
+					.attr("width", w - pl - pr)
+					.attr("height", h - pt - pb)
+					.style("visibility", "hidden")
+					.attr("pointer-events", "all")
+					.call(xyzoom)
+					.on("dblclick.zoom", null)
+					
+				//append all the points
+				allCircles = svg.selectAll(".allData")
+					.data(allData.Values)
+					.enter()
+					.append("circle")
+					//.style("fill-opacity",0.25) //0.25
+					.attr("visibility","hidden")
+					.style("fill",function(d,i){return allDataRGBcolor[i];})
+					.attr("cx", function(d){return xscale(d.D3xValue);}) //d.D3xValue
+					.attr("cy", function(d){return yscale(d[specIndex]);})
+					.attr("r", 3)
+					.attr("class","allData");
+				
+				//append the representative points
+				circles = svg.selectAll(".data")
+					.data(data.Values)
+					.enter()
+					.append("circle")
+					.style("fill",function(d,i){return rgbColor[i];})
+					.attr("cx", function(d){return xscale(d.Year);})
+					.attr("cy", function(d){return yscale(d[specIndex]);})
+					.attr("r", 9)
+					.attr("class","data unselected");
+				
+				//add the default line
+				var lineGraph = svg.append("path") //local because it will get overwritten
+					.attr("d", lineFunction(lineData))
+					.attr("id","plotLine");
+				
+				//draw the x axis
+				svg.append("g")
+					.attr("class", "x axis")
+					.attr("transform", "translate(0," + (h - pb) + ")")
+					.call(xaxis);
+					
+				//draw the y axis
+				svg.append("g")
+					.attr("class", "y axis")
+					.attr("transform", "translate(" + pl + ",0)")
+					.call(yaxis);
+					
+				//add label for the x axis
+				svg.append("text")      
+					.attr("transform", "rotate(-90)")
+					.attr("x", (h-pb)/-2)
+					.attr("y", 20)
+					.style("text-anchor", "middle")
+					.text("TC Wetness")
+					.attr("id","specPlotIndex");
+				
+				//define clip path so that circles don't go outside the axes
+				svg.append("defs")
+					.append("clipPath")
+					  .attr("id", "clip")
+					.append("rect")
+					  .attr("x", 70)
+					  .attr("y", 10)
+					  .attr("width", w-pr-pl)
+					  .attr("height", h-pb-pt);
+					
+				//append an x box
+				xbox = svg.append("rect")
+					.attr("class", "zoom x box")
+					.attr("id","xbox")
+					.attr("x", pl)
+					.attr("y", h-pb)
+					.attr("width", w - pl - pr)
+					.attr("height", pb)
+					.style("visibility", "hidden")
+					.attr("pointer-events", "all")
+					.call(xzoom)
+					.on("dblclick.zoom", null) 
+								
+				//append a y box
+				ybox = svg.append("rect")
+					.attr("class", "zoom y box")
+					.attr("id","ybox")
+					.attr("y", pt)
+					.attr("width", pl)
+					.attr("height", h - pt - pb)
+					.style("visibility", "hidden")
+					.attr("pointer-events", "all")
+					.call(yzoom)
+					.on("dblclick.zoom", null)
+	
+				//add the path to the circles to activate the clipping
+				circles.attr("clip-path", "url(#clip)");
+				allCircles.attr("clip-path", "url(#clip)");
+				lineGraph.attr("clip-path", "url(#clip)");
+															
+				//default the first and last circles to class "selected"
+				var dataCircles = $("circle.data");
+				dataCircles.eq(0).attr("class","data selected");
+				dataCircles.eq(len-1).attr("class","data selected");
+				
+				//fill in the global selectedCircles variable for the first time
+				var selectedCirclesTemp = $("circle.data.selected");
+				for(var i=0; i < selectedCirclesTemp.length; i++){
+					selectedCircles.push(dataCircles.index(selectedCirclesTemp[i]));
+				}
+				updateSegmentForm();
+			}
+			
+		
+			//define function to update the D3 scatterplot when new selection are made
+			function plotUpdate(data, specIndex, rgbColor, domain){
+				//reset the y domain based on new spectral index
+				yscale.domain([domain[specIndex].min, domain[specIndex].max]); //yscale was defined in the plotInt function
+				
+				//update the zoom since the y axis domain has changed
+				zoomUpdate()
+				
+				//update the circles with new data
+				svg.selectAll("circle.allData") //svg was defined in the plotInt function
+					.data(allData.Values)					   
+					.transition()
+					.duration(500)
+					//.attr("cx", function(d){return xscale(d.Year);})
+					.attr("cy", function(d){return yscale(d[specIndex]);});
+
+				svg.selectAll("circle.data") //svg was defined in the plotInt function
+					.data(data.Values)					   
+					.transition()
+					.duration(500)
+					.attr("cy", function(d){return yscale(d[specIndex]);})
+					//.style("fill",function(d,i){return rgbColor[i]})
+
+				//make a new line 
+				for(var i=0; i < selectedCircles.length; i++){
+					var thisone = selectedCircles[i];
+					lineData[i] = ({"x":data.Values[thisone].Year, "y":data.Values[thisone][specIndex]}); //.push
+				}
+				
+				//update the line
+				svg.selectAll("#plotLine") //local because it will get overwritten
+					.transition()
+					.duration(500)
+					.attr("d", lineFunction(lineData));
+					
+				//update y axis
+				svg.select(".y.axis") //svg was defined in the plotInt function
+					.transition()
+					.duration(500)
+					.call(yaxis);
+			}
+	
+			function updatePlotRGB(){
+				svg.selectAll("circle.data") //svg was defined in the plotInt function					   
+					.transition()
+					.duration(500)
+					.style("fill",function(d,i){return rgbColor[i]})
+			}
+	
+			//define function to add and remove line segments
+			var selectedCircles = [] //global
+			var lineDate = [] //global
+			function changePlotLine(){
+				var selectedCirclesTemp = $("circle.selected");
+				lineData = [] //reset lineData
+				selectedCircles = []; //reset selectedCircles
+				for(var i=0; i < selectedCirclesTemp.length; i++){
+					var thisone = $("circle.data").index(selectedCirclesTemp[i]);
+					selectedCircles.push(thisone);
+					lineData.push({"x":data.Values[thisone].Year, "y":data.Values[thisone][specIndex]});
+				}
+				
+				$("#plotLine").remove(); //remove the line
+				
+				lineGraph = svg.append("path") //redraw the line
+					.attr("d", lineFunction(lineData))
+					.attr("id","plotLine")
+					.attr("clip-path", "url(#clip)");
+				
+				updateSegmentForm();				
+			}
+	
+//////////////////////////////////////////////////////////////////////////////////////////////////////	
+//////////////////////////////////////////////////////////////////////////////////////////////////////	
+//////////////////////////////////////////////////////////////////////////////////////////////////////	
+	
 	
 			//define function to update the circle selection
 			function changeSelectedClass(seriesIndex){
@@ -63,58 +366,13 @@
 				});
 			});
 			
-			
-			//define function to add and remove line segments
-			var selectedCircles = [] //global
-			function changePlotLine(){
-				var selectedCirclesTemp = $("circle.selected"),
-					lineData = [],
-					i = 0;
-				selectedCircles = [];
-				for(i; i < selectedCirclesTemp.length; i++){
-					var thisone = $("circle.data").index(selectedCirclesTemp[i]);
-					selectedCircles.push(thisone);
-					lineData.push({"x":data.Values[thisone].Year, "y":data.Values[thisone][specIndex]});
-				}
-				
-				$("#plotLine").remove();				//add the default line
-				//make the line function to convert the xy object to svg path syntax 
-				//var lineFunction = d3.svg.line() //TODO: CHECK IF THIS NEEDS TO BE A GLOBAL VARIABLE OR NOT
-				//	.x(function(d){return xscale(d.x);})
-				//	.y(function(d){return yscale(d.y);})
-				//	.interpolate("linear");
-				
-				lineGraph = svg.append("path")
-					.attr("d", lineFunction(lineData))
-					.attr("id","plotLine")
-					.attr("clip-path", "url(#clip)");
-				
-				//define the zooming function - what gets scaled on zoom 
-				function zoomed() {
-					svg.select(".y.axis").call(yaxis);
-					svg.selectAll("circle").attr("cy", function(d){return yscale(d[specIndex]);});
-					svg.selectAll("#plotLine").attr("d", lineFunction(lineData));
-				}
-				
-				//define the zoom behavior
-				var zoom = d3.behavior.zoom()
-					.y(yscale)
-					.scaleExtent([.1, 5])
-					.on("zoom", zoomed);
-				
-				//call the function to make the scale change
-				svg.call(zoom).on("dblclick.zoom", null);//svg was defined in the plotInt function
-				updateSegmentForm();
-				
-			}
-			
+						
 			//define function to return stretch color array by index
 			function setcolor(data, specIndex, stretch, n_stdev, len) {
 				var minv = stretch[specIndex].mean - (stretch[specIndex].stdev * n_stdev),
 					maxv = stretch[specIndex].mean + (stretch[specIndex].stdev * n_stdev),
-					color = [],
-					i = 0;
-				for (i; i < len; i++) {
+					color = [];
+				for (var i=0; i < len; i++) {
 					if (data.Values[i][specIndex] < minv) data.Values[i][specIndex] = minv;
 					if (data.Values[i][specIndex] > maxv) data.Values[i][specIndex] = maxv;
 					color[i] = ((data.Values[i][specIndex] - minv) / (maxv - minv)) * 256;
@@ -127,9 +385,8 @@
 				var colorR = setcolor(data, RspecIndex, stretch, n_stdev, len),
 					colorG = setcolor(data, GspecIndex, stretch, n_stdev, len),
 					colorB = setcolor(data, BspecIndex, stretch, n_stdev, len),
-					color = [],
-					i = 0;
-				for(i;i<len;i++) {color[i] = d3.rgb(colorR[i],colorG[i],colorB[i]);}
+					color = [];
+				for(var i=0;i<len;i++) {color[i] = d3.rgb(colorR[i],colorG[i],colorB[i]);}
 				return color;
 			}			
 			
@@ -188,381 +445,43 @@
 					allData.Values[i]["D3xValue"] = D3date
 				}
 			}
-			
-			//define function to initialize the spectral trajectory
-			function plotInt(){
-				//get the range of the x values
-				var yearmin = d3.min(data.Values, function(d) {return d.Year;}),
-					yearmax = d3.max(data.Values, function(d) {return d.Year;});
-				
-				//adjust the ranges so there is some buffer
-				var xmin = yearmin-1, //
-					xmax = yearmax+1;
-				
-				//define the width of the svg plot area
-				var w = 740, 
-					h = 250; 
-				
-				//define the plot margins
-				var pt = 10, //plot top
-					pr = 20, //plot right
-					pl = 70, //plot left
-					pb = 37; //plot bottom
-				
-				//define the x scale
-				xscale = d3.scale.linear() //NEEDS TO BE A GLOBAL VARIABLE - IS USED HERE AND IN THE UPDATE FUNCTION
-					.domain([xmin, xmax])
-					.range([pl, w - pr]);
-				
-				//define the y scale
-				yscale = d3.scale.linear() //NEEDS TO BE A GLOBAL VARIABLE - IS USED HERE AND IN THE UPDATE FUNCTION
-					.domain([domain[specIndex].min, domain[specIndex].max])
-					.range([h - pb, pt]);
-						
-				//define the x axis
-				var xaxis = d3.svg.axis()
-					.scale(xscale)
-					.orient("bottom")
-					.tickFormat(d3.format("d"));
-				
-				//define the x axis
-				yaxis = d3.svg.axis() //NEEDS TO BE A GLOBAL VARIABLE - IS USED HERE AND IN THE UPDATE FUNCTION
-					.scale(yscale)
-					.orient("left");
-				
-				//define the zooming function - what gets scaled on zoom
-				//function zoomed() {
-				//	svg.select(".y.axis").call(yaxis);
-				//	svg.selectAll("circle").attr("cy", function(d){return yscale(d[specIndex]);});
-				//	svg.selectAll("#plotLine").attr("d", lineFunction(lineData));
-				//}
-				
-				//define the zoom behavior
-				var xyzoom = d3.behavior.zoom()
-					.y(yscale)
-					.x(xscale)
-					//.scaleExtent([1, 5])
-					.on("zoom", draw); //zoomed
-				var xzoom = d3.behavior.zoom()
-				  .x(xscale)
-				  //.scaleExtent([1, 5])
-				  .on("zoom", draw);
-				var yzoom = d3.behavior.zoom()
-				  .y(yscale)
-				  //.scaleExtent([1, 5])
-				  .on("zoom", draw);				
 
-				
-				
-				svg = d3.select(svg); //retrieve the svg reference
-				
-				
-				//make the default line data
-				var lineData = [ //needs to be local variable
-					{"x":yearmin ,"y":data.Values[0][specIndex]},
-					{"x":yearmax ,"y":data.Values[len-1][specIndex]}
-				];
-
-
-				//make the line function to convert the xy object to svg path syntax 
-				lineFunction = d3.svg.line() //global because it gets used when selecting new points
-					.x(function(d){return xscale(d.x);})
-					.y(function(d){return yscale(d.y);})
-					.interpolate("linear");
-
-				//append an xy box
-				var xybox = svg.append("rect")
-					.attr("class", "zoom xy box")
-					.attr("x", 70)
-					.attr("y", 10)
-					.attr("width", w - pl - pr)
-					.attr("height", h - pt - pb)
-					.style("visibility", "hidden")
-					//.style("stroke-width", 1)
-					//.style("stroke", "red")
-					//.style("fill", "none")
-					.attr("pointer-events", "all")
-					.call(xyzoom)
-					.on("dblclick.zoom", null)
-
-					
-				//create the circles that will go into the svg
-				var circles = svg.selectAll(".data")
-					.data(data.Values)
-					.enter()
-					.append("circle")
-					.style("fill",function(d,i){return rgbColor[i];})
-					.attr("cx", function(d){return xscale(d.Year);})
-					.attr("cy", function(d){return yscale(d[specIndex]);})
-					.attr("r", 9)
-					.attr("class","data unselected");
-				
-				var allCircles = svg.selectAll(".allData")
-					.data(allData.Values)
-					.enter()
-					.append("circle")
-					.style("fill-opacity",0.25) //0.25
-					.attr("visibility","hidden")
-					.attr("cx", function(d){return xscale(d.Year);}) //d.D3xValue
-					.attr("cy", function(d){return yscale(d[specIndex]);})
-					.attr("r", 3)
-					.attr("class","allData");
-							
-				//add the default line
-				var lineGraph = svg.append("path") //local because it will get overwritten
-					.attr("d", lineFunction(lineData))
-					.attr("id","plotLine");
-				
-				//draw the x axis
-				svg.append("g")
-					.attr("class", "x axis")
-					.attr("transform", "translate(0," + (h - pb) + ")")
-					.call(xaxis);
-					
-				//draw the y axis
-				svg.append("g")
-					.attr("class", "y axis")
-					.attr("transform", "translate(" + pl + ",0)")
-					.call(yaxis);
-					
-				//add label for the x axis
-				svg.append("text")      
-					.attr("transform", "rotate(-90)")
-					.attr("x", (h-pb)/-2)
-					.attr("y", 20)
-					.style("text-anchor", "middle")
-					.text("TC Wetness")
-					.attr("id","specPlotIndex");
-				
-				//define clip path so that circles don't go outside the axes
-				svg.append("defs")
-					.append("clipPath")
-					  .attr("id", "clip")
-					.append("rect")
-					  .attr("x", 70)
-					  .attr("y", 10)
-					  .attr("width", w-pr-pl)
-					  .attr("height", h-pb-pt);
-				
-
-	
-				//append an x box
-				var xbox = svg.append("rect")
-					.attr("class", "zoom x box")
-					.attr("x", pl)
-					.attr("y", h-pb)
-					.attr("width", w - pl - pr)
-					.attr("height", pb)
-					.style("visibility", "hidden")
-					//.style("stroke-width", 1)
-					//.style("stroke", "red")
-					//.style("fill", "none")
-					.attr("pointer-events", "all")
-					.call(xzoom)
-					.on("dblclick.zoom", null) 
-								
-				//append a y box
-				var ybox = svg.append("rect")
-					.attr("class", "zoom y box")
-					.attr("y", pt)
-					.attr("width", pl)
-					.attr("height", h - pt - pb)
-					.style("visibility", "hidden")
-					//.style("stroke-width", 1)
-					//.style("stroke", "red")
-					//.style("fill", "none")
-					.attr("pointer-events", "all")
-					.call(yzoom)
-					.on("dblclick.zoom", null)
-				
-				//xbox.call(xzoom).on("dblclick.zoom", null) //turn off dblclick
-				//ybox.call(yzoom).on("dblclick.zoom", null) //turn off dblclick
-				//xybox.call(xyzoom).on("dblclick.zoom", null) //turn off dblclick
-				
-			//function xyZoomDraw(){
-			//	svg.select('.x.axis').call(xaxis);
-			//	svg.select('.y.axis').call(yaxis);
-			//	svg.selectAll("circle").attr("cx", function(d){return xscale(d.Year);});
-			//	svg.selectAll("circle").attr("cy", function(d){return yscale(d[specIndex]);});
-			//	svg.selectAll("#plotLine").attr("d", lineFunction(lineData));
-			//}
-			//function xZoomDraw(){
-			//	svg.select('.x.axis').call(xaxis);
-			//	svg.selectAll("circle").attr("cx", function(d){return xscale(d.Year);});
-			//	svg.selectAll("#plotLine").attr("d", lineFunction(lineData));
-
-			//}
-			//function yZoomDraw(){
-			//	svg.select('.y.axis').call(yaxis);
-			//	svg.selectAll("circle").attr("cy", function(d){return yscale(d[specIndex]);});
-			//	svg.selectAll("#plotLine").attr("d", lineFunction(lineData));
-			//}
-
-
-			function zoom_update() {
-				var xyzoom = d3.behavior.zoom()
-					.y(yscale)
-					.x(xscale)
-					.on("zoom", draw);
-				var xzoom = d3.behavior.zoom()
-					.x(xscale)
-					.on("zoom", draw);
-				var yzoom = d3.behavior.zoom()
-					.y(yscale)
-					.on("zoom", draw);
-				
-				xybox.call(xyzoom).on("dblclick.zoom", null); //svg.
-				xbox.call(xzoom).on("dblclick.zoom", null); //svg.
-				ybox.call(yzoom).on("dblclick.zoom", null);	//svg.	 		
-				//xbox.call(xzoom).on("dblclick.zoom", null) //turn off dblclick
-				//ybox.call(yzoom).on("dblclick.zoom", null) //turn off dblclick
-				//xybox.call(xyzoom).on("dblclick.zoom", null) //turn off dblclick				
-			}
-			
-			function draw() {
-				svg.select('.x.axis').call(xaxis);
-				svg.select('.y.axis').call(yaxis);
-				svg.selectAll("circle").attr("cx", function(d){return xscale(d.Year);});
-				svg.selectAll("circle").attr("cy", function(d){return yscale(d[specIndex]);});
-				svg.selectAll("#plotLine").attr("d", lineFunction(lineData));
-				zoom_update();
-			};			
-				
-				
-				//add the path to the circles to activate the clipping
-				circles.attr("clip-path", "url(#clip)");
-				allCircles.attr("clip-path", "url(#clip)");
-				lineGraph.attr("clip-path", "url(#clip)");
-				
-				//default the first and last circles to class "selected"
-				var dataCircles = $("circle.data");
-				dataCircles.eq(0).attr("class","data selected");
-				dataCircles.eq(len-1).attr("class","data selected");
-				
-				//fill in the global selectedCircles variable for the first time
-				var selectedCirclesTemp = $("circle.data.selected"),
-					i = 0;	
-				for(i; i < selectedCirclesTemp.length; i++){
-					selectedCircles.push(dataCircles.index(selectedCirclesTemp[i]));
-				}
-				updateSegmentForm();
-			}
-			
-			
-
-			
-			
-			
-			
-			//define function to update the D3 scatterplot when new selection are made
-			function update(data, specIndex, rgbColor, domain){
-				//update the y domain based on the new index
-				
-				//console.log("im in update!")
-				yscale.domain([domain[specIndex].min, domain[specIndex].max]); //yscale was defined in the plotInt function
-				
-				//define the zooming function - what gets scaled on zoom 
-				function zoomed() {
-					svg.select(".y.axis").call(yaxis);
-					svg.selectAll("circle").attr("cy", function(d){return yscale(d[specIndex]);});
-					svg.selectAll("#plotLine").attr("d", lineFunction(lineData));
-				}
-				
-				//define the zoom behavior
-				var zoom = d3.behavior.zoom()
-					.y(yscale)
-					.scaleExtent([1, 5])
-					.on("zoom", zoomed);
-				
-				//call the function to make the scale change
-				svg.call(zoom).on("dblclick.zoom", null);//svg was defined in the plotInt function
-				
-				//update the circles with new data
-				svg.selectAll("circle.allData") //svg was defined in the plotInt function
-					.data(allData.Values)					   
-					.transition()
-					.duration(500)
-					.attr("cx", function(d){return xscale(d.Year);})
-					.attr("cy", function(d){return yscale(d[specIndex]);});
-
-				svg.selectAll("circle.data") //svg was defined in the plotInt function
-					.data(data.Values)					   
-					.transition()
-					.duration(500)
-					.attr("cx", function(d){return xscale(d.Year);})
-					.attr("cy", function(d){return yscale(d[specIndex]);})
-					.style("fill",function(d,i){return rgbColor[i]})
-
-					
-				/////////////////////////////////LINE UPDATE////////////////////////////////	
-				//retrieve the line data (this section could be made into a function cause it is also used in the changePlotLine function)
-				//selectedCircles = $("circle.selected");
-				var lineData = [];
-				var i = 0;
-				for(i; i < selectedCircles.length; i++){
-					//var thisone = $("circle").index(selectedCircles[i]);
-					var thisone = selectedCircles[i];
-					lineData.push({"x":data.Values[thisone].Year, "y":data.Values[thisone][specIndex]});
-				}
-				
-				//update the line
-				svg.selectAll("#plotLine") //local because it will get overwritten
-					.transition()
-					.duration(500)
-					.attr("d", lineFunction(lineData));
-
-				/////////////////////////////////////////////////////////////////////////////
-					
-				//update y axis
-				svg.select(".y.axis") //svg was defined in the plotInt function
-					.transition()
-					.duration(500)
-					.call(yaxis);
-			}
-			
 			
 			//update the plot when buttons are clicked		
-			//right now the points and colors are redrawn each time, in the future could break this down
-			//by which button type is pressed, either index or color and only update either the point locations
-			//or the colors
 			$(document).ready(function(){
-				$(".dropdown-menu li").click(function() { //This will attach the function to all the input elements
-					
+				$(".dropdown-menu li").click(function() { //This will attach the function to all the input elements					
 					//figure out which dropdown was selected and change its active status 
-					var thisListID = $(this).closest("ul").attr('id'),
-						thisSpecIndexID = $(this).attr('id'),
+					var thisLi = $(this);
+					var thisListID = thisLi.closest("ul").attr('id'),
+						thisSpecIndexID = thisLi.attr('id'),
 						newactive = "#"+thisListID+" #"+thisSpecIndexID,
 						activesearch = "#"+thisListID+" .active",
 						activeid = $(activesearch).attr('id'),
 						oldactive = "#"+thisListID+" #"+activeid;
-					
+						
 					$(oldactive).removeClass('active');
 					$(newactive).addClass('active');
 					
-					if(thisListID == "index-list"){$("#btnIndex div").replaceWith('<div><strong>Index:</strong><br><small>'+$("#"+thisSpecIndexID).text()+'</small><span class="caret"></span></div>')};
-					if(thisListID == "red-list"){$("#btnRed div").replaceWith('<div><strong>R</strong><small>GB</small><br><small>'+$("#"+thisSpecIndexID).text()+'</small><span class="caret"></span></div>')};
-					if(thisListID == "green-list"){$("#btnGreen div").replaceWith('<div><small>R</small><strong>G</strong><small>B</small><br><small>'+$("#"+thisSpecIndexID).text()+'</small><span class="caret"></span></div>')};
-					if(thisListID == "blue-list"){$("#btnBlue div").replaceWith('<div><small>RG</small><strong>B</strong><br><small>'+$("#"+thisSpecIndexID).text()+'</small><span class="caret"></span></div>')};
-					
-					
-					
-					//get the active classes from the dropdown displays buttons
-					var activeSpecIndex = $("#index-list li.active").attr('id'),		
+					if(thisLi.parent().hasClass("rgb")){
+						if(thisListID == "red-list"){$("#btnRed div").replaceWith('<div><strong>R</strong><small>GB</small><br><small>'+$("#"+thisSpecIndexID).text()+'</small><span class="caret"></span></div>')}
+						else if(thisListID == "green-list"){$("#btnGreen div").replaceWith('<div><small>R</small><strong>G</strong><small>B</small><br><small>'+$("#"+thisSpecIndexID).text()+'</small><span class="caret"></span></div>')}
+						else if(thisListID == "blue-list"){$("#btnBlue div").replaceWith('<div><small>RG</small><strong>B</strong><br><small>'+$("#"+thisSpecIndexID).text()+'</small><span class="caret"></span></div>')};
+						
 						activeRedSpecIndex = $("#red-list li.active").attr('id'),
 						activeGreenSpecIndex = $("#green-list li.active").attr('id'),
 						activeBlueSpecIndex = $("#blue-list li.active").attr('id');
-					
-					//get the RBG color
-					rgbColor = scaledRGB(data, activeRedSpecIndex, activeGreenSpecIndex, activeBlueSpecIndex, stretch, 2, len);
-					
-					//reset the global varible so that other functions know what it is know
-					specIndex=activeSpecIndex 
-					
-					//update the plot
-					update(data, specIndex, rgbColor, domain);
-					$("#specPlotIndex").text($("#"+specIndex).text());
+						rgbColor = scaledRGB(data, activeRedSpecIndex, activeGreenSpecIndex, activeBlueSpecIndex, stretch, 2, len);
+						updatePlotRGB();
+					} else{
+						$("#btnIndex div").replaceWith('<div><strong>Index:</strong><br><small>'+$("#"+thisSpecIndexID).text()+'</small><span class="caret"></span></div>');
+						specIndex = $("#index-list li.active").attr('id')
+						plotUpdate(data, specIndex, rgbColor, domain);
+						$("#specPlotIndex").text($("#"+specIndex).text());
+					}
 				});
 			});
+			
+
 			
 			
 			//mechanism to display the selected points and line in the trajectory plot
@@ -1185,7 +1104,7 @@
 			
 			//turn highlighting off
 			function highlightOff(){
-				$("circle.highlight").attr("class","data selected");
+				$("circle.data.highlight").attr("class","data selected");
 				$(".chipHolder.highlight").addClass("selected").removeClass("highlight");							
 				$("tr.active").removeClass("active").css("background-color","white"); //only needed when using the color options			
 				$("circle").css("cursor","pointer");
@@ -1198,14 +1117,14 @@
 				switch(linePart){
 					case "vertex":
 						var thisIndex = vertInfo[thisOne].index;
-						$("circle:eq("+thisIndex+")").attr("class","data highlight");
+						$("circle.data:eq("+thisIndex+")").attr("class","data highlight");
 						$(".chipHolder:eq("+thisIndex+")").removeClass("selected").addClass("highlight");
 					break;
 					case "segment":
 						var startIndex = vertInfo[thisOne-1].index; //pull out the start index for the selected row
 						var endIndex = vertInfo[thisOne].index; //pull out the end index for the selected row
-						$("circle:eq("+startIndex+")").attr("class","data highlight"); //highlight the start circle for the selected row (segment)
-						$("circle:eq("+endIndex+")").attr("class","data highlight"); //highlight the end circle for the selected row (segment)
+						$("circle.data:eq("+startIndex+")").attr("class","data highlight"); //highlight the start circle for the selected row (segment)
+						$("circle.data:eq("+endIndex+")").attr("class","data highlight"); //highlight the end circle for the selected row (segment)
 						$(".chipHolder:eq("+startIndex+")").removeClass("selected").addClass("highlight"); //highlight the start canvas for the selected row (segment)
 						$(".chipHolder:eq("+endIndex+")").removeClass("selected").addClass("highlight"); //highlight the end canvas for the selected row (segment)
 					break;
@@ -1711,7 +1630,7 @@
 			///////////////////OPEN THE REMOTE CHIP STRIP WINDOW AND SEND MESSAGES/////////////////////
 			var trajectoryWindow = null ;//keep track of whether the chipstrip window is open or not so it is not opened in multiple new window on each chip click
 			var innerWidth = window.innerWidth
-			$("body").on("click", "#btnExpand", function(e){ //need to use body because the canvases have probably not loaded yet
+			$("body").on("click", "#expandTrajPlot", function(e){ //need to use body because the canvases have probably not loaded yet
 				var pass_data = {
 					"action":"add_trajectory", //hard assign
 					"data":data,

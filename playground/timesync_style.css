@@ -83,6 +83,7 @@ body {
 #plot{
 	border:1px solid #afafaf;;
 	border-radius: 4px;
+	width:100%;
 }
 
 circle.data{
@@ -106,9 +107,20 @@ circle.highlight{
 
 svg{
 	margin:-1px;
-	cursor: n-resize;
+	/*cursor: n-resize;*/
 	display: block;
 }
+
+#xybox{
+	cursor: move;
+}
+#xbox{
+	cursor: ew-resize;
+}
+#ybox{
+	cursor: ns-resize;
+}
+
 #plotLine{
 	stroke:#ED2939; /*'#FF0000;*/
 	stroke-width:2px;
