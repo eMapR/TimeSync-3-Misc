@@ -52,6 +52,7 @@
 			
 			//define function to redraw the points and update the zoom behavior is invoked 
 			function zoomDraw() {
+				console.log(xyzoom.translate(),xyzoom.scale() )
 				svg.select('.x.axis').call(xaxis);
 				svg.select('.y.axis').call(yaxis);
 				svg.selectAll("circle.data").attr("cx", function(d){return xscale(d.Year);});
@@ -514,6 +515,17 @@
 					$("circle.allData").attr("visibility","visible");
 					$("circle.data").css("fill-opacity","0.5");
 				}
+			});
+			
+			//mechanism to reset the plot zoom
+			$("#btnReset").click(function(){
+				//console.log(xyzoom.translate(),xyzoom.scale() )
+				xyzoom.scale(1);
+				xzoom.scale(1);
+				yzoom.scale(1);
+				xybox.call(xyzoom).on("dblclick.zoom", null); //svg.
+				xbox.call(xzoom).on("dblclick.zoom", null); //svg.
+				ybox.call(yzoom).on("dblclick.zoom", null);	//svg.	
 			});
 			
 			$("#highlightColor").change(function(){
